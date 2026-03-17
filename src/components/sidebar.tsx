@@ -3,7 +3,7 @@
 import { useMemo, memo } from "react";
 import { Conversations } from "@ant-design/x";
 import type { Session } from "@/types/chat";
-import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 
 interface SidebarProps {
   sessions: Session[];

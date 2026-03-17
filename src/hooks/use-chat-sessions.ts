@@ -10,14 +10,24 @@ import {
 } from "@/lib/sessions";
 import type { Session } from "@/types/chat";
 
+function loadInitialState() {
+  const loaded = loadSessions();
+  const sessions = loaded.length > 0 ? loaded : [createSession()];
+  const activeId = loadActiveSessionId() ?? sessions[0]?.id ?? null;
+  return { sessions, activeId };
+}
+
 export function useChatSessions() {
-  const [sessions, setSessions] = useState<Session[]>(() => loadSessions());
+  const [initial] = useState(loadInitialState);
+  const [sessions, setSessions] = useState<Session[]>(initial.sessions);
   const [activeSessionId, setActiveSessionId] = useState<string | null>(
-    () => loadActiveSessionId(),
+    initial.activeId,
   );
 
   const sessionsRef = useRef(sessions);
-  sessionsRef.current = sessions;
+  useEffect(() => {
+    sessionsRef.current = sessions;
+  }, [sessions]);
 
   const activeSession =
     sessions.find((s) => s.id === activeSessionId) ?? null;
@@ -60,12 +70,6 @@ export function useChatSessions() {
     },
     [activeSessionId],
   );
-
-  useEffect(() => {
-    if (sessions.length === 0) {
-      handleCreateSession();
-    }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return {
     sessions,
