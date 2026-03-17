@@ -215,13 +215,13 @@ const ROLE_CONFIG = {
     ),
     style: {
       maxWidth: "80%",
-      alignItems: "center" as const,
+      alignItems: "flex-start" as const,
     },
     styles: {
       content: {
         background: "transparent",
         border: "none",
-        padding: 0,
+        padding: "5px 0 0",
         boxShadow: "none",
         minHeight: "auto",
       },

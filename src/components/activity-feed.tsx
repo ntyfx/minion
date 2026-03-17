@@ -78,21 +78,36 @@ const EventCard = memo(function EventCard({ evt }: { evt: ActivityEvent }) {
           {new Date(evt.timestamp).toLocaleTimeString()}
         </Typography.Text>
       </Flex>
-      <pre
-        style={{
-          margin: 0,
-          whiteSpace: "pre-wrap",
-          wordBreak: "break-word",
-          fontFamily: "var(--font-mono), ui-monospace, monospace",
-          fontSize: 11,
-          color: "var(--text-secondary)",
-          lineHeight: 1.55,
-          maxHeight: expanded ? "none" : 60,
-          overflow: "hidden",
-        }}
-      >
-        {text}
-      </pre>
+      <div style={{ position: "relative" }}>
+        <pre
+          style={{
+            margin: 0,
+            whiteSpace: "pre-wrap",
+            wordBreak: "break-word",
+            fontFamily: "var(--font-mono), ui-monospace, monospace",
+            fontSize: 11,
+            color: "var(--text-secondary)",
+            lineHeight: 1.55,
+            maxHeight: expanded || !isLong ? "none" : 68,
+            overflow: "hidden",
+          }}
+        >
+          {text}
+        </pre>
+        {isLong && !expanded && (
+          <div
+            style={{
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              height: 28,
+              background: "linear-gradient(transparent, var(--bg-elevated))",
+              pointerEvents: "none",
+            }}
+          />
+        )}
+      </div>
       {isLong && (
         <button
           onClick={() => setExpanded(!expanded)}
