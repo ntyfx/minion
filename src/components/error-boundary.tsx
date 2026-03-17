@@ -47,7 +47,9 @@ export default class ErrorBoundary extends Component<Props, State> {
             type="secondary"
             style={{ maxWidth: 480, textAlign: "center" }}
           >
-            {this.state.error.message}
+            {process.env.NODE_ENV === "development"
+              ? this.state.error.message
+              : "An unexpected error occurred. Please try again."}
           </Typography.Text>
           <Button
             type="primary"

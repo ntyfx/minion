@@ -1,36 +1,91 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Minion Chat
+
+A game operations AI agent chat interface built with Next.js, Ant Design, and Ant Design X.
+
+## Features
+
+- Real-time streaming chat via Server-Sent Events (SSE)
+- Markdown rendering with syntax highlighting
+- AI reasoning/thinking visualization
+- Multi-session conversation management
+- Activity feed for debugging SSE events
+- Light/dark theme switching
+- Responsive sidebar with collapsible groups
+
+## Tech Stack
+
+- **Framework:** Next.js 16 (App Router, static export)
+- **UI:** Ant Design 6, Ant Design X
+- **Styling:** Tailwind CSS v4, CSS custom properties
+- **Language:** TypeScript
+- **Testing:** Vitest + React Testing Library, Playwright (E2E)
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Configuration
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Open **Settings** (gear icon in the header) to configure:
 
-## Learn More
+- **API Base URL** — your running minion server endpoint
+- **Access Token** — Bearer token for authentication
 
-To learn more about Next.js, take a look at the following resources:
+Settings are persisted in `localStorage`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Scripts
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Command | Description |
+|---------|-------------|
+| `pnpm dev` | Start development server |
+| `pnpm build` | Production build (static export to `out/`) |
+| `pnpm lint` | Run ESLint |
+| `pnpm test` | Run unit tests (Vitest) |
+| `pnpm test run` | Run unit tests once |
+| `pnpm test:e2e` | Run E2E tests (Playwright) |
 
-## Deploy on Vercel
+## Deployment
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The project deploys to GitHub Pages automatically on push to `main` via GitHub Actions.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The CI pipeline runs lint, type check, unit tests, and dependency audit before building and deploying.
+
+Live: [https://ntyfx.github.io/minion/](https://ntyfx.github.io/minion/)
+
+## Project Structure
+
+```
+src/
+├── app/                  # Next.js App Router pages and layout
+│   ├── layout.tsx        # Root layout with fonts and theme script
+│   ├── page.tsx          # Main page composing all panels
+│   ├── antd-provider.tsx # Ant Design + theme config
+│   └── globals.css       # CSS variables, overrides, markdown styles
+├── components/           # React components
+│   ├── chat-panel.tsx    # Chat bubbles, markdown, thinking content
+│   ├── sidebar.tsx       # Conversation list with groups
+│   ├── activity-feed.tsx # SSE event inspector drawer
+│   ├── settings-panel.tsx# Settings drawer
+│   ├── tools-status.tsx  # Skills/tools status popover
+│   └── error-boundary.tsx# Error boundary wrapper
+├── hooks/                # Custom React hooks
+│   ├── use-chat-sessions.ts  # Session CRUD and persistence
+│   ├── use-streaming.ts      # SSE streaming and message handling
+│   └── use-rename-modal.ts   # Rename modal state
+├── lib/                  # Utilities
+│   ├── sse-client.ts     # SSE parser, streamChat, fetchSkills
+│   ├── sessions.ts       # localStorage session persistence
+│   ├── settings.ts       # localStorage settings persistence
+│   └── theme.tsx         # Theme context and provider
+└── types/
+    └── chat.ts           # Shared TypeScript interfaces
+```
+
+## License
+
+MIT

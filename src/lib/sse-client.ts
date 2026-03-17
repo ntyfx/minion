@@ -16,6 +16,14 @@ export interface SSEEvent {
 
 export type SSEEventHandler = (event: SSEEvent) => void;
 
+const MAX_ERROR_LENGTH = 200;
+
+function sanitizeErrorText(text: string): string {
+  const cleaned = text.replace(/\n/g, " ").trim();
+  if (cleaned.length <= MAX_ERROR_LENGTH) return cleaned;
+  return `${cleaned.slice(0, MAX_ERROR_LENGTH)}…`;
+}
+
 function parseEventData(rawData: string): SSEChunkPayload {
   const trimmed = rawData.trim();
   if (!trimmed) return {};
@@ -94,7 +102,7 @@ export async function streamChat(
     const errorText = await response
       .text()
       .catch(() => response.statusText || "Request failed");
-    throw new Error(`HTTP ${response.status}: ${errorText}`);
+    throw new Error(`HTTP ${response.status}: ${sanitizeErrorText(errorText)}`);
   }
 
   const reader = response.body.getReader();
@@ -160,7 +168,7 @@ export async function fetchSkills(
     const errorText = await response
       .text()
       .catch(() => response.statusText || "Request failed");
-    throw new Error(`HTTP ${response.status}: ${errorText}`);
+    throw new Error(`HTTP ${response.status}: ${sanitizeErrorText(errorText)}`);
   }
 
   return response.json();
