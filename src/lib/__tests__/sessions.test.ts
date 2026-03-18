@@ -1,8 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import {
   createSession,
-  loadSessions,
-  saveSessions,
   loadActiveSessionId,
   saveActiveSessionId,
   addMessageToSession,
@@ -19,7 +17,8 @@ describe("createSession", () => {
   it("creates a session with default label", () => {
     const s = createSession();
     expect(s.id).toMatch(/^sess_/);
-    expect(s.label).toMatch(/^Chat /);
+    expect(s.label).toBe("New Chat");
+    expect(s.icon).toBe("MessageOutlined");
     expect(s.messages).toEqual([]);
     expect(s.activity).toEqual([]);
     expect(s.createdAt).toBeGreaterThan(0);
@@ -35,27 +34,6 @@ describe("createSession", () => {
     const a = createSession();
     const b = createSession();
     expect(a.id).not.toBe(b.id);
-  });
-});
-
-describe("loadSessions / saveSessions", () => {
-  it("returns empty array when nothing stored", () => {
-    expect(loadSessions()).toEqual([]);
-  });
-
-  it("round-trips sessions through save and load", () => {
-    const s1 = createSession("A");
-    const s2 = createSession("B");
-    saveSessions([s1, s2]);
-    const loaded = loadSessions();
-    expect(loaded).toHaveLength(2);
-    expect(loaded[0].label).toBe("A");
-    expect(loaded[1].label).toBe("B");
-  });
-
-  it("returns empty array for corrupted JSON", () => {
-    localStorage.setItem("minion-sessions", "not-json{{{");
-    expect(loadSessions()).toEqual([]);
   });
 });
 
@@ -155,12 +133,5 @@ describe("generateMessageId", () => {
     expect(a).toMatch(/^msg_/);
     expect(b).toMatch(/^msg_/);
     expect(a).not.toBe(b);
-  });
-});
-
-describe("loadSessions edge cases", () => {
-  it("returns empty array for invalid JSON", () => {
-    localStorage.setItem("minion-sessions", "not valid json{{{");
-    expect(loadSessions()).toEqual([]);
   });
 });

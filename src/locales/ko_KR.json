@@ -9,7 +9,8 @@
     "openSettings": "설정 열기",
     "renameConversation": "대화 이름 변경",
     "rename": "변경",
-    "enterNewName": "새 이름 입력"
+    "enterNewName": "새 이름 입력",
+    "chooseIcon": "아이콘 선택"
   },
   "chat": {
     "welcomeTitle": "Minion Chat",
@@ -61,7 +62,11 @@
     "clearToken": "토큰 삭제",
     "sentAs": "<header></header>(으)로 전송됩니다.",
     "version": "Minion Chat v{version}",
-    "language": "언어"
+    "language": "언어",
+    "storageTitle": "저장소",
+    "sessions": "{count}개 대화",
+    "storageUsed": "{used} / {quota} 사용 중",
+    "storageUnavailable": "저장소 정보를 사용할 수 없습니다"
   },
   "activity": {
     "title": "활동 피드",
@@ -76,8 +81,6 @@
   },
   "tools": {
     "title": "도구 상태",
-    "refresh": "새로고침",
-    "refreshStatus": "도구 상태 새로고침",
     "openStatus": "도구 상태 열기",
     "name": "이름",
     "status": "상태",
@@ -86,8 +89,12 @@
     "loaded": "로드 시간",
     "eligible": "사용 가능",
     "noToken": "먼저 설정에서 액세스 토큰을 설정해 주세요.",
-    "noSkills": "서버에서 스킬이 반환되지 않았습니다.",
-    "clickRefresh": "새로고침을 클릭하여 도구 상태를 로드하세요."
+    "noSkills": "서버에서 스킬이 반환되지 않았습니다."
+  },
+  "error": {
+    "title": "문제가 발생했습니다",
+    "description": "예기치 않은 오류가 발생했습니다. 다시 시도해 주세요.",
+    "tryAgain": "다시 시도"
   },
   "theme": {
     "chooseTheme": "테마 선택",

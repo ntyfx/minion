@@ -163,7 +163,7 @@ export function ActivityToggle({
   const t = useTranslations("activity");
   return (
     <Tooltip title={t("title")}>
-      <Badge count={count} size="small" offset={[-4, 4]} color="var(--accent)">
+      <Badge dot={count > 0} offset={[-4, 4]} color="var(--accent)">
         <button
           onClick={onClick}
           className="icon-button"
@@ -198,13 +198,15 @@ export default function ActivityFeed({
             </Typography.Text>
             {events.length > 0 && (
               <Tag
-                variant="filled"
                 style={{
                   fontSize: 11,
                   lineHeight: "18px",
                   padding: "0 6px",
                   borderRadius: 10,
                   margin: 0,
+                  background: "color-mix(in srgb, var(--accent) 12%, transparent)",
+                  color: "var(--accent)",
+                  border: "none",
                 }}
               >
                 {events.length}

@@ -9,7 +9,8 @@
     "openSettings": "Open settings",
     "renameConversation": "Rename Conversation",
     "rename": "Rename",
-    "enterNewName": "Enter new name"
+    "enterNewName": "Enter new name",
+    "chooseIcon": "Choose icon"
   },
   "chat": {
     "welcomeTitle": "Minion Chat",
@@ -61,7 +62,11 @@
     "clearToken": "Clear token",
     "sentAs": "Sent as <header></header>.",
     "version": "Minion Chat v{version}",
-    "language": "Language"
+    "language": "Language",
+    "storageTitle": "Storage",
+    "sessions": "{count} conversations",
+    "storageUsed": "Used {used} of {quota}",
+    "storageUnavailable": "Storage info unavailable"
   },
   "activity": {
     "title": "Activity Feed",
@@ -76,8 +81,6 @@
   },
   "tools": {
     "title": "Tools Status",
-    "refresh": "Refresh",
-    "refreshStatus": "Refresh tools status",
     "openStatus": "Open tools status",
     "name": "Name",
     "status": "Status",
@@ -86,8 +89,12 @@
     "loaded": "Loaded",
     "eligible": "Eligible",
     "noToken": "Set an access token in Settings first.",
-    "noSkills": "No skills returned by the server.",
-    "clickRefresh": "Click Refresh to load tools status."
+    "noSkills": "No skills returned by the server."
+  },
+  "error": {
+    "title": "Something went wrong",
+    "description": "An unexpected error occurred. Please try again.",
+    "tryAgain": "Try Again"
   },
   "theme": {
     "chooseTheme": "Choose Theme",

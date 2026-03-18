@@ -66,8 +66,10 @@ export function useStreaming({
       setSessions((prev) =>
         prev.map((s) => {
           if (s.id !== sessionId) return s;
+          const isFirstMessage = s.messages.every((m) => m.role !== "user");
           return {
             ...s,
+            label: isFirstMessage ? userMessage.slice(0, 32) : s.label,
             messages: [
               ...s.messages,
               {
