@@ -85,7 +85,7 @@ export function ToolsToggle({ baseUrl, accessToken }: ToolsStatusProps) {
       const list = Array.isArray(payload.skills) ? payload.skills : [];
       const withVersion = list.map((s) => ({
         ...s,
-        active_version: payload.active_version || "-",
+        active_version: s.active_version || "-",
       }));
       setSkills(withVersion);
       setActiveVersion(payload.active_version || "-");
