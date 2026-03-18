@@ -2,9 +2,11 @@
 
 import { useMemo, memo } from "react";
 import { Conversations } from "@ant-design/x";
+import { Tooltip } from "antd";
 import { useTranslations } from "next-intl";
 import type { Session } from "@/types/chat";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import { getChatIcon } from "@/lib/chat-icons";
 
 interface SidebarProps {
   sessions: Session[];
@@ -65,24 +67,39 @@ export default memo(function Sidebar({
     () =>
       [...sessions]
         .sort((a, b) => b.updatedAt - a.updatedAt)
-        .map((s) => ({
-          key: s.id,
-          label: s.label,
-          group: getTimeGroup(s.updatedAt, groupLabels),
-          description: collapsed ? undefined : (
-            <span
-              style={{
-                fontSize: 11,
-                color: "var(--text-muted)",
-                fontVariantNumeric: "tabular-nums",
-              }}
-            >
-              {s.messages.length > 0
-                ? `${s.messages.length} ${t("msg")} · ${formatTimeAgo(s.updatedAt, t("now"))}`
-                : formatTimeAgo(s.updatedAt, t("now"))}
-            </span>
-          ),
-        })),
+        .map((s) =>
+          collapsed
+            ? {
+                key: s.id,
+                label: (
+                  <Tooltip title={s.label} placement="right">
+                    <span style={{ display: "flex", justifyContent: "center", fontSize: 16 }}>
+                      {getChatIcon(s.icon)}
+                    </span>
+                  </Tooltip>
+                ),
+                group: getTimeGroup(s.updatedAt, groupLabels),
+              }
+            : {
+                key: s.id,
+                label: s.label,
+                icon: getChatIcon(s.icon),
+                group: getTimeGroup(s.updatedAt, groupLabels),
+                description: (
+                  <span
+                    style={{
+                      fontSize: 11,
+                      color: "var(--text-muted)",
+                      fontVariantNumeric: "tabular-nums",
+                    }}
+                  >
+                    {s.messages.length > 0
+                      ? `${s.messages.length} ${t("msg")} · ${formatTimeAgo(s.updatedAt, t("now"))}`
+                      : formatTimeAgo(s.updatedAt, t("now"))}
+                  </span>
+                ),
+              },
+        ),
     [sessions, collapsed, groupLabels, t],
   );
 
@@ -106,6 +123,9 @@ export default memo(function Sidebar({
         creation={{
           label: collapsed ? undefined : t("newChat"),
           onClick: onCreateSession,
+          style: collapsed
+            ? { width: 32, height: 32, borderRadius: "50%", padding: 0, justifyContent: "center", margin: "8px auto 12px" }
+            : { marginBlock: "8px 12px" },
         }}
         menu={
           collapsed
@@ -131,7 +151,12 @@ export default memo(function Sidebar({
               })
         }
         onActiveChange={(key) => key && onSelectSession(key)}
-        style={{ flex: 1, overflow: "auto", padding: "4px 8px" }}
+        style={{
+          flex: 1,
+          overflowX: "hidden",
+          overflowY: "auto",
+          padding: collapsed ? "4px 4px" : "4px 6px",
+        }}
       />
     </nav>
   );

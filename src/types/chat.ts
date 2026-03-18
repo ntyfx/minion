@@ -25,6 +25,7 @@ export interface ActivityEvent {
 export interface Session {
   id: string;
   label: string;
+  icon?: string;
   messages: ChatMessage[];
   activity: ActivityEvent[];
   createdAt: number;

@@ -9,7 +9,8 @@
     "openSettings": "打开设置",
     "renameConversation": "重命名对话",
     "rename": "重命名",
-    "enterNewName": "输入新名称"
+    "enterNewName": "输入新名称",
+    "chooseIcon": "选择图标"
   },
   "chat": {
     "welcomeTitle": "Minion Chat",
@@ -61,7 +62,11 @@
     "clearToken": "清除 Token",
     "sentAs": "以 <header></header> 方式发送。",
     "version": "Minion Chat v{version}",
-    "language": "语言"
+    "language": "语言",
+    "storageTitle": "存储",
+    "sessions": "{count} 个对话",
+    "storageUsed": "已使用 {used}，共 {quota}",
+    "storageUnavailable": "存储信息不可用"
   },
   "activity": {
     "title": "活动日志",
@@ -76,8 +81,6 @@
   },
   "tools": {
     "title": "工具状态",
-    "refresh": "刷新",
-    "refreshStatus": "刷新工具状态",
     "openStatus": "打开工具状态",
     "name": "名称",
     "status": "状态",
@@ -86,8 +89,12 @@
     "loaded": "加载时间",
     "eligible": "可用",
     "noToken": "请先在设置中配置 Access Token。",
-    "noSkills": "服务器未返回任何技能。",
-    "clickRefresh": "点击刷新以加载工具状态。"
+    "noSkills": "服务器未返回任何技能。"
+  },
+  "error": {
+    "title": "出错了",
+    "description": "发生了意外错误，请重试。",
+    "tryAgain": "重试"
   },
   "theme": {
     "chooseTheme": "选择主题",

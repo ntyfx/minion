@@ -1,6 +1,6 @@
 import type { Session, ChatMessage, ActivityEvent } from "@/types/chat";
+import { DEFAULT_CHAT_ICON } from "@/lib/chat-icons";
 
-const STORAGE_KEY = "minion-sessions";
 const ACTIVE_KEY = "minion-active-session";
 
 function generateId(): string {
@@ -14,31 +14,17 @@ function generateMessageId(): string {
   return `msg_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 }
 
-export function createSession(label?: string): Session {
+export function createSession(label?: string, icon?: string): Session {
   const id = generateId();
   return {
     id,
-    label: label || `Chat ${new Date().toLocaleString()}`,
+    label: label || "New Chat",
+    icon: icon || DEFAULT_CHAT_ICON,
     messages: [],
     activity: [],
     createdAt: Date.now(),
     updatedAt: Date.now(),
   };
-}
-
-export function loadSessions(): Session[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [];
-    return JSON.parse(raw);
-  } catch {
-    return [];
-  }
-}
-
-export function saveSessions(sessions: Session[]): void {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(sessions));
 }
 
 export function loadActiveSessionId(): string | null {

@@ -120,7 +120,13 @@ describe("Sidebar component", () => {
   });
 
   it("renders session labels", () => {
-    render(<Sidebar {...defaultProps} />);
+    const recentSessions: Session[] = [
+      { ...mockSessions[0] },
+      { ...mockSessions[1], updatedAt: Date.now() - 1000 },
+    ];
+    render(
+      <Sidebar {...defaultProps} sessions={recentSessions} />,
+    );
     expect(screen.getAllByText("Chat A").length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText("Chat B").length).toBeGreaterThanOrEqual(1);
   });

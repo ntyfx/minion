@@ -1,14 +1,17 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { Layout, Badge, Modal, Input, Flex, Tooltip, message } from "antd";
+import { Layout, Badge, Modal, Input, Flex, Tooltip, message, Space, Spin } from "antd";
 import {
   SafetyCertificateOutlined,
   LinkOutlined,
   SettingOutlined,
+  GithubOutlined,
 } from "@ant-design/icons";
+import { CHAT_ICON_KEYS, getChatIcon } from "@/lib/chat-icons";
 import { useTranslations } from "next-intl";
 import Sidebar from "@/components/sidebar";
+import { BrandLogo, BrandMark } from "@/components/brand-logo";
 import ChatPanel from "@/components/chat-panel";
 import ActivityFeed, { ActivityToggle } from "@/components/activity-feed";
 import { ToolsToggle } from "@/components/tools-status";
@@ -43,6 +46,7 @@ export default function Home() {
     activeSessionId,
     setActiveSessionId,
     activeSession,
+    loading: sessionsLoading,
     updateSession,
     handleCreateSession,
     handleSelectSession: baseSelectSession,
@@ -74,6 +78,8 @@ export default function Home() {
     renameModalOpen,
     renameValue,
     setRenameValue,
+    iconValue,
+    setIconValue,
     handleRenameSession,
     handleRenameConfirm,
     handleRenameCancel,
@@ -118,75 +124,95 @@ export default function Home() {
     ? `${settings.accessToken.slice(0, 6)}…${settings.accessToken.slice(-4)}`
     : t("tokenNotSet");
 
+  if (sessionsLoading) {
+    return (
+      <div style={{ height: "100dvh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--bg-base)" }}>
+        <Spin size="large" />
+      </div>
+    );
+  }
+
   return (
     <Layout style={{ height: "100dvh", background: "var(--bg-base)" }}>
       {contextHolder}
 
+      <svg width={0} height={0} aria-hidden>
+        <defs>
+          <linearGradient id="brand-svg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style={{ stopColor: "var(--brand-g1)" }} />
+            <stop offset="50%" style={{ stopColor: "var(--brand-g2)" }} />
+            <stop offset="100%" style={{ stopColor: "var(--brand-g3)" }} />
+          </linearGradient>
+        </defs>
+      </svg>
+
       <Sider
-        width={280}
+        width={260}
+        collapsedWidth={48}
         collapsible
         collapsed={siderCollapsed}
         onCollapse={setSiderCollapsed}
         style={{
           background: "var(--bg-surface)",
-          borderRight: "1px solid var(--border)",
+          boxShadow: "1px 0 0 var(--border)",
           overflow: "hidden",
-          display: "flex",
-          flexDirection: "column",
         }}
         theme={colorScheme}
       >
-        {!siderCollapsed && (
+        <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
           <div
             style={{
-              padding: "16px 16px 12px",
+              height: 45,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: siderCollapsed ? "center" : "flex-start",
+              padding: siderCollapsed ? "0" : "0 16px",
               borderBottom: "1px solid var(--border)",
+              flexShrink: 0,
             }}
           >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                margin: 0,
-                fontWeight: 600,
-                fontSize: 15,
-                letterSpacing: "-0.01em",
-              }}
-            >
-              <span
+            {siderCollapsed ? (
+              <BrandMark size={24} />
+            ) : (
+              <div
                 style={{
-                  display: "inline-block",
-                  width: 8,
-                  height: 8,
-                  borderRadius: "50%",
-                  background: "var(--accent)",
-                  flexShrink: 0,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  fontWeight: 600,
+                  fontSize: 15,
+                  letterSpacing: "-0.01em",
                 }}
-              />
-              <span className="brand-gradient-text">Minion Chat</span>
-            </div>
+              >
+                <BrandLogo size={28} />
+                <span className="brand-gradient-text">Minion Chat</span>
+              </div>
+            )}
+          </div>
+          <div style={{ flex: 1, overflow: "hidden" }}>
+            <Sidebar
+              sessions={sessions}
+              activeSessionId={activeSessionId}
+              collapsed={siderCollapsed}
+              onSelectSession={handleSelectSession}
+              onCreateSession={handleCreateSession}
+              onDeleteSession={handleDeleteSession}
+              onRenameSession={handleRenameSession}
+            />
+          </div>
+          {!siderCollapsed && (
             <div
               style={{
-                fontSize: 12,
-                marginTop: 2,
-                color: "var(--text-muted)",
+              padding: "8px 16px",
+              fontSize: 11,
+              color: "var(--text-muted)",
+              flexShrink: 0,
+              textAlign: "center",
               }}
             >
               {t("subtitle")}
             </div>
-          </div>
-        )}
-        <div style={{ flex: 1, overflow: "hidden" }}>
-          <Sidebar
-            sessions={sessions}
-            activeSessionId={activeSessionId}
-            collapsed={siderCollapsed}
-            onSelectSession={handleSelectSession}
-            onCreateSession={handleCreateSession}
-            onDeleteSession={handleDeleteSession}
-            onRenameSession={handleRenameSession}
-          />
+          )}
         </div>
       </Sider>
 
@@ -200,7 +226,7 @@ export default function Home() {
             borderBottom: "1px solid var(--border)",
             flexShrink: 0,
             background: "var(--bg-surface)",
-            height: 44,
+            height: 45,
             gap: 8,
           }}
         >
@@ -280,6 +306,17 @@ export default function Home() {
                 <SettingOutlined />
               </button>
             </Tooltip>
+            <Tooltip title="GitHub">
+              <a
+                href="https://github.com/ntyfx/minion"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="icon-button icon-button-gradient"
+                aria-label="GitHub"
+              >
+                <GithubOutlined />
+              </a>
+            </Tooltip>
           </Flex>
         </header>
 
@@ -309,6 +346,7 @@ export default function Home() {
         onSave={handleSaveSettings}
         open={settingsOpen}
         onToggle={() => setSettingsOpen(false)}
+        sessionCount={sessions.length}
       />
 
       <Modal
@@ -319,13 +357,60 @@ export default function Home() {
         okText={t("rename")}
         destroyOnHidden
       >
-        <Input
-          value={renameValue}
-          onChange={(e) => setRenameValue(e.target.value)}
-          onPressEnter={handleRenameConfirm}
-          placeholder={t("enterNewName")}
-          autoFocus
-        />
+        <Space orientation="vertical" size="middle" style={{ width: "100%" }}>
+          <div>
+            <div style={{ marginBottom: 8, fontSize: 13, color: "var(--text-secondary)" }}>
+              {t("chooseIcon")}
+            </div>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(10, 1fr)",
+                gap: 4,
+              }}
+            >
+              {CHAT_ICON_KEYS.map((key) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setIconValue(key)}
+                  aria-label={key}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    width: 36,
+                    height: 36,
+                    borderRadius: 8,
+                    border: iconValue === key
+                      ? "2px solid var(--accent)"
+                      : "1px solid var(--border)",
+                    background: iconValue === key
+                      ? "color-mix(in srgb, var(--accent) 12%, transparent)"
+                      : "transparent",
+                    cursor: "pointer",
+                    fontSize: 16,
+                    color: iconValue === key ? "var(--accent)" : "var(--text-secondary)",
+                  }}
+                >
+                  {getChatIcon(key)}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <div style={{ marginBottom: 8, fontSize: 13, color: "var(--text-secondary)" }}>
+              {t("enterNewName")}
+            </div>
+            <Input
+              value={renameValue}
+              onChange={(e) => setRenameValue(e.target.value)}
+              onPressEnter={handleRenameConfirm}
+              placeholder={t("enterNewName")}
+              autoFocus
+            />
+          </div>
+        </Space>
       </Modal>
     </Layout>
   );

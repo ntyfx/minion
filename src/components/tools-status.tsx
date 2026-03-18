@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import {
-  Button,
   Table,
   Tag,
   Typography,
@@ -12,7 +11,7 @@ import {
   Flex,
   Badge,
 } from "antd";
-import { ReloadOutlined, ToolOutlined } from "@ant-design/icons";
+import { ToolOutlined } from "@ant-design/icons";
 import { useTranslations } from "next-intl";
 import { fetchSkills } from "@/lib/sse-client";
 import type { SkillItem } from "@/types/chat";
@@ -97,6 +96,21 @@ export function ToolsToggle({ baseUrl, accessToken }: ToolsStatusProps) {
     }
   }, [baseUrl, accessToken, t]);
 
+  const mountedRef = useRef(false);
+  useEffect(() => {
+    if (mountedRef.current) return;
+    mountedRef.current = true;
+    if (accessToken) refresh();
+  }, [accessToken, refresh]);
+
+  const handleOpenChange = useCallback(
+    (next: boolean) => {
+      setOpen(next);
+      if (next) refresh();
+    },
+    [refresh],
+  );
+
   const eligibleCount = skills.filter(
     (s) => s.status?.toLowerCase() === "eligible",
   ).length;
@@ -132,24 +146,9 @@ export function ToolsToggle({ baseUrl, accessToken }: ToolsStatusProps) {
 
   const content = (
     <div style={{ width: 400 }}>
-      <Flex
-        justify="space-between"
-        align="center"
-        style={{ marginBottom: 12 }}
-      >
-        <Typography.Text strong style={{ fontSize: 14 }}>
-          {t("title")}
-        </Typography.Text>
-        <Button
-          size="small"
-          icon={<ReloadOutlined />}
-          loading={loading}
-          onClick={refresh}
-          aria-label={t("refreshStatus")}
-        >
-          {t("refresh")}
-        </Button>
-      </Flex>
+      <Typography.Text strong style={{ fontSize: 14, display: "block", marginBottom: 12 }}>
+        {t("title")}
+      </Typography.Text>
 
       <Flex gap={8} style={{ marginBottom: 12 }}>
         <StatCard label={t("version")} value={activeVersion} />
@@ -184,11 +183,11 @@ export function ToolsToggle({ baseUrl, accessToken }: ToolsStatusProps) {
         />
       )}
 
-      {!skills.length && !error && (
+      {!skills.length && !error && loading && (
         <Typography.Text
           style={{ fontSize: 12, color: "var(--text-muted)" }}
         >
-          {t("clickRefresh")}
+          …
         </Typography.Text>
       )}
     </div>
@@ -200,7 +199,7 @@ export function ToolsToggle({ baseUrl, accessToken }: ToolsStatusProps) {
       trigger="click"
       placement="bottomRight"
       open={open}
-      onOpenChange={setOpen}
+      onOpenChange={handleOpenChange}
       overlayStyle={{ maxWidth: 440 }}
     >
       <Tooltip title={t("title")}>

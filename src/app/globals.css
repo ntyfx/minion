@@ -41,6 +41,9 @@
   --pre-text: #cdd6f4;
 
   --brand-gradient: linear-gradient(135deg, #10b981, #3b82f6, #8b5cf6);
+  --brand-g1: #10b981;
+  --brand-g2: #3b82f6;
+  --brand-g3: #8b5cf6;
 
   color-scheme: light;
 }
@@ -85,6 +88,9 @@
   --pre-text: #d4d4d8;
 
   --brand-gradient: linear-gradient(135deg, #34d399, #38bdf8, #a78bfa);
+  --brand-g1: #34d399;
+  --brand-g2: #38bdf8;
+  --brand-g3: #a78bfa;
 
   color-scheme: dark;
 }
@@ -129,6 +135,9 @@
   --pre-text: #D6D3D1;
 
   --brand-gradient: linear-gradient(135deg, #EAB308, #F59E0B, #F97316, #EF4444);
+  --brand-g1: #EAB308;
+  --brand-g2: #F97316;
+  --brand-g3: #EF4444;
 
   color-scheme: dark;
 }
@@ -173,6 +182,9 @@
   --pre-text: #D4C9BD;
 
   --brand-gradient: linear-gradient(135deg, #A0826D, #D4A76A, #E8985A, #C07850);
+  --brand-g1: #A0826D;
+  --brand-g2: #E8985A;
+  --brand-g3: #C07850;
 
   color-scheme: light;
 }
@@ -217,6 +229,9 @@
   --pre-text: #d8cab8;
 
   --brand-gradient: linear-gradient(135deg, #f0a060, #ec4899, #a855f7);
+  --brand-g1: #f0a060;
+  --brand-g2: #ec4899;
+  --brand-g3: #a855f7;
 
   color-scheme: dark;
 }
@@ -261,6 +276,9 @@
   --pre-text: #d4e2f4;
 
   --brand-gradient: linear-gradient(135deg, #f0a060, #f472b6, #5b9bd5);
+  --brand-g1: #f0a060;
+  --brand-g2: #f472b6;
+  --brand-g3: #5b9bd5;
 
   color-scheme: light;
 }
@@ -348,6 +366,7 @@ body {
   color: var(--text-secondary);
   cursor: pointer;
   font-size: 15px;
+  text-decoration: none;
   transition: background 0.15s, color 0.15s;
 }
 
@@ -360,11 +379,16 @@ body {
   box-shadow: var(--ring-focus);
 }
 
+.icon-button-gradient .anticon svg {
+  fill: url(#brand-svg-gradient);
+}
+
 /* ── Ant Design overrides ── */
 
 .ant-layout-sider-trigger {
   background: var(--bg-surface) !important;
   border-top: 1px solid var(--border) !important;
+  box-shadow: 1px 0 0 var(--border) !important;
 }
 
 .ant-btn-primary {
@@ -420,7 +444,7 @@ body {
   color: var(--text-muted) !important;
   text-transform: uppercase !important;
   letter-spacing: 0.04em !important;
-  padding-left: 14px !important;
+  padding-left: 10px !important;
 }
 
 .ant-think .ant-think-status-wrapper {

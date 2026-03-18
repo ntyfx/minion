@@ -1,13 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Input, Flex, Typography, Alert, Modal, Tooltip, Select } from "antd";
+import { Input, Flex, Typography, Alert, Modal, Tooltip, Select, message, Progress } from "antd";
 import {
   SaveOutlined,
   UndoOutlined,
   DeleteOutlined,
   InfoCircleOutlined,
   CheckOutlined,
+  DatabaseOutlined,
 } from "@ant-design/icons";
 import { useTranslations } from "next-intl";
 import type { AppSettings } from "@/types/chat";
@@ -15,14 +16,23 @@ import { preferredDefaultBaseUrl } from "@/lib/settings";
 import { useAppLocale, LOCALE_LIST, type LocaleId } from "@/lib/locale";
 import { useTheme } from "@/lib/theme";
 import { THEME_LIST, type ThemeId } from "@/lib/themes";
+import { getStorageEstimate } from "@/lib/session-db";
 
 const APP_VERSION = process.env.NEXT_PUBLIC_APP_VERSION ?? "unknown";
+
+function formatBytes(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
+}
 
 interface SettingsPanelProps {
   settings: AppSettings;
   onSave: (settings: AppSettings) => void;
   open: boolean;
   onToggle: () => void;
+  sessionCount: number;
 }
 
 export default function SettingsPanel({
@@ -30,6 +40,7 @@ export default function SettingsPanel({
   onSave,
   open,
   onToggle,
+  sessionCount,
 }: SettingsPanelProps) {
   const t = useTranslations("settings");
   const tTheme = useTranslations("theme");
@@ -37,33 +48,42 @@ export default function SettingsPanel({
   const { themeId, setTheme } = useTheme();
   const [baseUrl, setBaseUrl] = useState(settings.baseUrl);
   const [accessToken, setAccessToken] = useState(settings.accessToken);
-  const [notice, setNotice] = useState<{
-    text: string;
-    type: "success" | "error" | "info";
-  } | null>(null);
+  const [messageApi, contextHolder] = message.useMessage();
+  const [storageInfo, setStorageInfo] = useState<{ usage: number; quota: number } | null>(null);
 
   useEffect(() => {
     setBaseUrl(settings.baseUrl);
     setAccessToken(settings.accessToken);
   }, [settings]);
 
+  useEffect(() => {
+    if (open) {
+      getStorageEstimate().then(setStorageInfo);
+    }
+  }, [open]);
+
   const handleSave = () => {
     onSave({ baseUrl, accessToken });
-    setNotice({ text: t("saved"), type: "success" });
+    messageApi.success(t("saved"));
+    onToggle();
   };
 
   const handleLoadDefaults = () => {
     const defaultUrl = preferredDefaultBaseUrl();
     setBaseUrl(defaultUrl);
     onSave({ baseUrl: defaultUrl, accessToken });
-    setNotice({ text: t("urlReset"), type: "info" });
+    messageApi.info(t("urlReset"));
   };
 
   const handleClearToken = () => {
     setAccessToken("");
     onSave({ baseUrl, accessToken: "" });
-    setNotice({ text: t("tokenCleared"), type: "info" });
+    messageApi.info(t("tokenCleared"));
   };
+
+  const storagePercent = storageInfo && storageInfo.quota > 0
+    ? Math.round((storageInfo.usage / storageInfo.quota) * 100)
+    : 0;
 
   return (
     <Modal
@@ -83,6 +103,7 @@ export default function SettingsPanel({
         </Flex>
       )}
     >
+      {contextHolder}
       <Flex vertical gap={20}>
         <Flex align="center" justify="space-between">
           <Typography.Text strong style={{ fontSize: 13 }}>
@@ -269,15 +290,52 @@ export default function SettingsPanel({
           </Typography.Text>
         </fieldset>
 
-        {notice && (
-          <Alert
-            title={notice.text}
-            type={notice.type}
-            showIcon
-            closable
-            onClose={() => setNotice(null)}
-          />
-        )}
+        <fieldset
+          style={{
+            border: "1px solid var(--border)",
+            borderRadius: 10,
+            padding: 16,
+            margin: 0,
+          }}
+        >
+          <legend
+            style={{
+              fontSize: 13,
+              fontWeight: 600,
+              color: "var(--text-primary)",
+              padding: "0 4px",
+            }}
+          >
+            <DatabaseOutlined style={{ marginRight: 6 }} />
+            {t("storageTitle")}
+          </legend>
+          <Flex vertical gap={8}>
+            <Typography.Text style={{ fontSize: 13 }}>
+              {t("sessions", { count: sessionCount })}
+            </Typography.Text>
+            {storageInfo ? (
+              <>
+                <Progress
+                  percent={storagePercent}
+                  size="small"
+                  strokeColor="var(--accent)"
+                  railColor="var(--border)"
+                  showInfo={false}
+                />
+                <Typography.Text style={{ fontSize: 12, color: "var(--text-muted)" }}>
+                  {t("storageUsed", {
+                    used: formatBytes(storageInfo.usage),
+                    quota: formatBytes(storageInfo.quota),
+                  })}
+                </Typography.Text>
+              </>
+            ) : (
+              <Typography.Text style={{ fontSize: 12, color: "var(--text-muted)" }}>
+                {t("storageUnavailable")}
+              </Typography.Text>
+            )}
+          </Flex>
+        </fieldset>
 
         <Typography.Text
           style={{

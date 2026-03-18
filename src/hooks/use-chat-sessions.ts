@@ -2,39 +2,54 @@
 
 import { useState, useCallback, useRef, useEffect } from "react";
 import {
-  loadSessions,
-  saveSessions,
   loadActiveSessionId,
   saveActiveSessionId,
   createSession,
 } from "@/lib/sessions";
+import {
+  dbLoadSessions,
+  dbSaveSessions,
+  migrateFromLocalStorage,
+} from "@/lib/session-db";
 import type { Session } from "@/types/chat";
 
-function loadInitialState() {
-  const loaded = loadSessions();
-  const sessions = loaded.length > 0 ? loaded : [createSession()];
-  const activeId = loadActiveSessionId() ?? sessions[0]?.id ?? null;
-  return { sessions, activeId };
-}
-
 export function useChatSessions() {
-  const [initial] = useState(loadInitialState);
-  const [sessions, setSessions] = useState<Session[]>(initial.sessions);
-  const [activeSessionId, setActiveSessionId] = useState<string | null>(
-    initial.activeId,
-  );
+  const [sessions, setSessions] = useState<Session[]>([]);
+  const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
+  const [ready, setReady] = useState(false);
 
   const sessionsRef = useRef(sessions);
   useEffect(() => {
     sessionsRef.current = sessions;
   }, [sessions]);
 
+  const initializedRef = useRef(false);
+
+  useEffect(() => {
+    if (initializedRef.current) return;
+    initializedRef.current = true;
+
+    (async () => {
+      await migrateFromLocalStorage();
+      const loaded = await dbLoadSessions();
+      const initial = loaded.length > 0 ? loaded : [createSession()];
+      const activeId = loadActiveSessionId() ?? initial[0]?.id ?? null;
+
+      setSessions(initial);
+      setActiveSessionId(activeId);
+      setReady(true);
+    })();
+  }, []);
+
   const activeSession =
     sessions.find((s) => s.id === activeSessionId) ?? null;
 
   useEffect(() => {
-    saveSessions(sessions);
-  }, [sessions]);
+    if (!ready) return;
+    dbSaveSessions(sessions).catch((err) =>
+      console.error("[sessions] persist failed", err),
+    );
+  }, [sessions, ready]);
 
   useEffect(() => {
     if (activeSessionId) saveActiveSessionId(activeSessionId);
@@ -78,6 +93,7 @@ export function useChatSessions() {
     activeSessionId,
     setActiveSessionId,
     activeSession,
+    loading: !ready,
     updateSession,
     handleCreateSession,
     handleSelectSession,

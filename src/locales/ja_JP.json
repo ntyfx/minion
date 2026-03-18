@@ -9,7 +9,8 @@
     "openSettings": "設定を開く",
     "renameConversation": "会話名を変更",
     "rename": "変更",
-    "enterNewName": "新しい名前を入力"
+    "enterNewName": "新しい名前を入力",
+    "chooseIcon": "アイコンを選択"
   },
   "chat": {
     "welcomeTitle": "Minion Chat",
@@ -61,7 +62,11 @@
     "clearToken": "トークンをクリア",
     "sentAs": "<header></header> として送信されます。",
     "version": "Minion Chat v{version}",
-    "language": "言語"
+    "language": "言語",
+    "storageTitle": "ストレージ",
+    "sessions": "{count} 件の会話",
+    "storageUsed": "{used} / {quota} 使用中",
+    "storageUnavailable": "ストレージ情報を取得できません"
   },
   "activity": {
     "title": "アクティビティ",
@@ -76,8 +81,6 @@
   },
   "tools": {
     "title": "ツール状態",
-    "refresh": "更新",
-    "refreshStatus": "ツール状態を更新",
     "openStatus": "ツール状態を開く",
     "name": "名前",
     "status": "状態",
@@ -86,8 +89,12 @@
     "loaded": "読み込み",
     "eligible": "利用可能",
     "noToken": "先に設定でアクセストークンを設定してください。",
-    "noSkills": "サーバーからスキルが返されませんでした。",
-    "clickRefresh": "更新をクリックしてツール状態を読み込んでください。"
+    "noSkills": "サーバーからスキルが返されませんでした。"
+  },
+  "error": {
+    "title": "エラーが発生しました",
+    "description": "予期しないエラーが発生しました。もう一度お試しください。",
+    "tryAgain": "再試行"
   },
   "theme": {
     "chooseTheme": "テーマを選択",

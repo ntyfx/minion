@@ -22,6 +22,7 @@ describe("SettingsPanel component", () => {
     onSave: vi.fn(),
     open: true,
     onToggle: vi.fn(),
+    sessionCount: 3,
   };
 
   it("renders modal with title, fields and version", async () => {
