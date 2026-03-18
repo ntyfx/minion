@@ -17,8 +17,9 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Minion Chat",
-  description: "Game Operations AI Agent",
+  title: "Minion Chat — 游戏运营 AI 助手",
+  description:
+    "集说明分析、系统数据查询、变更执行于一体的游戏运营 AI 助手，支持 E-system / Artifex / G123 Box / Adnext / Gift / B-system 多系统协作。",
   icons: {
     icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>",
   },

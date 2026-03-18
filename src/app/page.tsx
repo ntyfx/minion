@@ -64,7 +64,7 @@ export default function Home() {
     setActiveSessionId,
     updateSession,
     onMissingToken: () => {
-      messageApi.warning("Please set an access token in Settings first.");
+      messageApi.warning("请先在设置中配置 Access Token。");
       setSettingsOpen(true);
     },
   });
@@ -115,7 +115,7 @@ export default function Home() {
 
   const tokenPreview = settings.accessToken
     ? `${settings.accessToken.slice(0, 6)}…${settings.accessToken.slice(-4)}`
-    : "not set";
+    : "未配置";
 
   return (
     <Layout style={{ height: "100dvh", background: "var(--bg-base)" }}>
@@ -163,16 +163,7 @@ export default function Home() {
                   flexShrink: 0,
                 }}
               />
-              <span
-                style={{
-                  background: "var(--brand-gradient)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  backgroundClip: "text",
-                }}
-              >
-                Minion Chat
-              </span>
+              <span className="brand-gradient-text">Minion Chat</span>
             </div>
             <div
               style={{
@@ -181,7 +172,7 @@ export default function Home() {
                 color: "var(--text-muted)",
               }}
             >
-              Game Operations AI Agent
+              说明分析 · 数据查询 · 变更执行
             </div>
           </div>
         )}

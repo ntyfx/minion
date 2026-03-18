@@ -24,12 +24,13 @@ describe("SettingsPanel component", () => {
     onToggle: vi.fn(),
   };
 
-  it("renders drawer with title and fields", async () => {
+  it("renders modal with title, fields and version", async () => {
     const SettingsPanel = (await import("@/components/settings-panel")).default;
     const { baseElement } = render(<SettingsPanel {...defaultProps} />);
     expect(baseElement.textContent).toContain("Settings");
     expect(baseElement.textContent).toContain("API Base URL");
     expect(baseElement.textContent).toContain("Access Token");
+    expect(baseElement.textContent).toMatch(/Minion Chat v[\d.]+/);
   });
 
   it("renders API endpoint hints", async () => {

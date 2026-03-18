@@ -10,10 +10,10 @@ import {
   UserOutlined,
   WarningOutlined,
   BulbOutlined,
-  FireOutlined,
+  FileTextOutlined,
   SearchOutlined,
-  CodeOutlined,
-  QuestionCircleOutlined,
+  ThunderboltOutlined,
+  ApartmentOutlined,
 } from "@ant-design/icons";
 import type { Session, ChatMessage } from "@/types/chat";
 
@@ -47,27 +47,27 @@ export function mapRole(msg: ChatMessage) {
 const PROMPTS_ITEMS = [
   {
     key: "1",
-    icon: <FireOutlined style={{ fontSize: 15, color: "var(--text-secondary)" }} />,
-    label: "What can you do?",
-    description: "你能做什么？",
+    icon: <FileTextOutlined style={{ fontSize: 15, color: "var(--text-secondary)" }} />,
+    label: "说明分析",
+    description: "帮我画 E-system 到 Adnext 的流程图",
   },
   {
     key: "2",
     icon: <SearchOutlined style={{ fontSize: 15, color: "var(--text-secondary)" }} />,
-    label: "Query player info",
-    description: "查询玩家信息",
+    label: "查询数据",
+    description: "查 appId=vividarmy 在 Adnext 的 campaign",
   },
   {
     key: "3",
-    icon: <CodeOutlined style={{ fontSize: 15, color: "var(--text-secondary)" }} />,
-    label: "Check game status",
-    description: "检查游戏状态",
+    icon: <ThunderboltOutlined style={{ fontSize: 15, color: "var(--text-secondary)" }} />,
+    label: "执行变更",
+    description: "帮我创建一个 campaign",
   },
   {
     key: "4",
-    icon: <QuestionCircleOutlined style={{ fontSize: 15, color: "var(--text-secondary)" }} />,
-    label: "Help & support",
-    description: "帮助与支持",
+    icon: <ApartmentOutlined style={{ fontSize: 15, color: "var(--text-secondary)" }} />,
+    label: "跨系统协作",
+    description: "帮我检查 Artifex → E-system → Box → Adnext 链路",
   },
 ];
 
@@ -363,7 +363,7 @@ export default function ChatPanel({
         <Welcome
           icon={WELCOME_ICON}
           title="Minion Chat"
-          description="Select or create a conversation to start chatting with the AI agent."
+          description="从左侧选择一个对话，或新建对话开始使用。"
           variant="borderless"
           styles={{
             ...WELCOME_STYLES,
@@ -390,8 +390,8 @@ export default function ChatPanel({
           >
             <Welcome
               icon={WELCOME_ICON}
-              title="How can I help you?"
-              description="I'm a game operations AI agent. Ask me anything about player management, game status, or operations tasks."
+              title="有什么可以帮你？"
+              description="我可以帮你做说明分析、查询系统数据、执行变更操作，也能协调跨系统链路。告诉我目标系统和操作类型即可。"
               variant="borderless"
               styles={WELCOME_STYLES}
             />
@@ -448,7 +448,7 @@ export default function ChatPanel({
           onSubmit={handleSubmit}
           onCancel={onStop}
           loading={isStreaming}
-          placeholder="Ask minion anything..."
+          placeholder="输入你的目标，例如：查 appId=seirei 的项目列表"
           submitType="enter"
         />
         <Typography.Text
@@ -461,7 +461,7 @@ export default function ChatPanel({
             color: "var(--text-muted)",
           }}
         >
-          Press Enter to send
+          Enter 发送 · Shift+Enter 换行 · 变更操作会先出计划等你确认
         </Typography.Text>
       </div>
     </Flex>

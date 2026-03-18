@@ -1,14 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import {
-  Input,
-  Button,
-  Flex,
-  Typography,
-  Alert,
-  Drawer,
-} from "antd";
+import { Input, Button, Flex, Typography, Alert, Modal, Tooltip } from "antd";
 import {
   SaveOutlined,
   UndoOutlined,
@@ -17,6 +10,8 @@ import {
 } from "@ant-design/icons";
 import type { AppSettings } from "@/types/chat";
 import { preferredDefaultBaseUrl } from "@/lib/settings";
+
+const APP_VERSION = process.env.NEXT_PUBLIC_APP_VERSION ?? "unknown";
 
 interface SettingsPanelProps {
   settings: AppSettings;
@@ -62,35 +57,22 @@ export default function SettingsPanel({
   };
 
   return (
-    <Drawer
-      title={
-        <div>
-          <Typography.Text
-            strong
-            style={{ fontSize: 14, color: "var(--text-primary)" }}
-          >
-            Settings
-          </Typography.Text>
-          <Typography.Text
-            style={{
-              display: "block",
-              fontSize: 12,
-              marginTop: 2,
-              color: "var(--text-muted)",
-            }}
-          >
-            Stored in localStorage
-          </Typography.Text>
-        </div>
-      }
-      placement="right"
+    <Modal
+      title="Settings"
       open={open}
-      onClose={onToggle}
-      styles={{
-        wrapper: { width: 400 },
-        header: { padding: "14px 20px" },
-        body: { padding: "20px" },
-      }}
+      onCancel={onToggle}
+      onOk={handleSave}
+      okText="Save"
+      okButtonProps={{ icon: <SaveOutlined /> }}
+      width={480}
+      centered
+      styles={{ body: { paddingTop: 20, paddingBottom: 20 } }}
+      footer={(_, { OkBtn, CancelBtn }) => (
+        <Flex justify="end" gap={8}>
+          <CancelBtn />
+          <OkBtn />
+        </Flex>
+      )}
     >
       <Alert
         title="Point the base URL to your running minion server."
@@ -124,6 +106,15 @@ export default function SettingsPanel({
             onChange={(e) => setBaseUrl(e.target.value)}
             placeholder="http://localhost:8080"
             aria-label="API Base URL"
+            suffix={
+              <Tooltip title="Reset to default">
+                <UndoOutlined
+                  onClick={handleLoadDefaults}
+                  style={{ color: "var(--text-muted)", cursor: "pointer" }}
+                  aria-label="Reset URL"
+                />
+              </Tooltip>
+            }
             style={{ marginBottom: 8 }}
           />
           <Typography.Text
@@ -161,6 +152,15 @@ export default function SettingsPanel({
             onChange={(e) => setAccessToken(e.target.value)}
             placeholder="Paste Bearer token"
             aria-label="Access token"
+            addonAfter={
+              <Tooltip title="Clear token">
+                <DeleteOutlined
+                  onClick={handleClearToken}
+                  style={{ color: "var(--text-muted)", cursor: "pointer" }}
+                  aria-label="Clear Token"
+                />
+              </Tooltip>
+            }
           />
           <Typography.Text
             style={{
@@ -178,22 +178,6 @@ export default function SettingsPanel({
           </Typography.Text>
         </fieldset>
 
-        <Flex gap={8} wrap>
-          <Button type="primary" icon={<SaveOutlined />} onClick={handleSave}>
-            Save
-          </Button>
-          <Button icon={<UndoOutlined />} onClick={handleLoadDefaults}>
-            Reset URL
-          </Button>
-          <Button
-            danger
-            icon={<DeleteOutlined />}
-            onClick={handleClearToken}
-          >
-            Clear Token
-          </Button>
-        </Flex>
-
         {notice && (
           <Alert
             title={notice.text}
@@ -203,7 +187,17 @@ export default function SettingsPanel({
             onClose={() => setNotice(null)}
           />
         )}
+
+        <Typography.Text
+          style={{
+            fontSize: 12,
+            color: "var(--text-muted)",
+            textAlign: "center",
+          }}
+        >
+          Minion Chat v{APP_VERSION}
+        </Typography.Text>
       </Flex>
-    </Drawer>
+    </Modal>
   );
 }
