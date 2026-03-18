@@ -96,6 +96,11 @@
     "description": "发生了意外错误，请重试。",
     "tryAgain": "重试"
   },
+  "update": {
+    "title": "发现新版本",
+    "description": "版本 {version} 已发布，刷新页面即可获取最新功能。",
+    "refresh": "刷新"
+  },
   "theme": {
     "chooseTheme": "选择主题",
     "switchTo": "切换到 {name} 主题",

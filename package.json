@@ -1,15 +1,17 @@
 {
   "name": "minion-chat",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "private": true,
   "packageManager": "pnpm@10.22.0",
   "scripts": {
     "dev": "next dev",
+    "prebuild": "node scripts/write-version.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
     "test": "vitest",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "generate-icons": "node scripts/generate-icons.mjs"
   },
   "dependencies": {
     "@ant-design/icons": "^6.1.0",
@@ -37,6 +39,7 @@
     "eslint-config-next": "16.1.7",
     "fake-indexeddb": "^6.2.5",
     "jsdom": "^29.0.0",
+    "sharp": "^0.34.5",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^4.1.0"

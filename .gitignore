@@ -19,6 +19,10 @@
 /.next/
 /out/
 
+# generated at build time
+/public/sw.js
+/public/version.json
+
 # production
 /build
 
