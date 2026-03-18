@@ -35,6 +35,8 @@ export interface Session {
 export interface SkillItem {
   name: string;
   status: string;
+  active_version?: string;
+  description?: string;
 }
 
 export interface SkillsPayload {

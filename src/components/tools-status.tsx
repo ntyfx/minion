@@ -11,7 +11,7 @@ import {
   Flex,
   Badge,
 } from "antd";
-import { ToolOutlined } from "@ant-design/icons";
+import { ToolOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import { useTranslations } from "next-intl";
 import { fetchSkills } from "@/lib/sse-client";
 import type { SkillItem } from "@/types/chat";
@@ -83,7 +83,11 @@ export function ToolsToggle({ baseUrl, accessToken }: ToolsStatusProps) {
     try {
       const payload = await fetchSkills(baseUrl, accessToken);
       const list = Array.isArray(payload.skills) ? payload.skills : [];
-      setSkills(list);
+      const withVersion = list.map((s) => ({
+        ...s,
+        active_version: payload.active_version || "-",
+      }));
+      setSkills(withVersion);
       setActiveVersion(payload.active_version || "-");
       setLoadedAt(payload.loaded_at || "-");
       if (!list.length) {
@@ -120,10 +124,24 @@ export function ToolsToggle({ baseUrl, accessToken }: ToolsStatusProps) {
       title: t("name"),
       dataIndex: "name",
       key: "name",
-      render: (name: string) => (
-        <Typography.Text code style={{ fontSize: 12 }}>
-          {name || "-"}
-        </Typography.Text>
+      render: (name: string, record: SkillItem) => (
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+          <Typography.Text>{name || "-"}</Typography.Text>
+          {record.description ? (
+            <Tooltip title={record.description} placement="top">
+              <InfoCircleOutlined style={{ color: "var(--text-muted)", fontSize: 12 }} />
+            </Tooltip>
+          ) : null}
+        </span>
+      ),
+    },
+    {
+      title: t("version"),
+      dataIndex: "active_version",
+      key: "active_version",
+      width: 120,
+      render: (active_version: string) => (
+        <Typography.Text>{active_version || "-"}</Typography.Text>
       ),
     },
     {
@@ -151,7 +169,6 @@ export function ToolsToggle({ baseUrl, accessToken }: ToolsStatusProps) {
       </Typography.Text>
 
       <Flex gap={8} style={{ marginBottom: 12 }}>
-        <StatCard label={t("version")} value={activeVersion} />
         <StatCard label={t("loaded")} value={loadedAt} />
         <StatCard
           label={t("eligible")}
@@ -170,6 +187,7 @@ export function ToolsToggle({ baseUrl, accessToken }: ToolsStatusProps) {
 
       {skills.length > 0 && (
         <Table
+          className="tools-status-table"
           dataSource={skills.map((s, i) => ({ ...s, key: i }))}
           columns={columns}
           pagination={false}

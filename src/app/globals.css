@@ -643,6 +643,15 @@ body {
   background: var(--bg-hover) !important;
 }
 
+.tools-status-table .ant-table {
+  /* Ensure the AntD table header corner uses our desired radius, even if AntD sets it internally */
+  --ant-table-header-border-radius: 8px !important;
+}
+
+.tools-status-table .ant-table-tbody tr:last-child > td {
+  border-bottom: none !important;
+}
+
 .ant-segmented {
   background: var(--bg-muted) !important;
   border-radius: 8px !important;
