@@ -160,7 +160,7 @@ export function ToolsToggle({ baseUrl, accessToken }: ToolsStatusProps) {
 
       {error && (
         <Alert
-          message={error}
+          title={error}
           type="warning"
           showIcon
           style={{ marginBottom: 8 }}

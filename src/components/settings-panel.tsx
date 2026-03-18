@@ -93,7 +93,7 @@ export default function SettingsPanel({
       }}
     >
       <Alert
-        message="Point the base URL to your running minion server."
+        title="Point the base URL to your running minion server."
         type="info"
         showIcon
         icon={<InfoCircleOutlined />}
@@ -196,7 +196,7 @@ export default function SettingsPanel({
 
         {notice && (
           <Alert
-            message={notice.text}
+            title={notice.text}
             type={notice.type}
             showIcon
             closable

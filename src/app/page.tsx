@@ -6,13 +6,12 @@ import {
   SafetyCertificateOutlined,
   LinkOutlined,
   SettingOutlined,
-  SunOutlined,
-  MoonOutlined,
 } from "@ant-design/icons";
 import Sidebar from "@/components/sidebar";
 import ChatPanel from "@/components/chat-panel";
 import ActivityFeed, { ActivityToggle } from "@/components/activity-feed";
 import { ToolsToggle } from "@/components/tools-status";
+import ThemePicker from "@/components/theme-picker";
 import SettingsPanel from "@/components/settings-panel";
 import {
   loadSettings,
@@ -27,7 +26,7 @@ import type { AppSettings } from "@/types/chat";
 const { Sider } = Layout;
 
 export default function Home() {
-  const { theme, toggleTheme } = useTheme();
+  const { colorScheme } = useTheme();
   const [settings, setSettings] = useState<AppSettings>(() => loadSettings());
   const [siderCollapsed, setSiderCollapsed] = useState(false);
   const [activityOpen, setActivityOpen] = useState(false);
@@ -134,7 +133,7 @@ export default function Home() {
           display: "flex",
           flexDirection: "column",
         }}
-        theme={theme}
+        theme={colorScheme}
       >
         {!siderCollapsed && (
           <div
@@ -151,7 +150,6 @@ export default function Home() {
                 margin: 0,
                 fontWeight: 600,
                 fontSize: 15,
-                color: "var(--text-primary)",
                 letterSpacing: "-0.01em",
               }}
             >
@@ -165,7 +163,16 @@ export default function Home() {
                   flexShrink: 0,
                 }}
               />
-              Minion Chat
+              <span
+                style={{
+                  background: "var(--brand-gradient)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                }}
+              >
+                Minion Chat
+              </span>
             </div>
             <div
               style={{
@@ -272,15 +279,7 @@ export default function Home() {
               count={unseenEventCount}
               onClick={handleToggleActivity}
             />
-            <Tooltip title={theme === "dark" ? "Light mode" : "Dark mode"}>
-              <button
-                onClick={toggleTheme}
-                className="icon-button"
-                aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-              >
-                {theme === "dark" ? <SunOutlined /> : <MoonOutlined />}
-              </button>
-            </Tooltip>
+            <ThemePicker />
             <Tooltip title="Settings">
               <button
                 onClick={() => setSettingsOpen(true)}

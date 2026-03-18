@@ -5,12 +5,14 @@ import { ThemeProvider, useTheme } from "@/lib/theme";
 const STORAGE_KEY = "minion-chat-theme";
 
 function ThemeConsumer() {
-  const { theme, toggleTheme, setTheme } = useTheme();
+  const { themeId, colorScheme, setTheme } = useTheme();
   return (
     <div>
-      <span data-testid="theme">{theme}</span>
-      <button onClick={toggleTheme}>toggle</button>
+      <span data-testid="theme">{themeId}</span>
+      <span data-testid="scheme">{colorScheme}</span>
       <button onClick={() => setTheme("light")}>set-light</button>
+      <button onClick={() => setTheme("premium-dark")}>set-premium</button>
+      <button onClick={() => setTheme("dusk")}>set-dusk</button>
     </div>
   );
 }
@@ -58,6 +60,20 @@ describe("ThemeProvider", () => {
     );
 
     expect(getByTestId("theme").textContent).toBe("light");
+    expect(getByTestId("scheme").textContent).toBe("light");
+  });
+
+  it("reads custom theme from data-theme attribute", () => {
+    document.documentElement.setAttribute("data-theme", "dusk");
+
+    const { getByTestId } = render(
+      <ThemeProvider>
+        <ThemeConsumer />
+      </ThemeProvider>,
+    );
+
+    expect(getByTestId("theme").textContent).toBe("dusk");
+    expect(getByTestId("scheme").textContent).toBe("dark");
   });
 
   it("falls back to localStorage", () => {
@@ -72,6 +88,19 @@ describe("ThemeProvider", () => {
     expect(getByTestId("theme").textContent).toBe("light");
   });
 
+  it("falls back to localStorage with custom theme", () => {
+    localStorage.setItem(STORAGE_KEY, "premium-dark");
+
+    const { getByTestId } = render(
+      <ThemeProvider>
+        <ThemeConsumer />
+      </ThemeProvider>,
+    );
+
+    expect(getByTestId("theme").textContent).toBe("premium-dark");
+    expect(getByTestId("scheme").textContent).toBe("dark");
+  });
+
   it("falls back to prefers-color-scheme when no stored value", () => {
     const { getByTestId } = render(
       <ThemeProvider>
@@ -82,7 +111,7 @@ describe("ThemeProvider", () => {
     expect(getByTestId("theme").textContent).toBe("dark");
   });
 
-  it("toggleTheme switches between dark and light", () => {
+  it("setTheme switches to a specific theme", () => {
     document.documentElement.setAttribute("data-theme", "dark");
 
     const { getByTestId, getByText } = render(
@@ -94,11 +123,12 @@ describe("ThemeProvider", () => {
     expect(getByTestId("theme").textContent).toBe("dark");
 
     act(() => {
-      getByText("toggle").click();
+      getByText("set-premium").click();
     });
 
-    expect(getByTestId("theme").textContent).toBe("light");
-    expect(localStorage.getItem(STORAGE_KEY)).toBe("light");
+    expect(getByTestId("theme").textContent).toBe("premium-dark");
+    expect(getByTestId("scheme").textContent).toBe("dark");
+    expect(localStorage.getItem(STORAGE_KEY)).toBe("premium-dark");
   });
 
   it("setTheme persists to localStorage", () => {
@@ -128,10 +158,10 @@ describe("ThemeProvider", () => {
     );
 
     act(() => {
-      getByText("toggle").click();
+      getByText("set-dusk").click();
     });
 
-    expect(document.documentElement.getAttribute("data-theme")).toBe("dark");
+    expect(document.documentElement.getAttribute("data-theme")).toBe("dusk");
     expect(document.documentElement.style.colorScheme).toBe("dark");
   });
 
@@ -173,7 +203,7 @@ describe("ThemeProvider", () => {
   });
 
   it("ignores system prefers-color-scheme change when stored preference exists", () => {
-    localStorage.setItem(STORAGE_KEY, "light");
+    localStorage.setItem(STORAGE_KEY, "latte");
 
     let capturedHandler: ((e: MediaQueryListEvent) => void) | null = null;
     window.matchMedia = vi.fn().mockImplementation((query: string) => ({
@@ -197,12 +227,12 @@ describe("ThemeProvider", () => {
       </ThemeProvider>,
     );
 
-    expect(getByTestId("theme").textContent).toBe("light");
+    expect(getByTestId("theme").textContent).toBe("latte");
 
     act(() => {
       capturedHandler!({ matches: true } as MediaQueryListEvent);
     });
 
-    expect(getByTestId("theme").textContent).toBe("light");
+    expect(getByTestId("theme").textContent).toBe("latte");
   });
 });
