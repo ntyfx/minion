@@ -7,6 +7,8 @@
     "tokenNotSet": "Not set",
     "settings": "Settings",
     "openSettings": "Open settings",
+    "collapseSidebar": "Collapse sidebar",
+    "expandSidebar": "Expand sidebar",
     "renameConversation": "Rename Conversation",
     "rename": "Rename",
     "enterNewName": "Enter new name",

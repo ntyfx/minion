@@ -7,6 +7,8 @@
     "tokenNotSet": "미설정",
     "settings": "설정",
     "openSettings": "설정 열기",
+    "collapseSidebar": "사이드바 접기",
+    "expandSidebar": "사이드바 펼치기",
     "renameConversation": "대화 이름 변경",
     "rename": "변경",
     "enterNewName": "새 이름 입력",

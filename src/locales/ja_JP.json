@@ -7,6 +7,8 @@
     "tokenNotSet": "未設定",
     "settings": "設定",
     "openSettings": "設定を開く",
+    "collapseSidebar": "サイドバーを閉じる",
+    "expandSidebar": "サイドバーを開く",
     "renameConversation": "会話名を変更",
     "rename": "変更",
     "enterNewName": "新しい名前を入力",

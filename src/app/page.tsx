@@ -7,6 +7,8 @@ import {
   LinkOutlined,
   SettingOutlined,
   GithubOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
 } from "@ant-design/icons";
 import { CHAT_ICON_KEYS, getChatIcon } from "@/lib/chat-icons";
 import { useTranslations } from "next-intl";
@@ -154,7 +156,7 @@ export default function Home() {
         collapsedWidth={48}
         collapsible
         collapsed={siderCollapsed}
-        onCollapse={setSiderCollapsed}
+        trigger={null}
         style={{
           background: "var(--bg-surface)",
           boxShadow: "1px 0 0 var(--border)",
@@ -225,7 +227,7 @@ export default function Home() {
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            padding: "0 16px",
+            padding: "0 16px 0 8px",
             borderBottom: "1px solid var(--border)",
             flexShrink: 0,
             background: "var(--bg-surface)",
@@ -234,6 +236,15 @@ export default function Home() {
           }}
         >
           <Flex gap={8} wrap align="center" style={{ minWidth: 0 }}>
+            <Tooltip title={siderCollapsed ? t("expandSidebar") : t("collapseSidebar")}>
+              <button
+                className="icon-button icon-button-muted"
+                onClick={() => setSiderCollapsed((c) => !c)}
+                aria-label={siderCollapsed ? t("expandSidebar") : t("collapseSidebar")}
+              >
+                {siderCollapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+              </button>
+            </Tooltip>
             <span
               style={{
                 display: "inline-flex",

@@ -428,7 +428,7 @@ export default function ChatPanel({
                 item: {
                   background: "var(--bg-elevated)",
                   border: "1px solid var(--border)",
-                  borderRadius: 10,
+                  borderRadius: 9999,
                 },
               }}
             />
@@ -473,15 +473,17 @@ export default function ChatPanel({
       </Flex>
 
       <div style={{ padding: "8px 20px 16px", flexShrink: 0 }}>
-        <Sender
-          value={inputValue}
-          onChange={(val: string) => onInputChange(val)}
-          onSubmit={handleSubmit}
-          onCancel={onStop}
-          loading={isStreaming}
-          placeholder={t("placeholder")}
-          submitType="enter"
-        />
+        <div className="sender-glow-wrapper">
+          <Sender
+            value={inputValue}
+            onChange={(val: string) => onInputChange(val)}
+            onSubmit={handleSubmit}
+            onCancel={onStop}
+            loading={isStreaming}
+            placeholder={t("placeholder")}
+            submitType="enter"
+          />
+        </div>
         <Typography.Text
           type="secondary"
           style={{
