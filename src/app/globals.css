@@ -283,6 +283,53 @@
   color-scheme: light;
 }
 
+/* ── 中国红 (China Red) ── warm lacquer dark + vermilion & gold */
+[data-theme="china-red"] {
+  --bg-base: #1C1410;
+  --bg-surface: #251C17;
+  --bg-elevated: #302520;
+  --bg-hover: rgba(204, 0, 13, 0.08);
+  --bg-active: rgba(204, 0, 13, 0.14);
+  --bg-muted: #302520;
+
+  --accent: #CC0000;
+  --accent-hover: #E53E3E;
+  --accent-subtle: rgba(204, 0, 0, 0.15);
+  --accent-text: #F56565;
+
+  --text-primary: #FAF5F0;
+  --text-secondary: #D4C4B0;
+  --text-muted: #8C7A6A;
+  --text-inverse: #1C1410;
+
+  --border: #4A3A30;
+  --border-strong: #5E4C40;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.6), 0 4px 6px -4px rgba(0, 0, 0, 0.5);
+
+  --ring-focus: 0 0 0 2px var(--bg-base), 0 0 0 4px var(--accent);
+
+  --error: #F56565;
+  --error-subtle: rgba(245, 101, 101, 0.12);
+  --error-border: rgba(245, 101, 101, 0.2);
+  --warning: #ECC94B;
+  --info: #63B3ED;
+
+  --code-bg: rgba(204, 0, 0, 0.10);
+  --code-text: #F56565;
+  --pre-bg: #161010;
+  --pre-text: #DDD0C4;
+
+  --brand-gradient: linear-gradient(135deg, #CC0000, #D4A017, #CC0000);
+  --brand-g1: #CC0000;
+  --brand-g2: #D4A017;
+  --brand-g3: #CC0000;
+
+  color-scheme: dark;
+}
+
 /* ── Brand gradient text ── */
 .brand-gradient-text {
   background: var(--brand-gradient);
