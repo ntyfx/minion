@@ -25,7 +25,7 @@ describe("ToolsToggle component", () => {
 
   it("auto-refreshes on mount when token is set", async () => {
     const mockPayload = {
-      skills: [{ name: "code_review", status: "eligible" }],
+      skills: [{ name: "code_review", status: "eligible", active_version: "v2.0" }],
       active_version: "v2.0",
       loaded_at: "2024-06-01",
     };
@@ -74,8 +74,8 @@ describe("ToolsToggle component", () => {
   it("refreshes when popover opens and displays skills", async () => {
     const mockPayload = {
       skills: [
-        { name: "code_review", status: "eligible" },
-        { name: "debug", status: "ineligible" },
+        { name: "code_review", status: "eligible", active_version: "1.0" },
+        { name: "debug", status: "ineligible", active_version: "2.0" },
       ],
       active_version: "v1.2.3",
       loaded_at: "2024-01-01",
@@ -103,9 +103,10 @@ describe("ToolsToggle component", () => {
     });
 
     await waitFor(() => {
-      expect(baseElement.textContent).toContain("v1.2.3");
       expect(baseElement.textContent).toContain("2024-01-01");
       expect(baseElement.textContent).toContain("code_review");
+      expect(baseElement.textContent).toContain("1.0");
+      expect(baseElement.textContent).toContain("2.0");
     });
   });
 
