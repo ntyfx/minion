@@ -47,26 +47,30 @@ const THEME_SCRIPT = `
 })();
 `;
 
-const isProd = process.env.NODE_ENV === "production";
+// In development (localhost/127.x) we disable service worker entirely to avoid caching issues.
+// In production, we still want SW enabled for offline support.
+const SW_REGISTER_SCRIPT = `
+(function(){
+  if (!('serviceWorker' in navigator)) return;
 
-const SW_REGISTER_SCRIPT = isProd
-  ? `
-(function(){
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('${basePath}/sw.js', { scope: '${basePath}/' });
-  }
-})();
-`
-  : `
-(function(){
-  if ('serviceWorker' in navigator) {
+  const isLocalhost = [
+    'localhost',
+    '127.0.0.1',
+    '[::1]',
+  ].includes(location.hostname);
+
+  if (isLocalhost) {
     navigator.serviceWorker.getRegistrations().then(function(regs){
       regs.forEach(function(r){ r.unregister(); });
     });
     caches.keys().then(function(keys){
       keys.forEach(function(k){ caches.delete(k); });
     });
+    return;
   }
+
+  // Only register in non-localhost environments (production / staging).
+  navigator.serviceWorker.register('${basePath}/sw.js', { scope: '${basePath}/' });
 })();
 `;
 

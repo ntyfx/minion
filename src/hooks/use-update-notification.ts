@@ -5,6 +5,8 @@ import { useTranslations } from "next-intl";
 const POLL_INTERVAL = 5 * 60 * 1000;
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 const currentVersion = process.env.NEXT_PUBLIC_APP_VERSION ?? "";
+const isProd =
+  process.env.NODE_ENV === "production" || process.env.NODE_ENV === "test";
 
 export function useUpdateNotification() {
   const t = useTranslations("update");
@@ -13,8 +15,9 @@ export function useUpdateNotification() {
   });
   const notifiedRef = useRef(false);
 
+  // Disable update polling in non-production (dev) environments
   useEffect(() => {
-    if (!currentVersion) return;
+    if (!isProd || !currentVersion) return;
 
     const NOTIFICATION_KEY = "app-update";
 
