@@ -96,6 +96,11 @@
     "description": "An unexpected error occurred. Please try again.",
     "tryAgain": "Try Again"
   },
+  "update": {
+    "title": "New Version Available",
+    "description": "Version {version} is available. Refresh to get the latest features.",
+    "refresh": "Refresh"
+  },
   "theme": {
     "chooseTheme": "Choose Theme",
     "switchTo": "Switch to {name} theme",

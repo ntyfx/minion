@@ -24,6 +24,7 @@ import { useTheme } from "@/lib/theme";
 import { useChatSessions } from "@/hooks/use-chat-sessions";
 import { useStreaming } from "@/hooks/use-streaming";
 import { useRenameModal } from "@/hooks/use-rename-modal";
+import { useUpdateNotification } from "@/hooks/use-update-notification";
 import type { AppSettings } from "@/types/chat";
 
 const { Sider } = Layout;
@@ -38,6 +39,7 @@ export default function Home() {
   const [settingsOpen, setSettingsOpen] = useState(false);
 
   const [messageApi, contextHolder] = message.useMessage();
+  const updateNotificationHolder = useUpdateNotification();
 
   const {
     sessions,
@@ -135,6 +137,7 @@ export default function Home() {
   return (
     <Layout style={{ height: "100dvh", background: "var(--bg-base)" }}>
       {contextHolder}
+      {updateNotificationHolder}
 
       <svg width={0} height={0} aria-hidden>
         <defs>

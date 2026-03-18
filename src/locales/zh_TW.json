@@ -96,6 +96,11 @@
     "description": "發生了意外錯誤，請重試。",
     "tryAgain": "重試"
   },
+  "update": {
+    "title": "發現新版本",
+    "description": "版本 {version} 已發佈，重新整理頁面即可取得最新功能。",
+    "refresh": "重新整理"
+  },
   "theme": {
     "chooseTheme": "選擇主題",
     "switchTo": "切換到 {name} 主題",
