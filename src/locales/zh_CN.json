@@ -7,6 +7,8 @@
     "tokenNotSet": "未配置",
     "settings": "设置",
     "openSettings": "打开设置",
+    "collapseSidebar": "收起侧栏",
+    "expandSidebar": "展开侧栏",
     "renameConversation": "重命名对话",
     "rename": "重命名",
     "enterNewName": "输入新名称",

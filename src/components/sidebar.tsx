@@ -125,7 +125,7 @@ export default memo(function Sidebar({
           onClick: onCreateSession,
           style: collapsed
             ? { width: 32, height: 32, borderRadius: "50%", padding: 0, justifyContent: "center", margin: "8px auto 12px" }
-            : { marginBlock: "8px 12px" },
+            : { marginBlock: "8px 12px", borderRadius: 9999 },
         }}
         menu={
           collapsed

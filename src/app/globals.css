@@ -422,6 +422,11 @@ body {
   color: var(--text-primary);
 }
 
+.icon-button-muted {
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
 .icon-button:focus-visible {
   box-shadow: var(--ring-focus);
 }
@@ -431,12 +436,6 @@ body {
 }
 
 /* ── Ant Design overrides ── */
-
-.ant-layout-sider-trigger {
-  background: var(--bg-surface) !important;
-  border-top: 1px solid var(--border) !important;
-  box-shadow: 1px 0 0 var(--border) !important;
-}
 
 .ant-btn-primary {
   background: var(--accent) !important;
@@ -507,20 +506,97 @@ body {
   padding: 16px 0 !important;
 }
 
+.sender-glow-wrapper {
+  position: relative;
+  border-radius: 9999px;
+  overflow: hidden;
+  padding: 1.5px;
+  background: var(--border);
+}
+
+.sender-glow-wrapper::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 200%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  background: conic-gradient(
+    var(--brand-g1),
+    var(--brand-g2),
+    var(--brand-g3),
+    var(--brand-g1)
+  );
+  animation: sender-glow-spin 2.5s linear infinite paused;
+}
+
+.sender-glow-wrapper:hover::before,
+.sender-glow-wrapper:focus-within::before {
+  opacity: 1;
+  animation-play-state: running;
+}
+
+@keyframes sender-glow-spin {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
 .ant-sender {
-  border-color: var(--border) !important;
-  border-radius: 12px !important;
+  border: none !important;
+  border-radius: 9999px !important;
   background: var(--bg-elevated) !important;
+  position: relative;
 }
 
 .ant-sender:focus-within {
-  border-color: var(--accent) !important;
-  box-shadow: 0 0 0 2px var(--accent-subtle) !important;
+  box-shadow: none !important;
+}
+
+.ant-sender .ant-btn.ant-sender-actions-btn:not(.ant-sender-actions-btn-loading-button),
+.ant-sender .ant-btn.ant-sender-actions-btn:not(.ant-sender-actions-btn-loading-button):hover,
+.ant-sender .ant-btn.ant-sender-actions-btn:not(.ant-sender-actions-btn-loading-button):active {
+  background: var(--brand-gradient) !important;
+  border: none !important;
+  color: #fff !important;
+  box-shadow: none !important;
+}
+
+.ant-sender .ant-btn.ant-sender-actions-btn:not(.ant-sender-actions-btn-loading-button):disabled {
+  background: var(--brand-gradient) !important;
+  opacity: 0.4;
+  color: #fff !important;
+}
+
+.ant-sender .ant-btn.ant-sender-actions-btn:not(.ant-sender-actions-btn-loading-button) .anticon {
+  color: #fff !important;
 }
 
 .ant-sender .ant-sender-main {
   border: none !important;
   box-shadow: none !important;
+  border-radius: 9999px !important;
+  overflow: hidden;
+}
+
+.ant-sender .ant-sender-actions-list-presets {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ant-sender .ant-sender-actions-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.ant-sender .ant-sender-actions-btn-loading-icon {
+  width: 1em;
+  height: 1em;
+  display: block;
 }
 
 .ant-sender .ant-sender-input,
