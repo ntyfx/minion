@@ -64,10 +64,8 @@ describe("ChatPanel component", () => {
         onStop={vi.fn()}
       />,
     );
-    expect(container.textContent).toContain("Minion Chat");
-    expect(container.textContent).toContain(
-      "Select or create a conversation to start chatting",
-    );
+    expect(container.textContent).toContain("chat.welcomeTitle");
+    expect(container.textContent).toContain("chat.welcomeNoSession");
   });
 
   it("renders prompt cards when session has no messages", async () => {
@@ -84,8 +82,8 @@ describe("ChatPanel component", () => {
         onStop={vi.fn()}
       />,
     );
-    expect(container.textContent).toContain("How can I help you?");
-    expect(container.textContent).toContain("What can you do?");
+    expect(container.textContent).toContain("chat.welcomeEmptyTitle");
+    expect(container.textContent).toContain("chat.promptAnalysis");
   });
 
   it("renders the sender input area", async () => {
@@ -102,7 +100,7 @@ describe("ChatPanel component", () => {
         onStop={vi.fn()}
       />,
     );
-    expect(container.textContent).toContain("Press Enter to send");
+    expect(container.textContent).toContain("chat.hint");
   });
 
   it("renders bubble list when session has messages", async () => {
@@ -158,7 +156,7 @@ describe("ChatPanel component", () => {
         onStop={vi.fn()}
       />,
     );
-    expect(container.textContent).toContain("Thinking");
+    expect(container.textContent).toContain("chat.thinking");
   });
 
   it("renders error messages", async () => {
@@ -196,7 +194,7 @@ describe("ChatPanel component", () => {
         onStop={vi.fn()}
       />,
     );
-    expect(container.textContent).toContain("Thinking");
+    expect(container.textContent).toContain("chat.thinking");
   });
 
   it("does not call onSend for empty input", async () => {
@@ -279,7 +277,7 @@ describe("ChatPanel component", () => {
         onStop={vi.fn()}
       />,
     );
-    expect(container.textContent).toContain("Thinking");
+    expect(container.textContent).toContain("chat.thinking");
 
     const thinkHeader = container.querySelector(".ant-think-header");
     if (thinkHeader) {
@@ -288,12 +286,12 @@ describe("ChatPanel component", () => {
       });
       const showAllBtn = Array.from(
         container.querySelectorAll("button"),
-      ).find((b) => b.textContent === "Show all");
+      ).find((b) => b.textContent === "chat.showAll");
       if (showAllBtn) {
         act(() => {
           showAllBtn.click();
         });
-        expect(container.textContent).toContain("Collapse");
+        expect(container.textContent).toContain("chat.collapse");
       }
     }
   });
@@ -316,7 +314,7 @@ describe("ChatPanel component", () => {
         onStop={vi.fn()}
       />,
     );
-    expect(container.textContent).toContain("Thinking");
+    expect(container.textContent).toContain("chat.thinking");
     const thinkHeader = container.querySelector(".ant-think-header");
     if (thinkHeader) {
       act(() => {
@@ -325,7 +323,7 @@ describe("ChatPanel component", () => {
     }
     const showAllBtns = Array.from(
       container.querySelectorAll("button"),
-    ).filter((b) => b.textContent === "Show all");
+    ).filter((b) => b.textContent === "chat.showAll");
     expect(showAllBtns).toHaveLength(0);
   });
 });

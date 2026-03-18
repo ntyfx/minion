@@ -1,8 +1,9 @@
 "use client";
 
 import { useMemo, useState, memo } from "react";
-import { Typography, Button, Empty, Drawer, Badge, Tooltip, Flex } from "antd";
+import { Typography, Button, Empty, Drawer, Badge, Tag, Tooltip, Flex } from "antd";
 import { ClearOutlined, ThunderboltOutlined, DownOutlined } from "@ant-design/icons";
+import { useTranslations } from "next-intl";
 import type { ActivityEvent } from "@/types/chat";
 
 interface ActivityFeedProps {
@@ -38,7 +39,19 @@ export function formatPayload(payload: unknown): string {
   }
 }
 
-const EventCard = memo(function EventCard({ evt }: { evt: ActivityEvent }) {
+const EventCard = memo(function EventCard({
+  evt,
+  showMoreLabel,
+  showLessLabel,
+  collapseAriaLabel,
+  expandAriaLabel,
+}: {
+  evt: ActivityEvent;
+  showMoreLabel: string;
+  showLessLabel: string;
+  collapseAriaLabel: string;
+  expandAriaLabel: string;
+}) {
   const [expanded, setExpanded] = useState(false);
   const text = formatPayload(evt.payload);
   const isLong = text.length > 200;
@@ -112,7 +125,7 @@ const EventCard = memo(function EventCard({ evt }: { evt: ActivityEvent }) {
         <button
           onClick={() => setExpanded(!expanded)}
           aria-expanded={expanded}
-          aria-label={expanded ? "Collapse event payload" : "Expand event payload"}
+          aria-label={expanded ? collapseAriaLabel : expandAriaLabel}
           style={{
             background: "none",
             border: "none",
@@ -133,7 +146,7 @@ const EventCard = memo(function EventCard({ evt }: { evt: ActivityEvent }) {
               transition: "transform 0.15s ease-out",
             }}
           />
-          {expanded ? "Show less" : "Show more"}
+          {expanded ? showLessLabel : showMoreLabel}
         </button>
       )}
     </div>
@@ -147,13 +160,14 @@ export function ActivityToggle({
   count: number;
   onClick: () => void;
 }) {
+  const t = useTranslations("activity");
   return (
-    <Tooltip title="Activity Feed">
+    <Tooltip title={t("title")}>
       <Badge count={count} size="small" offset={[-4, 4]} color="var(--accent)">
         <button
           onClick={onClick}
           className="icon-button"
-          aria-label="Open activity feed"
+          aria-label={t("openFeed")}
         >
           <ThunderboltOutlined />
         </button>
@@ -168,38 +182,43 @@ export default function ActivityFeed({
   open,
   onToggle,
 }: ActivityFeedProps) {
+  const t = useTranslations("activity");
   const reversed = useMemo(() => [...events].reverse(), [events]);
 
   return (
     <Drawer
       title={
         <Flex justify="space-between" align="center" style={{ width: "100%" }}>
-          <div>
+          <Flex align="center" gap={8}>
             <Typography.Text
               strong
               style={{ fontSize: 14, color: "var(--text-primary)" }}
             >
-              Activity Feed
+              {t("title")}
             </Typography.Text>
-            <Typography.Text
-              style={{
-                display: "block",
-                fontSize: 12,
-                marginTop: 2,
-                color: "var(--text-muted)",
-              }}
-            >
-              {events.length} event{events.length !== 1 ? "s" : ""}
-            </Typography.Text>
-          </div>
+            {events.length > 0 && (
+              <Tag
+                variant="filled"
+                style={{
+                  fontSize: 11,
+                  lineHeight: "18px",
+                  padding: "0 6px",
+                  borderRadius: 10,
+                  margin: 0,
+                }}
+              >
+                {events.length}
+              </Tag>
+            )}
+          </Flex>
           <Button
             size="small"
             icon={<ClearOutlined />}
             onClick={onClear}
             type="text"
-            aria-label="Clear all events"
+            aria-label={t("clearAll")}
           >
-            Clear
+            {t("clear")}
           </Button>
         </Flex>
       }
@@ -209,20 +228,27 @@ export default function ActivityFeed({
       closable
       styles={{
         wrapper: { width: 380 },
-        header: { padding: "14px 16px" },
+        header: { padding: "10px 16px" },
         body: { padding: "12px 16px" },
       }}
     >
       {reversed.length === 0 ? (
         <Empty
           image={Empty.PRESENTED_IMAGE_SIMPLE}
-          description="No events yet"
+          description={t("noEvents")}
           style={{ marginTop: 60 }}
         />
       ) : (
         <Flex vertical gap={0}>
           {reversed.map((evt) => (
-            <EventCard key={evt.id} evt={evt} />
+            <EventCard
+              key={evt.id}
+              evt={evt}
+              showMoreLabel={t("showMore")}
+              showLessLabel={t("showLess")}
+              collapseAriaLabel={t("collapsePayload")}
+              expandAriaLabel={t("expandPayload")}
+            />
           ))}
         </Flex>
       )}

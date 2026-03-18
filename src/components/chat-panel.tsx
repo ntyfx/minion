@@ -15,6 +15,7 @@ import {
   ThunderboltOutlined,
   ApartmentOutlined,
 } from "@ant-design/icons";
+import { useTranslations } from "next-intl";
 import type { Session, ChatMessage } from "@/types/chat";
 
 interface ChatPanelProps {
@@ -44,32 +45,7 @@ export function mapRole(msg: ChatMessage) {
   }
 }
 
-const PROMPTS_ITEMS = [
-  {
-    key: "1",
-    icon: <FileTextOutlined style={{ fontSize: 15, color: "var(--text-secondary)" }} />,
-    label: "说明分析",
-    description: "帮我画 E-system 到 Adnext 的流程图",
-  },
-  {
-    key: "2",
-    icon: <SearchOutlined style={{ fontSize: 15, color: "var(--text-secondary)" }} />,
-    label: "查询数据",
-    description: "查 appId=vividarmy 在 Adnext 的 campaign",
-  },
-  {
-    key: "3",
-    icon: <ThunderboltOutlined style={{ fontSize: 15, color: "var(--text-secondary)" }} />,
-    label: "执行变更",
-    description: "帮我创建一个 campaign",
-  },
-  {
-    key: "4",
-    icon: <ApartmentOutlined style={{ fontSize: 15, color: "var(--text-secondary)" }} />,
-    label: "跨系统协作",
-    description: "帮我检查 Artifex → E-system → Box → Adnext 链路",
-  },
-];
+const ICON_STYLE = { fontSize: 15, color: "var(--text-secondary)" };
 
 const MarkdownContent = memo(function MarkdownContent({
   content,
@@ -97,7 +73,19 @@ const FONT_SIZE = 12;
 const MAX_LINES = 5;
 const COLLAPSED_HEIGHT = Math.round(FONT_SIZE * LINE_HEIGHT * MAX_LINES);
 
-function ThinkContent({ text }: { text: string }) {
+function ThinkContent({
+  text,
+  collapseLabel,
+  showAllLabel,
+  collapseAriaLabel,
+  expandAriaLabel,
+}: {
+  text: string;
+  collapseLabel: string;
+  showAllLabel: string;
+  collapseAriaLabel: string;
+  expandAriaLabel: string;
+}) {
   const [expanded, setExpanded] = useState(false);
   const lineCount = text.split("\n").length;
   const needsCollapse = lineCount > MAX_LINES;
@@ -121,7 +109,7 @@ function ThinkContent({ text }: { text: string }) {
         <button
           onClick={() => setExpanded((v) => !v)}
           aria-expanded={expanded}
-          aria-label={expanded ? "Collapse thinking content" : "Expand thinking content"}
+          aria-label={expanded ? collapseAriaLabel : expandAriaLabel}
           style={{
             background: "none",
             border: "none",
@@ -132,7 +120,7 @@ function ThinkContent({ text }: { text: string }) {
             fontFamily: "var(--font-mono), ui-monospace, monospace",
           }}
         >
-          {expanded ? "Collapse" : "Show all"}
+          {expanded ? collapseLabel : showAllLabel}
         </button>
       )}
     </div>
@@ -280,8 +268,39 @@ export default function ChatPanel({
   onSend,
   onStop,
 }: ChatPanelProps) {
+  const t = useTranslations("chat");
   const hasMessages =
     session && (session.messages.length > 0 || isStreaming);
+
+  const promptsItems = useMemo(
+    () => [
+      {
+        key: "1",
+        icon: <FileTextOutlined style={ICON_STYLE} />,
+        label: t("promptAnalysis"),
+        description: t("promptAnalysisDesc"),
+      },
+      {
+        key: "2",
+        icon: <SearchOutlined style={ICON_STYLE} />,
+        label: t("promptQuery"),
+        description: t("promptQueryDesc"),
+      },
+      {
+        key: "3",
+        icon: <ThunderboltOutlined style={ICON_STYLE} />,
+        label: t("promptExecute"),
+        description: t("promptExecuteDesc"),
+      },
+      {
+        key: "4",
+        icon: <ApartmentOutlined style={ICON_STYLE} />,
+        label: t("promptOrchestrate"),
+        description: t("promptOrchestrateDesc"),
+      },
+    ],
+    [t],
+  );
 
   const bubbleItems = useMemo(() => {
     if (!session) return [];
@@ -352,6 +371,12 @@ export default function ChatPanel({
     [],
   );
 
+  const thinkingTitle = t("thinking");
+  const collapseLabel = t("collapse");
+  const showAllLabel = t("showAll");
+  const collapseAriaLabel = t("collapseThinking");
+  const expandAriaLabel = t("expandThinking");
+
   if (!session) {
     return (
       <Flex
@@ -362,8 +387,8 @@ export default function ChatPanel({
       >
         <Welcome
           icon={WELCOME_ICON}
-          title="Minion Chat"
-          description="从左侧选择一个对话，或新建对话开始使用。"
+          title={t("welcomeTitle")}
+          description={t("welcomeNoSession")}
           variant="borderless"
           styles={{
             ...WELCOME_STYLES,
@@ -390,13 +415,13 @@ export default function ChatPanel({
           >
             <Welcome
               icon={WELCOME_ICON}
-              title="有什么可以帮你？"
-              description="我可以帮你做说明分析、查询系统数据、执行变更操作，也能协调跨系统链路。告诉我目标系统和操作类型即可。"
+              title={t("welcomeEmptyTitle")}
+              description={t("welcomeEmptyDesc")}
               variant="borderless"
               styles={WELCOME_STYLES}
             />
             <Prompts
-              items={PROMPTS_ITEMS}
+              items={promptsItems}
               onItemClick={handlePromptClick}
               wrap
               styles={{
@@ -424,11 +449,17 @@ export default function ChatPanel({
                   ...item,
                   contentRender: (content: unknown) => (
                     <Think
-                      title="Thinking"
+                      title={thinkingTitle}
                       loading={isLive && isStreaming}
                       defaultExpanded={false}
                     >
-                      <ThinkContent text={String(content)} />
+                      <ThinkContent
+                        text={String(content)}
+                        collapseLabel={collapseLabel}
+                        showAllLabel={showAllLabel}
+                        collapseAriaLabel={collapseAriaLabel}
+                        expandAriaLabel={expandAriaLabel}
+                      />
                     </Think>
                   ),
                 };
@@ -448,7 +479,7 @@ export default function ChatPanel({
           onSubmit={handleSubmit}
           onCancel={onStop}
           loading={isStreaming}
-          placeholder="输入你的目标，例如：查 appId=seirei 的项目列表"
+          placeholder={t("placeholder")}
           submitType="enter"
         />
         <Typography.Text
@@ -461,7 +492,7 @@ export default function ChatPanel({
             color: "var(--text-muted)",
           }}
         >
-          Enter 发送 · Shift+Enter 换行 · 变更操作会先出计划等你确认
+          {t("hint")}
         </Typography.Text>
       </div>
     </Flex>

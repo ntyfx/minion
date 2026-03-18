@@ -6,47 +6,54 @@ import type { Session } from "@/types/chat";
 
 const DAY = 86400000;
 
+const LABELS = {
+  today: "Today",
+  yesterday: "Yesterday",
+  thisWeek: "This Week",
+  earlier: "Earlier",
+};
+
 describe("getTimeGroup", () => {
   it('returns "Today" for timestamps within the last 24h', () => {
-    expect(getTimeGroup(Date.now() - 1000)).toBe("Today");
-    expect(getTimeGroup(Date.now() - DAY + 1000)).toBe("Today");
+    expect(getTimeGroup(Date.now() - 1000, LABELS)).toBe("Today");
+    expect(getTimeGroup(Date.now() - DAY + 1000, LABELS)).toBe("Today");
   });
 
   it('returns "Yesterday" for timestamps 1-2 days ago', () => {
-    expect(getTimeGroup(Date.now() - DAY - 1000)).toBe("Yesterday");
+    expect(getTimeGroup(Date.now() - DAY - 1000, LABELS)).toBe("Yesterday");
   });
 
   it('returns "This Week" for timestamps 2-7 days ago', () => {
-    expect(getTimeGroup(Date.now() - 3 * DAY)).toBe("This Week");
-    expect(getTimeGroup(Date.now() - 6 * DAY)).toBe("This Week");
+    expect(getTimeGroup(Date.now() - 3 * DAY, LABELS)).toBe("This Week");
+    expect(getTimeGroup(Date.now() - 6 * DAY, LABELS)).toBe("This Week");
   });
 
   it('returns "Earlier" for timestamps older than 7 days', () => {
-    expect(getTimeGroup(Date.now() - 8 * DAY)).toBe("Earlier");
-    expect(getTimeGroup(Date.now() - 30 * DAY)).toBe("Earlier");
+    expect(getTimeGroup(Date.now() - 8 * DAY, LABELS)).toBe("Earlier");
+    expect(getTimeGroup(Date.now() - 30 * DAY, LABELS)).toBe("Earlier");
   });
 });
 
 describe("formatTimeAgo", () => {
-  it('returns "now" for less than 1 minute', () => {
-    expect(formatTimeAgo(Date.now())).toBe("now");
-    expect(formatTimeAgo(Date.now() - 30000)).toBe("now");
+  it('returns nowLabel for less than 1 minute', () => {
+    expect(formatTimeAgo(Date.now(), "now")).toBe("now");
+    expect(formatTimeAgo(Date.now() - 30000, "now")).toBe("now");
   });
 
   it("returns minutes for 1-59 minutes", () => {
-    expect(formatTimeAgo(Date.now() - 60000)).toBe("1m");
-    expect(formatTimeAgo(Date.now() - 5 * 60000)).toBe("5m");
-    expect(formatTimeAgo(Date.now() - 59 * 60000)).toBe("59m");
+    expect(formatTimeAgo(Date.now() - 60000, "now")).toBe("1m");
+    expect(formatTimeAgo(Date.now() - 5 * 60000, "now")).toBe("5m");
+    expect(formatTimeAgo(Date.now() - 59 * 60000, "now")).toBe("59m");
   });
 
   it("returns hours for 1-23 hours", () => {
-    expect(formatTimeAgo(Date.now() - 3600000)).toBe("1h");
-    expect(formatTimeAgo(Date.now() - 12 * 3600000)).toBe("12h");
+    expect(formatTimeAgo(Date.now() - 3600000, "now")).toBe("1h");
+    expect(formatTimeAgo(Date.now() - 12 * 3600000, "now")).toBe("12h");
   });
 
   it("returns days for 24+ hours", () => {
-    expect(formatTimeAgo(Date.now() - DAY)).toBe("1d");
-    expect(formatTimeAgo(Date.now() - 7 * DAY)).toBe("7d");
+    expect(formatTimeAgo(Date.now() - DAY, "now")).toBe("1d");
+    expect(formatTimeAgo(Date.now() - 7 * DAY, "now")).toBe("7d");
   });
 });
 
@@ -90,7 +97,7 @@ describe("Sidebar component", () => {
     expect(screen.getByRole("navigation")).toBeInTheDocument();
   });
 
-  it('shows "New Chat" text when expanded', () => {
+  it("shows New Chat text when expanded", () => {
     const { container } = render(
       <Sidebar {...defaultProps} collapsed={false} />,
     );
@@ -98,7 +105,7 @@ describe("Sidebar component", () => {
       ".ant-conversations-creation",
     );
     expect(creationBtn).toBeInTheDocument();
-    expect(creationBtn?.textContent).toContain("New Chat");
+    expect(creationBtn?.textContent).toContain("sidebar.newChat");
   });
 
   it("hides New Chat text when collapsed", () => {
@@ -109,7 +116,7 @@ describe("Sidebar component", () => {
       ".ant-conversations-creation",
     );
     expect(creationBtn).toBeInTheDocument();
-    expect(creationBtn?.textContent).not.toContain("New Chat");
+    expect(creationBtn?.textContent).not.toContain("sidebar.newChat");
   });
 
   it("renders session labels", () => {
@@ -122,8 +129,8 @@ describe("Sidebar component", () => {
     const { container } = render(
       <Sidebar {...defaultProps} collapsed={false} />,
     );
-    expect(container.textContent).toContain("Today");
-    expect(container.textContent).toContain("This Week");
+    expect(container.textContent).toContain("sidebar.today");
+    expect(container.textContent).toContain("sidebar.thisWeek");
   });
 
   it("hides group labels when collapsed", () => {

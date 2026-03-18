@@ -2,6 +2,7 @@
 
 import { useMemo, memo } from "react";
 import { Conversations } from "@ant-design/x";
+import { useTranslations } from "next-intl";
 import type { Session } from "@/types/chat";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 
@@ -15,20 +16,23 @@ interface SidebarProps {
   onRenameSession: (id: string) => void;
 }
 
-export function getTimeGroup(ts: number): string {
+export function getTimeGroup(
+  ts: number,
+  labels: { today: string; yesterday: string; thisWeek: string; earlier: string },
+): string {
   const now = Date.now();
   const diff = now - ts;
   const day = 86400000;
-  if (diff < day) return "Today";
-  if (diff < 2 * day) return "Yesterday";
-  if (diff < 7 * day) return "This Week";
-  return "Earlier";
+  if (diff < day) return labels.today;
+  if (diff < 2 * day) return labels.yesterday;
+  if (diff < 7 * day) return labels.thisWeek;
+  return labels.earlier;
 }
 
-export function formatTimeAgo(ts: number): string {
+export function formatTimeAgo(ts: number, nowLabel: string): string {
   const diff = Date.now() - ts;
   const min = Math.floor(diff / 60000);
-  if (min < 1) return "now";
+  if (min < 1) return nowLabel;
   if (min < 60) return `${min}m`;
   const hr = Math.floor(min / 60);
   if (hr < 24) return `${hr}h`;
@@ -45,6 +49,18 @@ export default memo(function Sidebar({
   onDeleteSession,
   onRenameSession,
 }: SidebarProps) {
+  const t = useTranslations("sidebar");
+
+  const groupLabels = useMemo(
+    () => ({
+      today: t("today"),
+      yesterday: t("yesterday"),
+      thisWeek: t("thisWeek"),
+      earlier: t("earlier"),
+    }),
+    [t],
+  );
+
   const items = useMemo(
     () =>
       [...sessions]
@@ -52,7 +68,7 @@ export default memo(function Sidebar({
         .map((s) => ({
           key: s.id,
           label: s.label,
-          group: getTimeGroup(s.updatedAt),
+          group: getTimeGroup(s.updatedAt, groupLabels),
           description: collapsed ? undefined : (
             <span
               style={{
@@ -62,17 +78,17 @@ export default memo(function Sidebar({
               }}
             >
               {s.messages.length > 0
-                ? `${s.messages.length} msg · ${formatTimeAgo(s.updatedAt)}`
-                : formatTimeAgo(s.updatedAt)}
+                ? `${s.messages.length} ${t("msg")} · ${formatTimeAgo(s.updatedAt, t("now"))}`
+                : formatTimeAgo(s.updatedAt, t("now"))}
             </span>
           ),
         })),
-    [sessions, collapsed],
+    [sessions, collapsed, groupLabels, t],
   );
 
   return (
     <nav
-      aria-label="Conversations"
+      aria-label={t("conversations")}
       style={{ display: "flex", flexDirection: "column", height: "100%" }}
     >
       <Conversations
@@ -84,11 +100,11 @@ export default memo(function Sidebar({
             : {
                 label: (group) => group,
                 collapsible: true,
-                defaultExpandedKeys: ["Today"],
+                defaultExpandedKeys: [groupLabels.today],
               }
         }
         creation={{
-          label: collapsed ? undefined : "New Chat",
+          label: collapsed ? undefined : t("newChat"),
           onClick: onCreateSession,
         }}
         menu={
@@ -98,12 +114,12 @@ export default memo(function Sidebar({
                 items: [
                   {
                     key: "rename",
-                    label: "Rename",
+                    label: t("menuRename"),
                     icon: <EditOutlined />,
                   },
                   {
                     key: "delete",
-                    label: "Delete",
+                    label: t("menuDelete"),
                     icon: <DeleteOutlined />,
                     danger: true,
                   },

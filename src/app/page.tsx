@@ -7,11 +7,11 @@ import {
   LinkOutlined,
   SettingOutlined,
 } from "@ant-design/icons";
+import { useTranslations } from "next-intl";
 import Sidebar from "@/components/sidebar";
 import ChatPanel from "@/components/chat-panel";
 import ActivityFeed, { ActivityToggle } from "@/components/activity-feed";
 import { ToolsToggle } from "@/components/tools-status";
-import ThemePicker from "@/components/theme-picker";
 import SettingsPanel from "@/components/settings-panel";
 import {
   loadSettings,
@@ -27,6 +27,7 @@ const { Sider } = Layout;
 
 export default function Home() {
   const { colorScheme } = useTheme();
+  const t = useTranslations("page");
   const [settings, setSettings] = useState<AppSettings>(() => loadSettings());
   const [siderCollapsed, setSiderCollapsed] = useState(false);
   const [activityOpen, setActivityOpen] = useState(false);
@@ -64,7 +65,7 @@ export default function Home() {
     setActiveSessionId,
     updateSession,
     onMissingToken: () => {
-      messageApi.warning("请先在设置中配置 Access Token。");
+      messageApi.warning(t("missingToken"));
       setSettingsOpen(true);
     },
   });
@@ -115,7 +116,7 @@ export default function Home() {
 
   const tokenPreview = settings.accessToken
     ? `${settings.accessToken.slice(0, 6)}…${settings.accessToken.slice(-4)}`
-    : "未配置";
+    : t("tokenNotSet");
 
   return (
     <Layout style={{ height: "100dvh", background: "var(--bg-base)" }}>
@@ -172,7 +173,7 @@ export default function Home() {
                 color: "var(--text-muted)",
               }}
             >
-              说明分析 · 数据查询 · 变更执行
+              {t("subtitle")}
             </div>
           </div>
         )}
@@ -218,7 +219,7 @@ export default function Home() {
                 status={isStreaming ? "processing" : "default"}
                 style={{ marginRight: 0 }}
               />
-              {isStreaming ? "Streaming" : "Idle"}
+              {isStreaming ? t("streaming") : t("idle")}
             </span>
             <span
               style={{
@@ -270,12 +271,11 @@ export default function Home() {
               count={unseenEventCount}
               onClick={handleToggleActivity}
             />
-            <ThemePicker />
-            <Tooltip title="Settings">
+            <Tooltip title={t("settings")}>
               <button
                 onClick={() => setSettingsOpen(true)}
                 className="icon-button"
-                aria-label="Open settings"
+                aria-label={t("openSettings")}
               >
                 <SettingOutlined />
               </button>
@@ -312,18 +312,18 @@ export default function Home() {
       />
 
       <Modal
-        title="Rename Conversation"
+        title={t("renameConversation")}
         open={renameModalOpen}
         onOk={handleRenameConfirm}
         onCancel={handleRenameCancel}
-        okText="Rename"
+        okText={t("rename")}
         destroyOnHidden
       >
         <Input
           value={renameValue}
           onChange={(e) => setRenameValue(e.target.value)}
           onPressEnter={handleRenameConfirm}
-          placeholder="Enter new name"
+          placeholder={t("enterNewName")}
           autoFocus
         />
       </Modal>

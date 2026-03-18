@@ -13,6 +13,7 @@ import {
   Badge,
 } from "antd";
 import { ReloadOutlined, ToolOutlined } from "@ant-design/icons";
+import { useTranslations } from "next-intl";
 import { fetchSkills } from "@/lib/sse-client";
 import type { SkillItem } from "@/types/chat";
 
@@ -65,6 +66,7 @@ function StatCard({
 }
 
 export function ToolsToggle({ baseUrl, accessToken }: ToolsStatusProps) {
+  const t = useTranslations("tools");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [skills, setSkills] = useState<SkillItem[]>([]);
@@ -74,7 +76,7 @@ export function ToolsToggle({ baseUrl, accessToken }: ToolsStatusProps) {
 
   const refresh = useCallback(async () => {
     if (!accessToken) {
-      setError("Set an access token in Settings first.");
+      setError(t("noToken"));
       return;
     }
     setLoading(true);
@@ -86,14 +88,14 @@ export function ToolsToggle({ baseUrl, accessToken }: ToolsStatusProps) {
       setActiveVersion(payload.active_version || "-");
       setLoadedAt(payload.loaded_at || "-");
       if (!list.length) {
-        setError("No skills returned by the server.");
+        setError(t("noSkills"));
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
     } finally {
       setLoading(false);
     }
-  }, [baseUrl, accessToken]);
+  }, [baseUrl, accessToken, t]);
 
   const eligibleCount = skills.filter(
     (s) => s.status?.toLowerCase() === "eligible",
@@ -101,7 +103,7 @@ export function ToolsToggle({ baseUrl, accessToken }: ToolsStatusProps) {
 
   const columns = [
     {
-      title: "Name",
+      title: t("name"),
       dataIndex: "name",
       key: "name",
       render: (name: string) => (
@@ -111,7 +113,7 @@ export function ToolsToggle({ baseUrl, accessToken }: ToolsStatusProps) {
       ),
     },
     {
-      title: "Status",
+      title: t("status"),
       dataIndex: "status",
       key: "status",
       width: 100,
@@ -123,7 +125,7 @@ export function ToolsToggle({ baseUrl, accessToken }: ToolsStatusProps) {
             : s === "ineligible"
               ? "error"
               : "warning";
-        return <Tag color={color}>{status || "unknown"}</Tag>;
+        return <Tag color={color}>{status || t("unknown")}</Tag>;
       },
     },
   ];
@@ -136,24 +138,24 @@ export function ToolsToggle({ baseUrl, accessToken }: ToolsStatusProps) {
         style={{ marginBottom: 12 }}
       >
         <Typography.Text strong style={{ fontSize: 14 }}>
-          Tools Status
+          {t("title")}
         </Typography.Text>
         <Button
           size="small"
           icon={<ReloadOutlined />}
           loading={loading}
           onClick={refresh}
-          aria-label="Refresh tools status"
+          aria-label={t("refreshStatus")}
         >
-          Refresh
+          {t("refresh")}
         </Button>
       </Flex>
 
       <Flex gap={8} style={{ marginBottom: 12 }}>
-        <StatCard label="Version" value={activeVersion} />
-        <StatCard label="Loaded" value={loadedAt} />
+        <StatCard label={t("version")} value={activeVersion} />
+        <StatCard label={t("loaded")} value={loadedAt} />
         <StatCard
-          label="Eligible"
+          label={t("eligible")}
           value={`${eligibleCount} / ${skills.length}`}
         />
       </Flex>
@@ -186,7 +188,7 @@ export function ToolsToggle({ baseUrl, accessToken }: ToolsStatusProps) {
         <Typography.Text
           style={{ fontSize: 12, color: "var(--text-muted)" }}
         >
-          Click Refresh to load tools status.
+          {t("clickRefresh")}
         </Typography.Text>
       )}
     </div>
@@ -201,7 +203,7 @@ export function ToolsToggle({ baseUrl, accessToken }: ToolsStatusProps) {
       onOpenChange={setOpen}
       overlayStyle={{ maxWidth: 440 }}
     >
-      <Tooltip title="Tools Status">
+      <Tooltip title={t("title")}>
         <Badge
           count={skills.length > 0 ? eligibleCount : 0}
           size="small"
@@ -211,7 +213,7 @@ export function ToolsToggle({ baseUrl, accessToken }: ToolsStatusProps) {
         >
           <button
             className="icon-button"
-            aria-label="Open tools status"
+            aria-label={t("openStatus")}
           >
             <ToolOutlined />
           </button>
