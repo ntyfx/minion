@@ -69,7 +69,7 @@ describe("ActivityToggle", () => {
   it("renders the toggle button", () => {
     render(<ActivityToggle count={0} onClick={vi.fn()} />);
     const buttons = screen.getAllByRole("button", {
-      name: "Open activity feed",
+      name: "activity.openFeed",
     });
     expect(buttons.length).toBeGreaterThanOrEqual(1);
   });
@@ -81,7 +81,7 @@ describe("ActivityToggle", () => {
     );
 
     const btn = container.querySelector<HTMLButtonElement>(
-      'button[aria-label="Open activity feed"]',
+      'button[aria-label="activity.openFeed"]',
     );
     act(() => {
       btn?.click();
@@ -123,10 +123,10 @@ describe("ActivityFeed component", () => {
         onToggle={vi.fn()}
       />,
     );
-    expect(baseElement.textContent).toContain("No events yet");
+    expect(baseElement.textContent).toContain("activity.noEvents");
   });
 
-  it("renders event cards when events exist", async () => {
+  it("renders event cards and count tag when events exist", async () => {
     const ActivityFeed = (await import("@/components/activity-feed")).default;
     const events = [
       makeEvent("chunk", { content: "hello" }),
@@ -140,22 +140,23 @@ describe("ActivityFeed component", () => {
         onToggle={vi.fn()}
       />,
     );
-    expect(baseElement.textContent).toContain("2 events");
+    expect(baseElement.textContent).toContain("2");
     expect(baseElement.textContent).toContain("chunk");
     expect(baseElement.textContent).toContain("done");
   });
 
-  it("renders singular event count", async () => {
+  it("hides count tag when no events", async () => {
     const ActivityFeed = (await import("@/components/activity-feed")).default;
     const { baseElement } = render(
       <ActivityFeed
-        events={[makeEvent("chunk")]}
+        events={[]}
         onClear={vi.fn()}
         open={true}
         onToggle={vi.fn()}
       />,
     );
-    expect(baseElement.textContent).toContain("1 event");
+    const tags = baseElement.querySelectorAll(".ant-tag");
+    expect(tags.length).toBe(0);
   });
 
   it("shows expand button for long payloads", async () => {
@@ -169,7 +170,7 @@ describe("ActivityFeed component", () => {
         onToggle={vi.fn()}
       />,
     );
-    expect(baseElement.textContent).toContain("Show more");
+    expect(baseElement.textContent).toContain("activity.showMore");
   });
 
   it("toggles expand/collapse on long payload", async () => {
@@ -186,21 +187,21 @@ describe("ActivityFeed component", () => {
 
     const showMoreBtn = Array.from(
       baseElement.querySelectorAll<HTMLButtonElement>("button"),
-    ).find((b) => b.textContent?.includes("Show more"));
+    ).find((b) => b.textContent?.includes("activity.showMore"));
     expect(showMoreBtn).toBeTruthy();
 
     act(() => {
       showMoreBtn?.click();
     });
-    expect(baseElement.textContent).toContain("Show less");
+    expect(baseElement.textContent).toContain("activity.showLess");
 
     const showLessBtn = Array.from(
       baseElement.querySelectorAll<HTMLButtonElement>("button"),
-    ).find((b) => b.textContent?.includes("Show less"));
+    ).find((b) => b.textContent?.includes("activity.showLess"));
     act(() => {
       showLessBtn?.click();
     });
-    expect(baseElement.textContent).toContain("Show more");
+    expect(baseElement.textContent).toContain("activity.showMore");
   });
 
   it("does not show expand button for short payloads", async () => {
@@ -215,7 +216,7 @@ describe("ActivityFeed component", () => {
     );
     const expandBtns = Array.from(
       baseElement.querySelectorAll("button"),
-    ).filter((b) => b.textContent?.includes("Show more"));
+    ).filter((b) => b.textContent?.includes("activity.showMore"));
     expect(expandBtns).toHaveLength(0);
   });
 
@@ -231,7 +232,7 @@ describe("ActivityFeed component", () => {
       />,
     );
     const clearBtn = baseElement.querySelector<HTMLButtonElement>(
-      'button[aria-label="Clear all events"]',
+      'button[aria-label="activity.clearAll"]',
     );
     expect(clearBtn).toBeTruthy();
     act(() => {

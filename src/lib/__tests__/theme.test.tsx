@@ -1,3 +1,5 @@
+vi.unmock("@/lib/theme");
+
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import { render, act, cleanup } from "@testing-library/react";
 import { ThemeProvider, useTheme } from "@/lib/theme";

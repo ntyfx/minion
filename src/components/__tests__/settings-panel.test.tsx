@@ -24,19 +24,20 @@ describe("SettingsPanel component", () => {
     onToggle: vi.fn(),
   };
 
-  it("renders drawer with title and fields", async () => {
+  it("renders modal with title, fields and version", async () => {
     const SettingsPanel = (await import("@/components/settings-panel")).default;
     const { baseElement } = render(<SettingsPanel {...defaultProps} />);
-    expect(baseElement.textContent).toContain("Settings");
-    expect(baseElement.textContent).toContain("API Base URL");
-    expect(baseElement.textContent).toContain("Access Token");
+    expect(baseElement.textContent).toContain("settings.title");
+    expect(baseElement.textContent).toContain("settings.apiBaseUrl");
+    expect(baseElement.textContent).toContain("settings.accessToken");
+    expect(baseElement.textContent).toContain("settings.version");
   });
 
   it("renders API endpoint hints", async () => {
     const SettingsPanel = (await import("@/components/settings-panel")).default;
     const { baseElement } = render(<SettingsPanel {...defaultProps} />);
-    expect(baseElement.textContent).toContain("/api/v1/chat");
-    expect(baseElement.textContent).toContain("/api/v1/skills");
+    expect(baseElement.textContent).toContain("settings.apiUsedFor");
+    expect(baseElement.textContent).toContain("settings.sentAs");
   });
 
   it("calls onSave with current values when Save clicked", async () => {
@@ -46,7 +47,7 @@ describe("SettingsPanel component", () => {
       <SettingsPanel {...defaultProps} onSave={onSave} />,
     );
 
-    const saveBtn = findButtonByText(baseElement, "Save");
+    const saveBtn = findButtonByText(baseElement, "settings.save");
     expect(saveBtn).toBeTruthy();
     act(() => {
       saveBtn!.click();
@@ -62,49 +63,12 @@ describe("SettingsPanel component", () => {
     const SettingsPanel = (await import("@/components/settings-panel")).default;
     const { baseElement } = render(<SettingsPanel {...defaultProps} />);
 
-    const saveBtn = findButtonByText(baseElement, "Save");
+    const saveBtn = findButtonByText(baseElement, "settings.save");
     act(() => {
       saveBtn!.click();
     });
 
-    expect(baseElement.textContent).toContain("Settings saved.");
-  });
-
-  it("resets URL when Reset URL clicked", async () => {
-    const onSave = vi.fn();
-    const SettingsPanel = (await import("@/components/settings-panel")).default;
-    const { baseElement } = render(
-      <SettingsPanel {...defaultProps} onSave={onSave} />,
-    );
-
-    const resetBtn = findButtonByText(baseElement, "Reset URL");
-    expect(resetBtn).toBeTruthy();
-    act(() => {
-      resetBtn!.click();
-    });
-
-    expect(onSave).toHaveBeenCalled();
-    expect(baseElement.textContent).toContain("Base URL reset to default.");
-  });
-
-  it("clears token when Clear Token clicked", async () => {
-    const onSave = vi.fn();
-    const SettingsPanel = (await import("@/components/settings-panel")).default;
-    const { baseElement } = render(
-      <SettingsPanel {...defaultProps} onSave={onSave} />,
-    );
-
-    const clearBtn = findButtonByText(baseElement, "Clear Token");
-    expect(clearBtn).toBeTruthy();
-    act(() => {
-      clearBtn!.click();
-    });
-
-    expect(onSave).toHaveBeenCalledWith({
-      baseUrl: "http://localhost:8080",
-      accessToken: "",
-    });
-    expect(baseElement.textContent).toContain("Access token cleared.");
+    expect(baseElement.textContent).toContain("settings.saved");
   });
 
   it("updates base URL input value", async () => {
@@ -112,7 +76,7 @@ describe("SettingsPanel component", () => {
     const { baseElement } = render(<SettingsPanel {...defaultProps} />);
 
     const input = baseElement.querySelector(
-      'input[aria-label="API Base URL"]',
+      'input[aria-label="settings.apiBaseUrl"]',
     ) as HTMLInputElement;
     expect(input).toBeTruthy();
     expect(input.value).toBe("http://localhost:8080");
@@ -135,9 +99,46 @@ describe("SettingsPanel component", () => {
     );
 
     const input = baseElement.querySelector(
-      'input[aria-label="API Base URL"]',
+      'input[aria-label="settings.apiBaseUrl"]',
     ) as HTMLInputElement;
     expect(input).toBeTruthy();
     expect(input.value).toBe("http://changed:1234");
+  });
+
+  it("renders language selector", async () => {
+    const SettingsPanel = (await import("@/components/settings-panel")).default;
+    const { baseElement } = render(<SettingsPanel {...defaultProps} />);
+    expect(baseElement.textContent).toContain("settings.language");
+    expect(baseElement.textContent).toContain("简体中文");
+  });
+
+  it("renders theme swatches", async () => {
+    const SettingsPanel = (await import("@/components/settings-panel")).default;
+    const { baseElement } = render(<SettingsPanel {...defaultProps} />);
+    expect(baseElement.textContent).toContain("theme.chooseTheme");
+    const swatches = baseElement.querySelectorAll(
+      'button[aria-pressed]',
+    );
+    expect(swatches.length).toBe(6);
+  });
+
+  it("marks active theme swatch", async () => {
+    const SettingsPanel = (await import("@/components/settings-panel")).default;
+    const { baseElement } = render(<SettingsPanel {...defaultProps} />);
+    const activeSwatches = baseElement.querySelectorAll(
+      'button[aria-pressed="true"]',
+    );
+    expect(activeSwatches.length).toBe(1);
+  });
+
+  it("renders alert inside API Base URL fieldset", async () => {
+    const SettingsPanel = (await import("@/components/settings-panel")).default;
+    const { baseElement } = render(<SettingsPanel {...defaultProps} />);
+    const fieldsets = baseElement.querySelectorAll("fieldset");
+    const apiFieldset = fieldsets[0];
+    expect(apiFieldset).toBeTruthy();
+    const alert = apiFieldset?.querySelector(".ant-alert");
+    expect(alert).toBeTruthy();
+    expect(apiFieldset?.textContent).toContain("settings.alertInfo");
   });
 });

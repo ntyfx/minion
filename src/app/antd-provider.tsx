@@ -3,6 +3,7 @@
 import { ConfigProvider, theme as antTheme } from "antd";
 import { XProvider } from "@ant-design/x";
 import { ThemeProvider, useTheme } from "@/lib/theme";
+import { LocaleProvider, useAppLocale, getAntdLocale } from "@/lib/locale";
 import { getThemeDefinition } from "@/lib/themes";
 import ErrorBoundary from "@/components/error-boundary";
 
@@ -19,12 +20,14 @@ const SHARED_TOKENS = {
 
 function AntdConfigInner({ children }: { children: React.ReactNode }) {
   const { themeId, colorScheme } = useTheme();
+  const { locale } = useAppLocale();
   const isDark = colorScheme === "dark";
   const { antdTokens: tokens, antdOverrides: overrides } =
     getThemeDefinition(themeId);
 
   return (
     <ConfigProvider
+      locale={getAntdLocale(locale)}
       theme={{
         algorithm: isDark ? antTheme.darkAlgorithm : antTheme.defaultAlgorithm,
         token: { ...SHARED_TOKENS, ...tokens },
@@ -73,7 +76,9 @@ export default function AntdProvider({
   return (
     <ErrorBoundary>
       <ThemeProvider>
-        <AntdConfigInner>{children}</AntdConfigInner>
+        <LocaleProvider>
+          <AntdConfigInner>{children}</AntdConfigInner>
+        </LocaleProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );

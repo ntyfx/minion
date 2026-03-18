@@ -10,11 +10,12 @@ import {
   UserOutlined,
   WarningOutlined,
   BulbOutlined,
-  FireOutlined,
+  FileTextOutlined,
   SearchOutlined,
-  CodeOutlined,
-  QuestionCircleOutlined,
+  ThunderboltOutlined,
+  ApartmentOutlined,
 } from "@ant-design/icons";
+import { useTranslations } from "next-intl";
 import type { Session, ChatMessage } from "@/types/chat";
 
 interface ChatPanelProps {
@@ -44,32 +45,7 @@ export function mapRole(msg: ChatMessage) {
   }
 }
 
-const PROMPTS_ITEMS = [
-  {
-    key: "1",
-    icon: <FireOutlined style={{ fontSize: 15, color: "var(--text-secondary)" }} />,
-    label: "What can you do?",
-    description: "你能做什么？",
-  },
-  {
-    key: "2",
-    icon: <SearchOutlined style={{ fontSize: 15, color: "var(--text-secondary)" }} />,
-    label: "Query player info",
-    description: "查询玩家信息",
-  },
-  {
-    key: "3",
-    icon: <CodeOutlined style={{ fontSize: 15, color: "var(--text-secondary)" }} />,
-    label: "Check game status",
-    description: "检查游戏状态",
-  },
-  {
-    key: "4",
-    icon: <QuestionCircleOutlined style={{ fontSize: 15, color: "var(--text-secondary)" }} />,
-    label: "Help & support",
-    description: "帮助与支持",
-  },
-];
+const ICON_STYLE = { fontSize: 15, color: "var(--text-secondary)" };
 
 const MarkdownContent = memo(function MarkdownContent({
   content,
@@ -97,7 +73,19 @@ const FONT_SIZE = 12;
 const MAX_LINES = 5;
 const COLLAPSED_HEIGHT = Math.round(FONT_SIZE * LINE_HEIGHT * MAX_LINES);
 
-function ThinkContent({ text }: { text: string }) {
+function ThinkContent({
+  text,
+  collapseLabel,
+  showAllLabel,
+  collapseAriaLabel,
+  expandAriaLabel,
+}: {
+  text: string;
+  collapseLabel: string;
+  showAllLabel: string;
+  collapseAriaLabel: string;
+  expandAriaLabel: string;
+}) {
   const [expanded, setExpanded] = useState(false);
   const lineCount = text.split("\n").length;
   const needsCollapse = lineCount > MAX_LINES;
@@ -121,7 +109,7 @@ function ThinkContent({ text }: { text: string }) {
         <button
           onClick={() => setExpanded((v) => !v)}
           aria-expanded={expanded}
-          aria-label={expanded ? "Collapse thinking content" : "Expand thinking content"}
+          aria-label={expanded ? collapseAriaLabel : expandAriaLabel}
           style={{
             background: "none",
             border: "none",
@@ -132,7 +120,7 @@ function ThinkContent({ text }: { text: string }) {
             fontFamily: "var(--font-mono), ui-monospace, monospace",
           }}
         >
-          {expanded ? "Collapse" : "Show all"}
+          {expanded ? collapseLabel : showAllLabel}
         </button>
       )}
     </div>
@@ -280,8 +268,39 @@ export default function ChatPanel({
   onSend,
   onStop,
 }: ChatPanelProps) {
+  const t = useTranslations("chat");
   const hasMessages =
     session && (session.messages.length > 0 || isStreaming);
+
+  const promptsItems = useMemo(
+    () => [
+      {
+        key: "1",
+        icon: <FileTextOutlined style={ICON_STYLE} />,
+        label: t("promptAnalysis"),
+        description: t("promptAnalysisDesc"),
+      },
+      {
+        key: "2",
+        icon: <SearchOutlined style={ICON_STYLE} />,
+        label: t("promptQuery"),
+        description: t("promptQueryDesc"),
+      },
+      {
+        key: "3",
+        icon: <ThunderboltOutlined style={ICON_STYLE} />,
+        label: t("promptExecute"),
+        description: t("promptExecuteDesc"),
+      },
+      {
+        key: "4",
+        icon: <ApartmentOutlined style={ICON_STYLE} />,
+        label: t("promptOrchestrate"),
+        description: t("promptOrchestrateDesc"),
+      },
+    ],
+    [t],
+  );
 
   const bubbleItems = useMemo(() => {
     if (!session) return [];
@@ -352,6 +371,12 @@ export default function ChatPanel({
     [],
   );
 
+  const thinkingTitle = t("thinking");
+  const collapseLabel = t("collapse");
+  const showAllLabel = t("showAll");
+  const collapseAriaLabel = t("collapseThinking");
+  const expandAriaLabel = t("expandThinking");
+
   if (!session) {
     return (
       <Flex
@@ -362,8 +387,8 @@ export default function ChatPanel({
       >
         <Welcome
           icon={WELCOME_ICON}
-          title="Minion Chat"
-          description="Select or create a conversation to start chatting with the AI agent."
+          title={t("welcomeTitle")}
+          description={t("welcomeNoSession")}
           variant="borderless"
           styles={{
             ...WELCOME_STYLES,
@@ -390,13 +415,13 @@ export default function ChatPanel({
           >
             <Welcome
               icon={WELCOME_ICON}
-              title="How can I help you?"
-              description="I'm a game operations AI agent. Ask me anything about player management, game status, or operations tasks."
+              title={t("welcomeEmptyTitle")}
+              description={t("welcomeEmptyDesc")}
               variant="borderless"
               styles={WELCOME_STYLES}
             />
             <Prompts
-              items={PROMPTS_ITEMS}
+              items={promptsItems}
               onItemClick={handlePromptClick}
               wrap
               styles={{
@@ -424,11 +449,17 @@ export default function ChatPanel({
                   ...item,
                   contentRender: (content: unknown) => (
                     <Think
-                      title="Thinking"
+                      title={thinkingTitle}
                       loading={isLive && isStreaming}
                       defaultExpanded={false}
                     >
-                      <ThinkContent text={String(content)} />
+                      <ThinkContent
+                        text={String(content)}
+                        collapseLabel={collapseLabel}
+                        showAllLabel={showAllLabel}
+                        collapseAriaLabel={collapseAriaLabel}
+                        expandAriaLabel={expandAriaLabel}
+                      />
                     </Think>
                   ),
                 };
@@ -448,7 +479,7 @@ export default function ChatPanel({
           onSubmit={handleSubmit}
           onCancel={onStop}
           loading={isStreaming}
-          placeholder="Ask minion anything..."
+          placeholder={t("placeholder")}
           submitType="enter"
         />
         <Typography.Text
@@ -461,7 +492,7 @@ export default function ChatPanel({
             color: "var(--text-muted)",
           }}
         >
-          Press Enter to send
+          {t("hint")}
         </Typography.Text>
       </div>
     </Flex>

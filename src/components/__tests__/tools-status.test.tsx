@@ -4,7 +4,7 @@ import { ToolsToggle } from "@/components/tools-status";
 
 function findRefreshBtn(root: HTMLElement) {
   return root.querySelector(
-    'button[aria-label="Refresh tools status"]',
+    'button[aria-label="tools.refreshStatus"]',
   ) as HTMLButtonElement | null;
 }
 
@@ -24,7 +24,7 @@ describe("ToolsToggle component", () => {
       <ToolsToggle baseUrl="http://test" accessToken="tok" />,
     );
     const btn = container.querySelector<HTMLButtonElement>(
-      'button[aria-label="Open tools status"]',
+      'button[aria-label="tools.openStatus"]',
     );
     expect(btn).toBeTruthy();
   });
@@ -34,14 +34,14 @@ describe("ToolsToggle component", () => {
       <ToolsToggle baseUrl="http://test" accessToken="tok" />,
     );
     const btn = container.querySelector<HTMLButtonElement>(
-      'button[aria-label="Open tools status"]',
+      'button[aria-label="tools.openStatus"]',
     )!;
     act(() => {
       btn.click();
     });
     await waitFor(() => {
-      expect(baseElement.textContent).toContain("Tools Status");
-      expect(baseElement.textContent).toContain("Click Refresh to load tools status.");
+      expect(baseElement.textContent).toContain("tools.title");
+      expect(baseElement.textContent).toContain("tools.clickRefresh");
     });
   });
 
@@ -50,7 +50,7 @@ describe("ToolsToggle component", () => {
       <ToolsToggle baseUrl="http://test" accessToken="" />,
     );
     const triggerBtn = container.querySelector<HTMLButtonElement>(
-      'button[aria-label="Open tools status"]',
+      'button[aria-label="tools.openStatus"]',
     )!;
     act(() => {
       triggerBtn.click();
@@ -65,9 +65,7 @@ describe("ToolsToggle component", () => {
     });
 
     await waitFor(() => {
-      expect(baseElement.textContent).toContain(
-        "Set an access token in Settings first.",
-      );
+      expect(baseElement.textContent).toContain("tools.noToken");
     });
   });
 
@@ -91,7 +89,7 @@ describe("ToolsToggle component", () => {
       <ToolsToggle baseUrl="http://test" accessToken="tok" />,
     );
     const triggerBtn = container.querySelector<HTMLButtonElement>(
-      'button[aria-label="Open tools status"]',
+      'button[aria-label="tools.openStatus"]',
     )!;
     act(() => {
       triggerBtn.click();
@@ -121,7 +119,7 @@ describe("ToolsToggle component", () => {
       <ToolsToggle baseUrl="http://test" accessToken="tok" />,
     );
     const triggerBtn = container.querySelector<HTMLButtonElement>(
-      'button[aria-label="Open tools status"]',
+      'button[aria-label="tools.openStatus"]',
     )!;
     act(() => {
       triggerBtn.click();
@@ -157,7 +155,7 @@ describe("ToolsToggle component", () => {
       <ToolsToggle baseUrl="http://test" accessToken="tok" />,
     );
     const triggerBtn = container.querySelector<HTMLButtonElement>(
-      'button[aria-label="Open tools status"]',
+      'button[aria-label="tools.openStatus"]',
     )!;
     act(() => {
       triggerBtn.click();
@@ -172,9 +170,7 @@ describe("ToolsToggle component", () => {
     });
 
     await waitFor(() => {
-      expect(baseElement.textContent).toContain(
-        "No skills returned by the server.",
-      );
+      expect(baseElement.textContent).toContain("tools.noSkills");
     });
   });
 
@@ -185,7 +181,7 @@ describe("ToolsToggle component", () => {
       <ToolsToggle baseUrl="http://test" accessToken="tok" />,
     );
     const triggerBtn = container.querySelector<HTMLButtonElement>(
-      'button[aria-label="Open tools status"]',
+      'button[aria-label="tools.openStatus"]',
     )!;
     act(() => {
       triggerBtn.click();
