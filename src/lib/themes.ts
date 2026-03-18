@@ -4,7 +4,8 @@ export type ThemeId =
   | "premium-dark"
   | "latte"
   | "dusk"
-  | "dawn";
+  | "dawn"
+  | "china-red";
 
 export type ColorScheme = "light" | "dark";
 
@@ -194,6 +195,31 @@ const THEMES: Record<ThemeId, ThemeDefinition> = {
       rowHoverBg: "rgba(91, 155, 213, 0.04)",
       inputHoverBorder: "rgba(91, 155, 213, 0.4)",
       tooltipBg: "#1e3a5f",
+    },
+  },
+  "china-red": {
+    meta: {
+      id: "china-red",
+      label: "中国红",
+      colorScheme: "dark",
+      preview: { bg: "#1C1410", accent: "#CC0000", text: "#FAF5F0" },
+    },
+    antdTokens: {
+      colorPrimary: "#CC0000",
+      colorBgContainer: "#251C17",
+      colorBgElevated: "#302520",
+      colorBgLayout: "#1C1410",
+      colorBorder: "#4A3A30",
+      colorBorderSecondary: "#3C2E26",
+      colorText: "#FAF5F0",
+      colorTextSecondary: "#D4C4B0",
+      colorTextTertiary: "#8C7A6A",
+    },
+    antdOverrides: {
+      headerBg: "#302520",
+      rowHoverBg: "rgba(204, 0, 0, 0.05)",
+      inputHoverBorder: "rgba(204, 0, 0, 0.4)",
+      tooltipBg: "#4A3A30",
     },
   },
 };

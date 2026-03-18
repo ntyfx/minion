@@ -120,7 +120,7 @@ describe("SettingsPanel component", () => {
     const swatches = baseElement.querySelectorAll(
       'button[aria-pressed]',
     );
-    expect(swatches.length).toBe(6);
+    expect(swatches.length).toBe(7);
   });
 
   it("marks active theme swatch", async () => {
