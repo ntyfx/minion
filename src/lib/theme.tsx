@@ -8,29 +8,35 @@ import {
   useCallback,
   type ReactNode,
 } from "react";
+import {
+  type ThemeId,
+  type ColorScheme,
+  isValidThemeId,
+  getThemeDefinition,
+} from "./themes";
 
-type Theme = "light" | "dark";
+export type { ThemeId };
 
 interface ThemeContextValue {
-  theme: Theme;
-  toggleTheme: () => void;
-  setTheme: (t: Theme) => void;
+  themeId: ThemeId;
+  colorScheme: ColorScheme;
+  setTheme: (id: ThemeId) => void;
 }
 
 const ThemeContext = createContext<ThemeContextValue>({
-  theme: "dark",
-  toggleTheme: () => {},
+  themeId: "dark",
+  colorScheme: "dark",
   setTheme: () => {},
 });
 
 const STORAGE_KEY = "minion-chat-theme";
 
-function getClientTheme(): Theme {
+function getClientThemeId(): ThemeId {
   const attr = document.documentElement.getAttribute("data-theme");
-  if (attr === "light" || attr === "dark") return attr;
+  if (attr && isValidThemeId(attr)) return attr;
 
   const stored = localStorage.getItem(STORAGE_KEY);
-  if (stored === "light" || stored === "dark") return stored;
+  if (stored && isValidThemeId(stored)) return stored;
 
   return window.matchMedia("(prefers-color-scheme: light)").matches
     ? "light"
@@ -38,43 +44,39 @@ function getClientTheme(): Theme {
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>("dark");
+  const [themeId, setThemeId] = useState<ThemeId>("dark");
   const [mounted, setMounted] = useState(false);
 
   /* eslint-disable react-hooks/set-state-in-effect -- hydration: read client theme once after mount to avoid SSR mismatch */
   useEffect(() => {
-    setThemeState(getClientTheme());
+    setThemeId(getClientThemeId());
     setMounted(true);
   }, []);
   /* eslint-enable react-hooks/set-state-in-effect */
 
-  const applyTheme = useCallback((t: Theme) => {
-    document.documentElement.setAttribute("data-theme", t);
-    document.documentElement.style.colorScheme = t;
+  const applyTheme = useCallback((id: ThemeId) => {
+    const { meta } = getThemeDefinition(id);
+    document.documentElement.setAttribute("data-theme", id);
+    document.documentElement.style.colorScheme = meta.colorScheme;
   }, []);
 
   useEffect(() => {
-    if (mounted) applyTheme(theme);
-  }, [theme, mounted, applyTheme]);
+    if (mounted) applyTheme(themeId);
+  }, [themeId, mounted, applyTheme]);
 
-  const setTheme = useCallback((t: Theme) => {
-    setThemeState(t);
-    localStorage.setItem(STORAGE_KEY, t);
-  }, []);
-
-  const toggleTheme = useCallback(() => {
-    setThemeState((prev) => {
-      const next = prev === "dark" ? "light" : "dark";
-      localStorage.setItem(STORAGE_KEY, next);
-      return next;
-    });
-  }, []);
+  const setTheme = useCallback(
+    (id: ThemeId) => {
+      setThemeId(id);
+      localStorage.setItem(STORAGE_KEY, id);
+    },
+    [],
+  );
 
   useEffect(() => {
     const mq = window.matchMedia("(prefers-color-scheme: dark)");
     const handler = (e: MediaQueryListEvent) => {
       if (!localStorage.getItem(STORAGE_KEY)) {
-        setThemeState(e.matches ? "dark" : "light");
+        setThemeId(e.matches ? "dark" : "light");
       }
     };
     mq.addEventListener("change", handler);
@@ -83,8 +85,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   if (!mounted) return null;
 
+  const colorScheme = getThemeDefinition(themeId).meta.colorScheme;
+
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme, setTheme }}>
+    <ThemeContext.Provider value={{ themeId, colorScheme, setTheme }}>
       {children}
     </ThemeContext.Provider>
   );
