@@ -240,4 +240,58 @@ describe("ActivityFeed component", () => {
     });
     expect(onClear).toHaveBeenCalledOnce();
   });
+
+  it("applies eventColor to border of event card", async () => {
+    const ActivityFeed = (await import("@/components/activity-feed")).default;
+    const { baseElement } = render(
+      <ActivityFeed
+        events={[makeEvent("error", "test error")]}
+        onClear={vi.fn()}
+        open={true}
+        onToggle={vi.fn()}
+      />,
+    );
+    const card = baseElement.querySelector<HTMLDivElement>(
+      'div[style*="border"]',
+    );
+    expect(card).toBeTruthy();
+    expect(card?.style.border).toContain("var(--error)");
+  });
+
+  it("applies eventColor-based background to event card", async () => {
+    const ActivityFeed = (await import("@/components/activity-feed")).default;
+    const { baseElement } = render(
+      <ActivityFeed
+        events={[makeEvent("done", "completed")]}
+        onClear={vi.fn()}
+        open={true}
+        onToggle={vi.fn()}
+      />,
+    );
+    const card = baseElement.querySelector<HTMLDivElement>(
+      'div[style*="background"]',
+    );
+    expect(card).toBeTruthy();
+    expect(card?.style.background).toContain("color-mix");
+    expect(card?.style.background).toContain("var(--accent)");
+  });
+
+  it("applies eventColor-based gradient to fade overlay for long payloads", async () => {
+    const ActivityFeed = (await import("@/components/activity-feed")).default;
+    const longPayload = "x".repeat(250);
+    const { baseElement } = render(
+      <ActivityFeed
+        events={[makeEvent("thinking", longPayload)]}
+        onClear={vi.fn()}
+        open={true}
+        onToggle={vi.fn()}
+      />,
+    );
+    const fadeOverlay = baseElement.querySelector<HTMLDivElement>(
+      'div[style*="linear-gradient"]',
+    );
+    expect(fadeOverlay).toBeTruthy();
+    expect(fadeOverlay?.style.background).toContain("color-mix");
+    expect(fadeOverlay?.style.background).toContain("var(--warning)");
+  });
 });

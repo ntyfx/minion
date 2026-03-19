@@ -56,12 +56,13 @@ const EventCard = memo(function EventCard({
   const text = formatPayload(evt.payload);
   const isLong = text.length > 200;
 
+  const color = eventColor(evt.type);
+
   return (
     <div
       style={{
-        background: "var(--bg-elevated)",
-        border: "1px solid var(--border)",
-        borderLeft: `2px solid ${eventColor(evt.type)}`,
+        background: `color-mix(in srgb, ${color} 8%, var(--bg-elevated))`,
+        border: `1px solid ${color}`,
         borderRadius: 8,
         padding: "10px 12px",
         marginBottom: 8,
@@ -75,7 +76,7 @@ const EventCard = memo(function EventCard({
             letterSpacing: "0.06em",
             fontWeight: 600,
             fontFamily: "var(--font-mono), ui-monospace, monospace",
-            color: eventColor(evt.type),
+            color: color,
           }}
         >
           {evt.type}
@@ -115,7 +116,7 @@ const EventCard = memo(function EventCard({
               left: 0,
               right: 0,
               height: 28,
-              background: "linear-gradient(transparent, var(--bg-elevated))",
+              background: `linear-gradient(transparent, color-mix(in srgb, ${color} 8%, var(--bg-elevated)))`,
               pointerEvents: "none",
             }}
           />
