@@ -33,7 +33,9 @@
     "collapse": "收起",
     "showAll": "展開全部",
     "collapseThinking": "收起思考內容",
-    "expandThinking": "展開思考內容"
+    "expandThinking": "展開思考內容",
+    "copy": "複製",
+    "copied": "已複製"
   },
   "sidebar": {
     "today": "今天",

@@ -16,7 +16,7 @@
   },
   "chat": {
     "welcomeTitle": "Minion Chat",
-    "welcomeNoSession": "사이드바에서 대화를 선택하거나 새 대화를 만들어 시작하세요.",
+    "welcomeNoSession": "사이드바에서 대화를選択하거나 새 대화를 만들어 시작하세요.",
     "welcomeEmptyTitle": "무엇을 도와드릴까요?",
     "welcomeEmptyDesc": "분석, 데이터 조회, 변경 실행, 크로스 시스템 오케스트레이션을 지원합니다. 대상 시스템과 작업 유형을 알려주세요.",
     "promptAnalysis": "분석",
@@ -33,7 +33,9 @@
     "collapse": "접기",
     "showAll": "모두 보기",
     "collapseThinking": "생각 내용 접기",
-    "expandThinking": "생각 내용 펼치기"
+    "expandThinking": "생각 내용 펼치기",
+    "copy": "복사",
+    "copied": "복사됨"
   },
   "sidebar": {
     "today": "오늘",

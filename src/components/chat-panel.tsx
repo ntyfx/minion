@@ -1,10 +1,11 @@
 "use client";
 
-import { useMemo, useCallback, useState, memo } from "react";
+import { useMemo, useCallback, useState, memo, useRef } from "react";
+import { useHover } from "ahooks";
 import { Bubble, Sender, Welcome, Think, Prompts } from "@ant-design/x";
 import { XMarkdown } from "@ant-design/x-markdown";
 import "@ant-design/x-markdown/themes/dark.css";
-import { Typography, Avatar, Flex } from "antd";
+import { Typography, Avatar, Flex, Button, message } from "antd";
 import {
   RobotOutlined,
   UserOutlined,
@@ -14,6 +15,7 @@ import {
   SearchOutlined,
   ThunderboltOutlined,
   ApartmentOutlined,
+  CopyFilled,
 } from "@ant-design/icons";
 import { useTranslations } from "next-intl";
 import type { Session, ChatMessage } from "@/types/chat";
@@ -54,17 +56,68 @@ const MarkdownContent = memo(function MarkdownContent({
   content: string;
   isStreaming: boolean;
 }) {
+  const [copied, setCopied] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const isHovered = useHover(containerRef);
+  const t = useTranslations("chat");
+  const [messageApi, contextHolder] = message.useMessage();
+  
+  const handleCopy = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(String(content));
+      setCopied(true);
+      messageApi.success(t("copied"));
+      
+      // Reset copied state after 2 seconds
+      setTimeout(() => {
+        setCopied(false);
+      }, 2000);
+    } catch (err) {
+      console.error("Failed to copy text: ", err);
+      messageApi.error("Failed to copy");
+    }
+  }, [content, t, messageApi]);
+
   return (
-    <XMarkdown
-      content={String(content)}
-      streaming={
-        isStreaming
-          ? { hasNextChunk: true, enableAnimation: true }
-          : undefined
-      }
-      openLinksInNewTab
-      className="chat-markdown"
-    />
+    <>
+      {contextHolder}
+      <div 
+        ref={containerRef}
+        style={{ position: "relative" }}
+      >
+        <XMarkdown
+          content={String(content)}
+          streaming={
+            isStreaming
+              ? { hasNextChunk: true, enableAnimation: true }
+              : undefined
+          }
+          openLinksInNewTab
+          className="chat-markdown"
+        />
+        <Button
+          type="text"
+          size="small"
+          icon={<CopyFilled style={{ fontSize: 12 }} />}
+          onClick={handleCopy}
+          style={{
+            position: "absolute",
+            top: 0,
+            right: 0,
+            opacity: isHovered ? 1 : 0,
+            padding: 0,
+            minWidth: "auto",
+            width: 24,
+            height: 24,
+            color: copied ? "var(--accent)" : "var(--text-secondary)",
+            transition: "opacity 0.2s ease",
+            pointerEvents: isHovered ? "auto" : "none",
+          }}
+          aria-label={copied ? t("copied") : t("copy")}
+          title={copied ? t("copied") : t("copy")}
+        />
+      </div>
+    </>
   );
 });
 

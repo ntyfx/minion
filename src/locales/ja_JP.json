@@ -33,7 +33,9 @@
     "collapse": "折りたたむ",
     "showAll": "すべて表示",
     "collapseThinking": "思考内容を折りたたむ",
-    "expandThinking": "思考内容を展開"
+    "expandThinking": "思考内容を展開",
+    "copy": "コピー",
+    "copied": "コピーしました"
   },
   "sidebar": {
     "today": "今日",
