@@ -18,19 +18,6 @@ interface SidebarProps {
   onRenameSession: (id: string) => void;
 }
 
-export function getTimeGroup(
-  ts: number,
-  labels: { today: string; yesterday: string; thisWeek: string; earlier: string },
-): string {
-  const now = Date.now();
-  const diff = now - ts;
-  const day = 86400000;
-  if (diff < day) return labels.today;
-  if (diff < 2 * day) return labels.yesterday;
-  if (diff < 7 * day) return labels.thisWeek;
-  return labels.earlier;
-}
-
 export function formatTimeAgo(ts: number, nowLabel: string): string {
   const diff = Date.now() - ts;
   const min = Math.floor(diff / 60000);
@@ -53,16 +40,6 @@ export default memo(function Sidebar({
 }: SidebarProps) {
   const t = useTranslations("sidebar");
 
-  const groupLabels = useMemo(
-    () => ({
-      today: t("today"),
-      yesterday: t("yesterday"),
-      thisWeek: t("thisWeek"),
-      earlier: t("earlier"),
-    }),
-    [t],
-  );
-
   const items = useMemo(
     () =>
       [...sessions]
@@ -78,13 +55,11 @@ export default memo(function Sidebar({
                     </span>
                   </Tooltip>
                 ),
-                group: getTimeGroup(s.updatedAt, groupLabels),
               }
             : {
                 key: s.id,
                 label: s.label,
                 icon: getChatIcon(s.icon),
-                group: getTimeGroup(s.updatedAt, groupLabels),
                 description: (
                   <span
                     style={{
@@ -100,7 +75,7 @@ export default memo(function Sidebar({
                 ),
               },
         ),
-    [sessions, collapsed, groupLabels, t],
+    [sessions, collapsed, t],
   );
 
   return (
@@ -111,15 +86,6 @@ export default memo(function Sidebar({
       <Conversations
         activeKey={activeSessionId ?? undefined}
         items={items}
-        groupable={
-          collapsed
-            ? undefined
-            : {
-                label: (group) => group,
-                collapsible: true,
-                defaultExpandedKeys: [groupLabels.today],
-              }
-        }
         creation={{
           label: collapsed ? undefined : t("newChat"),
           onClick: onCreateSession,

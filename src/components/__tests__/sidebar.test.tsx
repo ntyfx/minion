@@ -1,38 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, act } from "@testing-library/react";
-import { getTimeGroup, formatTimeAgo } from "@/components/sidebar";
+import { formatTimeAgo } from "@/components/sidebar";
 import Sidebar from "@/components/sidebar";
 import type { Session } from "@/types/chat";
 
 const DAY = 86400000;
-
-const LABELS = {
-  today: "Today",
-  yesterday: "Yesterday",
-  thisWeek: "This Week",
-  earlier: "Earlier",
-};
-
-describe("getTimeGroup", () => {
-  it('returns "Today" for timestamps within the last 24h', () => {
-    expect(getTimeGroup(Date.now() - 1000, LABELS)).toBe("Today");
-    expect(getTimeGroup(Date.now() - DAY + 1000, LABELS)).toBe("Today");
-  });
-
-  it('returns "Yesterday" for timestamps 1-2 days ago', () => {
-    expect(getTimeGroup(Date.now() - DAY - 1000, LABELS)).toBe("Yesterday");
-  });
-
-  it('returns "This Week" for timestamps 2-7 days ago', () => {
-    expect(getTimeGroup(Date.now() - 3 * DAY, LABELS)).toBe("This Week");
-    expect(getTimeGroup(Date.now() - 6 * DAY, LABELS)).toBe("This Week");
-  });
-
-  it('returns "Earlier" for timestamps older than 7 days', () => {
-    expect(getTimeGroup(Date.now() - 8 * DAY, LABELS)).toBe("Earlier");
-    expect(getTimeGroup(Date.now() - 30 * DAY, LABELS)).toBe("Earlier");
-  });
-});
 
 describe("formatTimeAgo", () => {
   it('returns nowLabel for less than 1 minute', () => {
@@ -129,24 +101,6 @@ describe("Sidebar component", () => {
     );
     expect(screen.getAllByText("Chat A").length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText("Chat B").length).toBeGreaterThanOrEqual(1);
-  });
-
-  it("renders group labels when expanded", () => {
-    const { container } = render(
-      <Sidebar {...defaultProps} collapsed={false} />,
-    );
-    expect(container.textContent).toContain("sidebar.today");
-    expect(container.textContent).toContain("sidebar.thisWeek");
-  });
-
-  it("hides group labels when collapsed", () => {
-    const { container } = render(
-      <Sidebar {...defaultProps} collapsed={true} />,
-    );
-    const groupLabels = container.querySelectorAll(
-      ".ant-conversations-group-title",
-    );
-    expect(groupLabels.length).toBe(0);
   });
 
   it("sorts sessions by updatedAt descending", () => {
