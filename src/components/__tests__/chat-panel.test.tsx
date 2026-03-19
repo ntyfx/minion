@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, act, cleanup, fireEvent } from "@testing-library/react";
+import { render, act, cleanup, fireEvent, waitFor } from "@testing-library/react";
 import { mapRole } from "@/components/chat-panel";
 import type { ChatMessage, Session } from "@/types/chat";
 
@@ -325,5 +325,220 @@ describe("ChatPanel component", () => {
       container.querySelectorAll("button"),
     ).filter((b) => b.textContent === "chat.showAll");
     expect(showAllBtns).toHaveLength(0);
+  });
+
+  describe("copy button functionality", () => {
+    let writeTextMock: ReturnType<typeof vi.fn>;
+
+    beforeEach(() => {
+      writeTextMock = vi.fn();
+      Object.defineProperty(global.navigator, "clipboard", {
+        value: { writeText: writeTextMock },
+        writable: true,
+      });
+    });
+
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    it("renders copy button in AI response bubbles", async () => {
+      const ChatPanel = (await import("@/components/chat-panel")).default;
+      const messages = [
+        makeMsg("assistant", "This is an AI response"),
+      ];
+      const { container } = render(
+        <ChatPanel
+          session={makeSession(messages)}
+          isStreaming={false}
+          streamingContent=""
+          reasoningContent=""
+          inputValue=""
+          onInputChange={vi.fn()}
+          onSend={vi.fn()}
+          onStop={vi.fn()}
+        />,
+      );
+
+      // Check if copy button is present (may be hidden initially due to hover state)
+      const copyButtons = container.querySelectorAll('button[aria-label*="copy"]');
+      expect(copyButtons.length).toBeGreaterThan(0);
+    });
+
+    it("copies AI response text when copy button is clicked", async () => {
+      const ChatPanel = (await import("@/components/chat-panel")).default;
+      const aiResponse = "This is an AI response that should be copied";
+      const messages = [
+        makeMsg("assistant", aiResponse),
+      ];
+      
+      writeTextMock.mockResolvedValue(undefined);
+      
+      const { container } = render(
+        <ChatPanel
+          session={makeSession(messages)}
+          isStreaming={false}
+          streamingContent=""
+          reasoningContent=""
+          inputValue=""
+          onInputChange={vi.fn()}
+          onSend={vi.fn()}
+          onStop={vi.fn()}
+        />,
+      );
+
+      // Find and click the copy button
+      const copyButton = Array.from(container.querySelectorAll('button')).find(
+        btn => btn.getAttribute('aria-label')?.includes('copy')
+      );
+      
+      expect(copyButton).toBeTruthy();
+      
+      if (copyButton) {
+        await act(async () => {
+          fireEvent.click(copyButton);
+        });
+
+        // Wait for async operation
+        await waitFor(() => {
+          expect(writeTextMock).toHaveBeenCalledWith(aiResponse);
+        });
+      }
+    });
+
+    it("shows success feedback after copying", async () => {
+      const ChatPanel = (await import("@/components/chat-panel")).default;
+      const messages = [
+        makeMsg("assistant", "Test response"),
+      ];
+      
+      writeTextMock.mockResolvedValue(undefined);
+      
+      const { container } = render(
+        <ChatPanel
+          session={makeSession(messages)}
+          isStreaming={false}
+          streamingContent=""
+          reasoningContent=""
+          inputValue=""
+          onInputChange={vi.fn()}
+          onSend={vi.fn()}
+          onStop={vi.fn()}
+        />,
+      );
+
+      const copyButton = Array.from(container.querySelectorAll('button')).find(
+        btn => btn.getAttribute('aria-label')?.includes('copy')
+      );
+      
+      expect(copyButton).toBeTruthy();
+      
+      if (copyButton) {
+        // Check initial aria-label
+        expect(copyButton.getAttribute('aria-label')).toContain('copy');
+        
+        await act(async () => {
+          fireEvent.click(copyButton);
+        });
+
+        // Wait for state update
+        await waitFor(() => {
+          // After successful copy, aria-label should change to "copied"
+          expect(copyButton.getAttribute('aria-label')).toContain('copied');
+        });
+      }
+    });
+
+    it("handles copy errors gracefully", async () => {
+      const ChatPanel = (await import("@/components/chat-panel")).default;
+      const messages = [
+        makeMsg("assistant", "Test response"),
+      ];
+      
+      writeTextMock.mockRejectedValue(new Error("Clipboard error"));
+      
+      const { container } = render(
+        <ChatPanel
+          session={makeSession(messages)}
+          isStreaming={false}
+          streamingContent=""
+          reasoningContent=""
+          inputValue=""
+          onInputChange={vi.fn()}
+          onSend={vi.fn()}
+          onStop={vi.fn()}
+        />,
+      );
+
+      const copyButton = Array.from(container.querySelectorAll('button')).find(
+        btn => btn.getAttribute('aria-label')?.includes('copy')
+      );
+      
+      expect(copyButton).toBeTruthy();
+      
+      if (copyButton) {
+        await act(async () => {
+          fireEvent.click(copyButton);
+        });
+
+        // Should not crash, error should be logged
+        await waitFor(() => {
+          expect(writeTextMock).toHaveBeenCalled();
+        });
+      }
+    });
+
+    it("does not show copy button in user messages", async () => {
+      const ChatPanel = (await import("@/components/chat-panel")).default;
+      const messages = [
+        makeMsg("user", "User message"),
+        makeMsg("assistant", "AI response"),
+      ];
+      
+      const { container } = render(
+        <ChatPanel
+          session={makeSession(messages)}
+          isStreaming={false}
+          streamingContent=""
+          reasoningContent=""
+          inputValue=""
+          onInputChange={vi.fn()}
+          onSend={vi.fn()}
+          onStop={vi.fn()}
+        />,
+      );
+
+      // Count buttons with copy-related aria-labels
+      const copyButtons = Array.from(container.querySelectorAll('button')).filter(
+        btn => btn.getAttribute('aria-label')?.includes('copy')
+      );
+      
+      // Should only have copy button for AI response, not for user message
+      expect(copyButtons.length).toBe(1);
+    });
+
+    it("shows copy button in streaming AI responses", async () => {
+      const ChatPanel = (await import("@/components/chat-panel")).default;
+      const messages = [
+        makeMsg("user", "Question"),
+      ];
+      
+      const { container } = render(
+        <ChatPanel
+          session={makeSession(messages)}
+          isStreaming={true}
+          streamingContent="Streaming AI response..."
+          reasoningContent=""
+          inputValue=""
+          onInputChange={vi.fn()}
+          onSend={vi.fn()}
+          onStop={vi.fn()}
+        />,
+      );
+
+      // Streaming responses should also have copy button
+      const copyButtons = container.querySelectorAll('button[aria-label*="copy"]');
+      expect(copyButtons.length).toBeGreaterThan(0);
+    });
   });
 });
