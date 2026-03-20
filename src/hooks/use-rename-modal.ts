@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState } from "react";
+import { useMemoizedFn } from "ahooks";
 import type { Session } from "@/types/chat";
 import { DEFAULT_CHAT_ICON } from "@/lib/chat-icons";
 
@@ -15,19 +16,16 @@ export function useRenameModal({ sessions, updateSession }: UseRenameModalOption
   const [renameValue, setRenameValue] = useState("");
   const [iconValue, setIconValue] = useState<string>(DEFAULT_CHAT_ICON);
 
-  const handleRenameSession = useCallback(
-    (id: string) => {
-      const s = sessions.find((s) => s.id === id);
-      if (!s) return;
-      setRenameTarget(id);
-      setRenameValue(s.label);
-      setIconValue(s.icon || DEFAULT_CHAT_ICON);
-      setRenameModalOpen(true);
-    },
-    [sessions],
-  );
+  const handleRenameSession = useMemoizedFn((id: string) => {
+    const s = sessions.find((s) => s.id === id);
+    if (!s) return;
+    setRenameTarget(id);
+    setRenameValue(s.label);
+    setIconValue(s.icon || DEFAULT_CHAT_ICON);
+    setRenameModalOpen(true);
+  });
 
-  const handleRenameConfirm = useCallback(() => {
+  const handleRenameConfirm = useMemoizedFn(() => {
     if (renameTarget && renameValue.trim()) {
       updateSession(renameTarget, (s) => ({
         ...s,
@@ -37,12 +35,12 @@ export function useRenameModal({ sessions, updateSession }: UseRenameModalOption
     }
     setRenameModalOpen(false);
     setRenameTarget(null);
-  }, [renameTarget, renameValue, iconValue, updateSession]);
+  });
 
-  const handleRenameCancel = useCallback(() => {
+  const handleRenameCancel = useMemoizedFn(() => {
     setRenameModalOpen(false);
     setRenameTarget(null);
-  }, []);
+  });
 
   return {
     renameModalOpen,

@@ -12,7 +12,14 @@
     "renameConversation": "대화 이름 변경",
     "rename": "변경",
     "enterNewName": "새 이름 입력",
-    "chooseIcon": "아이콘 선택"
+    "chooseIcon": "아이콘 선택",
+    "shareSession": "대화 공유",
+    "importSession": "대화 가져오기",
+    "importSuccess": "대화를 가져왔습니다",
+    "importFailed": "가져오기 실패 — 잘못된 파일 형식",
+    "editTags": "태그 편집",
+    "tagsHint": "태그를 쉼표로 구분하여 입력하세요",
+    "tagsPlaceholder": "광고 캠페인, 선물 팩"
   },
   "chat": {
     "welcomeTitle": "Minion Chat",
@@ -39,7 +46,9 @@
     "resend": "재전송",
     "tokenPrompt": "프롬프트 토큰",
     "tokenCompletion": "완성 토큰",
-    "tokenTotal": "총 토큰"
+    "tokenTotal": "총 토큰",
+    "bookmark": "북마크",
+    "bookmarked": "저장됨"
   },
   "sidebar": {
     "today": "오늘",
@@ -51,7 +60,14 @@
     "newChat": "새 대화",
     "conversations": "대화 목록",
     "menuRename": "이름 변경",
-    "menuDelete": "삭제"
+    "menuPin": "고정/해제",
+    "menuTag": "태그 편집",
+    "menuArchive": "보관",
+    "menuUnarchive": "보관 해제",
+    "menuDelete": "삭제",
+    "search": "대화 검색...",
+    "active": "활성",
+    "archived": "보관됨"
   },
   "settings": {
     "title": "설정",
@@ -85,7 +101,14 @@
     "showMore": "더 보기",
     "showLess": "접기",
     "collapsePayload": "이벤트 내용 접기",
-    "expandPayload": "이벤트 내용 펼치기"
+    "expandPayload": "이벤트 내용 펼치기",
+    "exportJson": "JSON 내보내기",
+    "filterAll": "전체",
+    "filterRequests": "요청",
+    "filterThinking": "생각",
+    "filterData": "데이터",
+    "filterTokens": "토큰",
+    "filterErrors": "오류"
   },
   "tools": {
     "title": "도구 상태",
@@ -117,6 +140,100 @@
     "completionTokens": "완성",
     "dailyUsage": "일별 사용량",
     "noData": "토큰 사용 데이터가 아직 없습니다"
+  },
+  "dashboard": {
+    "title": "Minion Chat",
+    "subtitle": "스마트 운영 워크벤치",
+    "totalSessions": "총 대화 수",
+    "totalTokens": "총 토큰",
+    "recentSessions": "최근 대화",
+    "quickActions": "빠른 작업",
+    "builtinTemplates": "자주 쓰는 템플릿",
+    "queryEsystem": "E-system 조회",
+    "queryArtifex": "Artifex 조회",
+    "queryBox": "Box 조회",
+    "queryAdnext": "Adnext 조회",
+    "queryGift": "Gift 조회",
+    "checkPipeline": "크로스 시스템 확인"
+  },
+  "sequences": {
+    "title": "작업 시퀀스",
+    "create": "만들기",
+    "empty": "아직 시퀀스가 없습니다",
+    "createSequence": "시퀀스 만들기",
+    "namePlaceholder": "시퀀스 이름 (예: 배포 체크 흐름)",
+    "stepPlaceholder": "메시지 입력 ('{매개변수}' 자리표시자 지원)",
+    "addStep": "단계 추가",
+    "run": "실행",
+    "save": "저장",
+    "fillParams": "매개변수 입력",
+    "stepCount": "{count}단계",
+    "deleteConfirm": "이 시퀀스를 삭제하시겠습니까?",
+    "yes": "예",
+    "no": "아니요"
+  },
+  "export": {
+    "title": "대화 내보내기",
+    "markdown": "Markdown (전체)",
+    "markdownAiOnly": "Markdown (AI 응답만)",
+    "json": "JSON",
+    "html": "HTML"
+  },
+  "bookmarks": {
+    "title": "지식 베이스",
+    "search": "북마크 검색...",
+    "empty": "아직 북마크가 없습니다. AI 응답의 별 아이콘을 클릭하여 저장하세요.",
+    "insertToChat": "입력란에 삽입",
+    "copyContent": "내용 복사",
+    "copied": "복사됨",
+    "deleteConfirm": "이 북마크를 삭제하시겠습니까?",
+    "yes": "예",
+    "no": "아니요"
+  },
+  "slashCommands": {
+    "cmdQueryDesc": "시스템 데이터 조회",
+    "cmdPlanDesc": "작업 계획 수립",
+    "cmdApproveDesc": "대기 중인 계획 승인",
+    "cmdExecuteDesc": "변경 실행",
+    "cmdCheckDesc": "크로스 시스템 흐름 확인",
+    "cmdHelpDesc": "사용 가능한 명령 표시"
+  },
+  "templates": {
+    "title": "프롬프트 템플릿",
+    "create": "만들기",
+    "empty": "아직 템플릿이 없습니다. 첫 번째 템플릿을 만드세요.",
+    "createTemplate": "템플릿 만들기",
+    "nameLabel": "템플릿 이름",
+    "namePlaceholder": "예: 프로젝트 캠페인 조회",
+    "contentLabel": "템플릿 내용 ('{매개변수}'를 자리표시자로 사용)",
+    "contentPlaceholder": "'{system}'에서 '{appId}'의 캠페인 목록 조회",
+    "use": "사용",
+    "save": "저장",
+    "send": "전송",
+    "fillParams": "매개변수 입력",
+    "usedCount": "{count}회 사용됨",
+    "deleteConfirm": "이 템플릿을 삭제하시겠습니까?",
+    "yes": "예",
+    "no": "아니요"
+  },
+  "richContent": {
+    "planApprove": "승인",
+    "planReject": "거부",
+    "planApproveMessage": "위 계획을 승인합니다",
+    "planRejectMessage": "위 계획을 거부합니다",
+    "planApproved": "승인됨",
+    "planRejected": "거부됨",
+    "planStepCount": "{count}단계",
+    "stepRead": "조회",
+    "stepWrite": "변경",
+    "budgetWarning": "예산 변경 포함",
+    "tableSearch": "테이블 검색...",
+    "tableExport": "CSV 내보내기",
+    "tableCopy": "테이블 복사",
+    "tableCopied": "복사됨",
+    "tableRows": "{count}행",
+    "errorRetry": "복구 제안 전송",
+    "errorSent": "전송됨"
   },
   "theme": {
     "chooseTheme": "테마 선택",

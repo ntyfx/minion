@@ -5,6 +5,15 @@ import { useHover } from "ahooks";
 import { Bubble, Sender, Welcome, Think, Prompts } from "@ant-design/x";
 import { XMarkdown } from "@ant-design/x-markdown";
 import "@ant-design/x-markdown/themes/dark.css";
+import { RichContent } from "@/components/rich-content/rich-content";
+import { SlashCommandPopup, SystemMentionPopup } from "@/components/slash-command-popup";
+import {
+  matchSlashCommands,
+  matchSystemNames,
+  resolveSlashCommand,
+  applySystemMention,
+} from "@/lib/slash-commands";
+import type { SlashCommand } from "@/lib/slash-commands";
 import { Typography, Avatar, Flex, Button, message, Tooltip } from "antd";
 import {
   RobotOutlined,
@@ -18,6 +27,7 @@ import {
   CopyOutlined,
   CheckOutlined,
   ReloadOutlined,
+  StarOutlined,
 } from "@ant-design/icons";
 import { useTranslations } from "next-intl";
 import type { Session, ChatMessage, TokenUsage, SSEChunkPayload } from "@/types/chat";
@@ -62,6 +72,7 @@ interface ChatPanelProps {
   onSend: (message: string) => void;
   onResend: (message: string) => void;
   onStop: () => void;
+  onBookmark?: (content: string, messageId: string) => void;
 }
 
 export function mapRole(msg: ChatMessage) {
@@ -92,12 +103,15 @@ const MessageToolbar = memo(function MessageToolbar({
   content,
   tokenUsage,
   visible,
+  onBookmark,
 }: {
   content: string;
   tokenUsage: TokenUsage | null;
   visible: boolean;
+  onBookmark?: () => void;
 }) {
   const [copied, setCopied] = useState(false);
+  const [bookmarked, setBookmarked] = useState(false);
   const t = useTranslations("chat");
   const [messageApi, contextHolder] = message.useMessage();
 
@@ -112,6 +126,15 @@ const MessageToolbar = memo(function MessageToolbar({
       messageApi.error("Failed to copy");
     }
   }, [content, t, messageApi]);
+
+  const handleBookmark = useCallback(() => {
+    if (onBookmark) {
+      onBookmark();
+      setBookmarked(true);
+      messageApi.success(t("bookmarked"));
+      setTimeout(() => setBookmarked(false), 2000);
+    }
+  }, [onBookmark, t, messageApi]);
 
   const hasUsage = tokenUsage && tokenUsage.totalTokens > 0;
 
@@ -142,6 +165,18 @@ const MessageToolbar = memo(function MessageToolbar({
               )}
             </button>
           </Tooltip>
+          {onBookmark && (
+            <Tooltip title={bookmarked ? t("bookmarked") : t("bookmark")} placement="bottom">
+              <button
+                className="toolbar-action-btn"
+                onClick={handleBookmark}
+                aria-label={t("bookmark")}
+                style={{ color: bookmarked ? "var(--warning)" : undefined }}
+              >
+                <StarOutlined style={{ fontSize: 12 }} />
+              </button>
+            </Tooltip>
+          )}
         </div>
 
         {hasUsage && (
@@ -179,30 +214,35 @@ const MarkdownContent = memo(function MarkdownContent({
   content,
   isStreaming,
   tokenUsage,
+  onAction,
+  onBookmark,
 }: {
   content: string;
   isStreaming: boolean;
   tokenUsage: TokenUsage | null;
+  onAction?: (message: string) => void;
+  onBookmark?: () => void;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const isHovered = useHover(containerRef);
 
   return (
     <div ref={containerRef}>
-      <XMarkdown
-        content={String(content)}
-        streaming={
-          isStreaming
-            ? { hasNextChunk: true, enableAnimation: true }
-            : undefined
-        }
-        openLinksInNewTab
-        className="chat-markdown"
-      />
+      {isStreaming ? (
+        <XMarkdown
+          content={String(content)}
+          streaming={{ hasNextChunk: true, enableAnimation: true }}
+          openLinksInNewTab
+          className="chat-markdown"
+        />
+      ) : (
+        <RichContent content={String(content)} onAction={onAction} />
+      )}
       <MessageToolbar
         content={content}
         tokenUsage={isStreaming ? null : tokenUsage}
         visible={isHovered && !isStreaming}
+        onBookmark={isStreaming ? undefined : onBookmark}
       />
     </div>
   );
@@ -439,6 +479,7 @@ export default function ChatPanel({
   onSend,
   onResend,
   onStop,
+  onBookmark,
 }: ChatPanelProps) {
   const t = useTranslations("chat");
   const hasMessages =
@@ -517,12 +558,88 @@ export default function ChatPanel({
     return items;
   }, [session, isStreaming, streamingContent, reasoningContent]);
 
+  const [slashMatches, setSlashMatches] = useState<SlashCommand[]>([]);
+  const [systemMatches, setSystemMatches] = useState<string[]>([]);
+  const [popupIndex, setPopupIndex] = useState(0);
+
+  const updatePopups = useCallback((val: string) => {
+    const sl = matchSlashCommands(val);
+    setSlashMatches(sl);
+    const sys = matchSystemNames(val);
+    setSystemMatches(sys);
+    setPopupIndex(0);
+  }, []);
+
+  const handleInputChangeWrapped = useCallback(
+    (val: string) => {
+      onInputChange(val);
+      updatePopups(val);
+    },
+    [onInputChange, updatePopups],
+  );
+
+  const selectSlashCommand = useCallback(
+    (cmd: SlashCommand) => {
+      const { text, send } = resolveSlashCommand(cmd);
+      setSlashMatches([]);
+      setSystemMatches([]);
+      if (send && text) {
+        onInputChange("");
+        onSend(text);
+      } else {
+        onInputChange(text);
+      }
+    },
+    [onInputChange, onSend],
+  );
+
+  const selectSystemMention = useCallback(
+    (sys: string) => {
+      const next = applySystemMention(inputValue, sys);
+      onInputChange(next);
+      setSlashMatches([]);
+      setSystemMatches([]);
+    },
+    [inputValue, onInputChange],
+  );
+
+  const popupVisible = slashMatches.length > 0 || systemMatches.length > 0;
+  const popupItems = slashMatches.length > 0 ? slashMatches : systemMatches;
+
+  const handleKeyDownCapture = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (!popupVisible) return;
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setPopupIndex((i) => (i + 1) % popupItems.length);
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setPopupIndex((i) => (i - 1 + popupItems.length) % popupItems.length);
+      } else if (e.key === "Tab" || (e.key === "Enter" && popupVisible)) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (slashMatches.length > 0) {
+          selectSlashCommand(slashMatches[popupIndex]);
+        } else if (systemMatches.length > 0) {
+          selectSystemMention(systemMatches[popupIndex]);
+        }
+      } else if (e.key === "Escape") {
+        setSlashMatches([]);
+        setSystemMatches([]);
+      }
+    },
+    [popupVisible, popupItems, popupIndex, slashMatches, systemMatches, selectSlashCommand, selectSystemMention],
+  );
+
   const handleSubmit = useCallback(
     (msg: string) => {
+      if (popupVisible) return;
       if (!msg.trim()) return;
+      setSlashMatches([]);
+      setSystemMatches([]);
       onSend(msg.trim());
     },
-    [onSend],
+    [onSend, popupVisible],
   );
 
   const handlePromptClick = useCallback(
@@ -536,9 +653,9 @@ export default function ChatPanel({
 
   const renderAiContent = useCallback(
     (content: unknown) => (
-      <MarkdownContent content={String(content)} isStreaming={isStreaming} tokenUsage={null} />
+      <MarkdownContent content={String(content)} isStreaming={isStreaming} tokenUsage={null} onAction={onSend} />
     ),
-    [isStreaming],
+    [isStreaming, onSend],
   );
 
   const renderUserContent = useCallback(
@@ -626,10 +743,17 @@ export default function ChatPanel({
                 if (item.role === "ai") {
                   const usage = tokenUsageByRound[aiIndex] ?? null;
                   aiIndex++;
+                  const msgId = item.key;
                   return {
                     ...item,
                     contentRender: (content: unknown) => (
-                      <MarkdownContent content={String(content)} isStreaming={false} tokenUsage={usage} />
+                      <MarkdownContent
+                        content={String(content)}
+                        isStreaming={false}
+                        tokenUsage={usage}
+                        onAction={onSend}
+                        onBookmark={onBookmark ? () => onBookmark(String(content), msgId) : undefined}
+                      />
                     ),
                   };
                 }
@@ -666,17 +790,33 @@ export default function ChatPanel({
         )}
       </Flex>
 
-      <div style={{ padding: "8px 20px 16px", flexShrink: 0 }}>
-        <div className="sender-glow-wrapper">
-          <Sender
-            value={inputValue}
-            onChange={(val: string) => onInputChange(val)}
-            onSubmit={handleSubmit}
-            onCancel={onStop}
-            loading={isStreaming}
-            placeholder={t("placeholder")}
-            submitType="enter"
-          />
+      <div style={{ padding: "8px 20px 16px", flexShrink: 0 }} onKeyDownCapture={handleKeyDownCapture}>
+        <div style={{ position: "relative" }}>
+          {slashMatches.length > 0 && (
+            <SlashCommandPopup
+              commands={slashMatches}
+              selectedIndex={popupIndex}
+              onSelect={selectSlashCommand}
+            />
+          )}
+          {systemMatches.length > 0 && slashMatches.length === 0 && (
+            <SystemMentionPopup
+              systems={systemMatches}
+              selectedIndex={popupIndex}
+              onSelect={selectSystemMention}
+            />
+          )}
+          <div className="sender-glow-wrapper">
+            <Sender
+              value={inputValue}
+              onChange={handleInputChangeWrapped}
+              onSubmit={handleSubmit}
+              onCancel={onStop}
+              loading={isStreaming}
+              placeholder={t("placeholder")}
+              submitType="enter"
+            />
+          </div>
         </div>
         <Typography.Text
           type="secondary"

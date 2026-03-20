@@ -12,7 +12,14 @@
     "renameConversation": "重新命名對話",
     "rename": "重新命名",
     "enterNewName": "輸入新名稱",
-    "chooseIcon": "選擇圖示"
+    "chooseIcon": "選擇圖示",
+    "shareSession": "分享對話",
+    "importSession": "匯入對話",
+    "importSuccess": "對話匯入成功",
+    "importFailed": "匯入失敗，檔案格式不正確",
+    "editTags": "編輯標籤",
+    "tagsHint": "輸入標籤，用逗號分隔",
+    "tagsPlaceholder": "廣告投放, 禮包管理"
   },
   "chat": {
     "welcomeTitle": "Minion Chat",
@@ -39,7 +46,9 @@
     "resend": "重新傳送",
     "tokenPrompt": "提示詞 Token",
     "tokenCompletion": "補全 Token",
-    "tokenTotal": "總 Token"
+    "tokenTotal": "總 Token",
+    "bookmark": "收藏",
+    "bookmarked": "已收藏"
   },
   "sidebar": {
     "today": "今天",
@@ -51,7 +60,14 @@
     "newChat": "新對話",
     "conversations": "對話列表",
     "menuRename": "重新命名",
-    "menuDelete": "刪除"
+    "menuPin": "置頂/取消置頂",
+    "menuTag": "編輯標籤",
+    "menuArchive": "歸檔",
+    "menuUnarchive": "取消歸檔",
+    "menuDelete": "刪除",
+    "search": "搜尋對話...",
+    "active": "活躍",
+    "archived": "已歸檔"
   },
   "settings": {
     "title": "設定",
@@ -85,7 +101,14 @@
     "showMore": "展開更多",
     "showLess": "收起",
     "collapsePayload": "收起事件內容",
-    "expandPayload": "展開事件內容"
+    "expandPayload": "展開事件內容",
+    "exportJson": "匯出 JSON",
+    "filterAll": "全部",
+    "filterRequests": "請求",
+    "filterThinking": "思考",
+    "filterData": "資料",
+    "filterTokens": "Token",
+    "filterErrors": "錯誤"
   },
   "tools": {
     "title": "工具狀態",
@@ -117,6 +140,100 @@
     "completionTokens": "補全",
     "dailyUsage": "每日消耗",
     "noData": "暫無 Token 消耗資料"
+  },
+  "dashboard": {
+    "title": "Minion Chat",
+    "subtitle": "你的智慧運營工作台",
+    "totalSessions": "對話總數",
+    "totalTokens": "Token 總用量",
+    "recentSessions": "最近對話",
+    "quickActions": "快速操作",
+    "builtinTemplates": "常用模板",
+    "queryEsystem": "查詢 E-system",
+    "queryArtifex": "查詢 Artifex",
+    "queryBox": "查詢 Box",
+    "queryAdnext": "查詢 Adnext",
+    "queryGift": "查詢 Gift",
+    "checkPipeline": "檢查跨系統鏈路"
+  },
+  "sequences": {
+    "title": "操作序列",
+    "create": "新建",
+    "empty": "暫無操作序列",
+    "createSequence": "新建操作序列",
+    "namePlaceholder": "序列名稱，例如：投放檢查流程",
+    "stepPlaceholder": "輸入訊息（支援 '{參數}' 佔位符）",
+    "addStep": "新增步驟",
+    "run": "執行",
+    "save": "儲存",
+    "fillParams": "填寫參數",
+    "stepCount": "{count} 步",
+    "deleteConfirm": "確定刪除此序列？",
+    "yes": "確定",
+    "no": "取消"
+  },
+  "export": {
+    "title": "匯出對話",
+    "markdown": "Markdown（全部）",
+    "markdownAiOnly": "Markdown（僅 AI 回覆）",
+    "json": "JSON",
+    "html": "HTML"
+  },
+  "bookmarks": {
+    "title": "知識庫",
+    "search": "搜尋收藏...",
+    "empty": "暫無收藏，在 AI 回覆上點擊星標即可收藏",
+    "insertToChat": "插入到輸入框",
+    "copyContent": "複製內容",
+    "copied": "已複製",
+    "deleteConfirm": "確定刪除此收藏？",
+    "yes": "確定",
+    "no": "取消"
+  },
+  "slashCommands": {
+    "cmdQueryDesc": "查詢系統資料",
+    "cmdPlanDesc": "規劃操作方案",
+    "cmdApproveDesc": "確認待審計畫",
+    "cmdExecuteDesc": "執行變更操作",
+    "cmdCheckDesc": "檢查跨系統鏈路",
+    "cmdHelpDesc": "顯示可用命令"
+  },
+  "templates": {
+    "title": "提示模板",
+    "create": "新建",
+    "empty": "暫無模板，點擊新建建立你的第一個模板",
+    "createTemplate": "新建模板",
+    "nameLabel": "模板名稱",
+    "namePlaceholder": "例如：查詢專案 campaign",
+    "contentLabel": "模板內容（使用 '{參數名}' 作為佔位符）",
+    "contentPlaceholder": "查詢 '{appId}' 在 '{system}' 的 campaign 列表",
+    "use": "使用",
+    "save": "儲存",
+    "send": "傳送",
+    "fillParams": "填寫參數",
+    "usedCount": "已用 {count} 次",
+    "deleteConfirm": "確定刪除此模板？",
+    "yes": "確定",
+    "no": "取消"
+  },
+  "richContent": {
+    "planApprove": "確認執行",
+    "planReject": "拒絕",
+    "planApproveMessage": "確認執行以上計畫",
+    "planRejectMessage": "拒絕執行以上計畫",
+    "planApproved": "已確認",
+    "planRejected": "已拒絕",
+    "planStepCount": "{count} 個步驟",
+    "stepRead": "查詢",
+    "stepWrite": "變更",
+    "budgetWarning": "涉及預算變更",
+    "tableSearch": "搜尋表格...",
+    "tableExport": "匯出 CSV",
+    "tableCopy": "複製表格",
+    "tableCopied": "已複製",
+    "tableRows": "{count} 列",
+    "errorRetry": "執行恢復建議",
+    "errorSent": "已傳送"
   },
   "theme": {
     "chooseTheme": "選擇主題",

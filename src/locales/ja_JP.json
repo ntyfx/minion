@@ -12,7 +12,14 @@
     "renameConversation": "会話名を変更",
     "rename": "変更",
     "enterNewName": "新しい名前を入力",
-    "chooseIcon": "アイコンを選択"
+    "chooseIcon": "アイコンを選択",
+    "shareSession": "会話を共有",
+    "importSession": "会話をインポート",
+    "importSuccess": "会話をインポートしました",
+    "importFailed": "インポート失敗：無効なファイル形式",
+    "editTags": "タグ編集",
+    "tagsHint": "タグをカンマ区切りで入力",
+    "tagsPlaceholder": "広告配信, ギフトパック"
   },
   "chat": {
     "welcomeTitle": "Minion Chat",
@@ -39,7 +46,9 @@
     "resend": "再送信",
     "tokenPrompt": "プロンプトトークン",
     "tokenCompletion": "補完トークン",
-    "tokenTotal": "合計トークン"
+    "tokenTotal": "合計トークン",
+    "bookmark": "ブックマーク",
+    "bookmarked": "保存しました"
   },
   "sidebar": {
     "today": "今日",
@@ -51,7 +60,14 @@
     "newChat": "新しい会話",
     "conversations": "会話一覧",
     "menuRename": "名前を変更",
-    "menuDelete": "削除"
+    "menuPin": "ピン留め/解除",
+    "menuTag": "タグ編集",
+    "menuArchive": "アーカイブ",
+    "menuUnarchive": "アーカイブ解除",
+    "menuDelete": "削除",
+    "search": "会話を検索...",
+    "active": "アクティブ",
+    "archived": "アーカイブ"
   },
   "settings": {
     "title": "設定",
@@ -85,7 +101,14 @@
     "showMore": "もっと見る",
     "showLess": "折りたたむ",
     "collapsePayload": "イベント内容を折りたたむ",
-    "expandPayload": "イベント内容を展開"
+    "expandPayload": "イベント内容を展開",
+    "exportJson": "JSON エクスポート",
+    "filterAll": "すべて",
+    "filterRequests": "リクエスト",
+    "filterThinking": "思考",
+    "filterData": "データ",
+    "filterTokens": "トークン",
+    "filterErrors": "エラー"
   },
   "tools": {
     "title": "ツール状態",
@@ -117,6 +140,100 @@
     "completionTokens": "補完",
     "dailyUsage": "日別使用量",
     "noData": "トークン使用データはまだありません"
+  },
+  "dashboard": {
+    "title": "Minion Chat",
+    "subtitle": "スマート運用ワークベンチ",
+    "totalSessions": "会話数",
+    "totalTokens": "トークン合計",
+    "recentSessions": "最近の会話",
+    "quickActions": "クイックアクション",
+    "builtinTemplates": "よく使うテンプレート",
+    "queryEsystem": "E-system 照会",
+    "queryArtifex": "Artifex 照会",
+    "queryBox": "Box 照会",
+    "queryAdnext": "Adnext 照会",
+    "queryGift": "Gift 照会",
+    "checkPipeline": "クロスシステムチェック"
+  },
+  "sequences": {
+    "title": "操作シーケンス",
+    "create": "作成",
+    "empty": "シーケンスはまだありません",
+    "createSequence": "シーケンス作成",
+    "namePlaceholder": "シーケンス名（例：配信チェックフロー）",
+    "stepPlaceholder": "メッセージ入力（'{パラメータ}' プレースホルダー対応）",
+    "addStep": "ステップ追加",
+    "run": "実行",
+    "save": "保存",
+    "fillParams": "パラメータ入力",
+    "stepCount": "{count} ステップ",
+    "deleteConfirm": "このシーケンスを削除しますか？",
+    "yes": "はい",
+    "no": "いいえ"
+  },
+  "export": {
+    "title": "会話をエクスポート",
+    "markdown": "Markdown（すべて）",
+    "markdownAiOnly": "Markdown（AI 回答のみ）",
+    "json": "JSON",
+    "html": "HTML"
+  },
+  "bookmarks": {
+    "title": "ナレッジベース",
+    "search": "ブックマークを検索...",
+    "empty": "まだブックマークはありません。AI の回答の星アイコンをクリックして保存しましょう。",
+    "insertToChat": "入力欄に挿入",
+    "copyContent": "内容をコピー",
+    "copied": "コピーしました",
+    "deleteConfirm": "このブックマークを削除しますか？",
+    "yes": "はい",
+    "no": "いいえ"
+  },
+  "slashCommands": {
+    "cmdQueryDesc": "システムデータを照会",
+    "cmdPlanDesc": "操作プランを作成",
+    "cmdApproveDesc": "保留中のプランを承認",
+    "cmdExecuteDesc": "変更を実行",
+    "cmdCheckDesc": "クロスシステムフローを確認",
+    "cmdHelpDesc": "使用可能なコマンドを表示"
+  },
+  "templates": {
+    "title": "プロンプトテンプレート",
+    "create": "作成",
+    "empty": "テンプレートはまだありません。最初のテンプレートを作成しましょう。",
+    "createTemplate": "テンプレート作成",
+    "nameLabel": "テンプレート名",
+    "namePlaceholder": "例：プロジェクトキャンペーンを照会",
+    "contentLabel": "テンプレート内容（'{パラメータ}' をプレースホルダーとして使用）",
+    "contentPlaceholder": "'{system}' で '{appId}' のキャンペーン一覧を照会",
+    "use": "使用",
+    "save": "保存",
+    "send": "送信",
+    "fillParams": "パラメータ入力",
+    "usedCount": "{count} 回使用",
+    "deleteConfirm": "このテンプレートを削除しますか？",
+    "yes": "はい",
+    "no": "いいえ"
+  },
+  "richContent": {
+    "planApprove": "承認",
+    "planReject": "拒否",
+    "planApproveMessage": "上記のプランを承認します",
+    "planRejectMessage": "上記のプランを拒否します",
+    "planApproved": "承認済み",
+    "planRejected": "拒否済み",
+    "planStepCount": "{count} ステップ",
+    "stepRead": "参照",
+    "stepWrite": "変更",
+    "budgetWarning": "予算変更あり",
+    "tableSearch": "テーブルを検索...",
+    "tableExport": "CSV エクスポート",
+    "tableCopy": "テーブルをコピー",
+    "tableCopied": "コピーしました",
+    "tableRows": "{count} 行",
+    "errorRetry": "復旧提案を送信",
+    "errorSent": "送信済み"
   },
   "theme": {
     "chooseTheme": "テーマを選択",

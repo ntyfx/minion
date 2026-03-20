@@ -1,16 +1,21 @@
 import { test, expect } from "@playwright/test";
 
+test.use({ locale: "en-US" });
+
 test.beforeEach(async ({ page }) => {
   await page.goto("/");
-  await page.evaluate(() => localStorage.clear());
+  await page.evaluate(() => {
+    localStorage.clear();
+    localStorage.setItem("minion-chat-locale", "en-US");
+  });
   await page.reload();
-  await page.waitForSelector(".ant-layout");
+  await page.waitForSelector(".ant-layout", { timeout: 10_000 });
 });
 
 test.describe("Token Report", () => {
   test("opens and closes the token report modal", async ({ page }) => {
     const reportBtn = page.locator(
-      'button[aria-label="tokenReport.openReport"]',
+      'button[aria-label="Open token usage report"]',
     );
     await expect(reportBtn).toBeVisible({ timeout: 10_000 });
     await reportBtn.click();
@@ -24,7 +29,7 @@ test.describe("Token Report", () => {
 
   test("shows empty state when no usage data", async ({ page }) => {
     const reportBtn = page.locator(
-      'button[aria-label="tokenReport.openReport"]',
+      'button[aria-label="Open token usage report"]',
     );
     await reportBtn.click();
 
@@ -37,7 +42,7 @@ test.describe("Token Report", () => {
 
   test("navigates between months", async ({ page }) => {
     const reportBtn = page.locator(
-      'button[aria-label="tokenReport.openReport"]',
+      'button[aria-label="Open token usage report"]',
     );
     await reportBtn.click();
 
@@ -56,7 +61,7 @@ test.describe("Token Report", () => {
 
   test("displays month label in header", async ({ page }) => {
     const reportBtn = page.locator(
-      'button[aria-label="tokenReport.openReport"]',
+      'button[aria-label="Open token usage report"]',
     );
     await reportBtn.click();
 

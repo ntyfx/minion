@@ -12,7 +12,14 @@
     "renameConversation": "Rename Conversation",
     "rename": "Rename",
     "enterNewName": "Enter new name",
-    "chooseIcon": "Choose icon"
+    "chooseIcon": "Choose icon",
+    "shareSession": "Share conversation",
+    "importSession": "Import conversation",
+    "importSuccess": "Conversation imported successfully",
+    "importFailed": "Import failed — invalid file format",
+    "editTags": "Edit Tags",
+    "tagsHint": "Enter tags, separated by commas",
+    "tagsPlaceholder": "ad campaign, gift packs"
   },
   "chat": {
     "welcomeTitle": "Minion Chat",
@@ -39,7 +46,9 @@
     "resend": "Resend",
     "tokenPrompt": "Prompt tokens",
     "tokenCompletion": "Completion tokens",
-    "tokenTotal": "Total tokens"
+    "tokenTotal": "Total tokens",
+    "bookmark": "Bookmark",
+    "bookmarked": "Bookmarked"
   },
   "sidebar": {
     "today": "Today",
@@ -51,7 +60,14 @@
     "newChat": "New Chat",
     "conversations": "Conversations",
     "menuRename": "Rename",
-    "menuDelete": "Delete"
+    "menuPin": "Pin / Unpin",
+    "menuTag": "Edit Tags",
+    "menuArchive": "Archive",
+    "menuUnarchive": "Unarchive",
+    "menuDelete": "Delete",
+    "search": "Search conversations...",
+    "active": "Active",
+    "archived": "Archived"
   },
   "settings": {
     "title": "Settings",
@@ -85,7 +101,14 @@
     "showMore": "Show more",
     "showLess": "Show less",
     "collapsePayload": "Collapse event payload",
-    "expandPayload": "Expand event payload"
+    "expandPayload": "Expand event payload",
+    "exportJson": "Export JSON",
+    "filterAll": "All",
+    "filterRequests": "Requests",
+    "filterThinking": "Thinking",
+    "filterData": "Data",
+    "filterTokens": "Tokens",
+    "filterErrors": "Errors"
   },
   "tools": {
     "title": "Tools Status",
@@ -117,6 +140,100 @@
     "completionTokens": "Completion",
     "dailyUsage": "Daily Usage",
     "noData": "No token usage data yet"
+  },
+  "dashboard": {
+    "title": "Minion Chat",
+    "subtitle": "Your Smart Operations Workbench",
+    "totalSessions": "Total Sessions",
+    "totalTokens": "Total Tokens",
+    "recentSessions": "Recent Sessions",
+    "quickActions": "Quick Actions",
+    "builtinTemplates": "Common Templates",
+    "queryEsystem": "Query E-system",
+    "queryArtifex": "Query Artifex",
+    "queryBox": "Query Box",
+    "queryAdnext": "Query Adnext",
+    "queryGift": "Query Gift",
+    "checkPipeline": "Check cross-system flow"
+  },
+  "sequences": {
+    "title": "Sequences",
+    "create": "Create",
+    "empty": "No sequences yet",
+    "createSequence": "Create Sequence",
+    "namePlaceholder": "Sequence name, e.g. Deployment check flow",
+    "stepPlaceholder": "Enter message (supports '{param}' placeholders)",
+    "addStep": "Add step",
+    "run": "Run",
+    "save": "Save",
+    "fillParams": "Fill Parameters",
+    "stepCount": "{count} steps",
+    "deleteConfirm": "Delete this sequence?",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "export": {
+    "title": "Export conversation",
+    "markdown": "Markdown (all)",
+    "markdownAiOnly": "Markdown (AI only)",
+    "json": "JSON",
+    "html": "HTML"
+  },
+  "bookmarks": {
+    "title": "Knowledge Base",
+    "search": "Search bookmarks...",
+    "empty": "No bookmarks yet. Click the star icon on AI responses to save them.",
+    "insertToChat": "Insert to input",
+    "copyContent": "Copy content",
+    "copied": "Copied",
+    "deleteConfirm": "Delete this bookmark?",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "slashCommands": {
+    "cmdQueryDesc": "Query system data",
+    "cmdPlanDesc": "Plan an operation",
+    "cmdApproveDesc": "Approve pending plan",
+    "cmdExecuteDesc": "Execute a change",
+    "cmdCheckDesc": "Check cross-system flow",
+    "cmdHelpDesc": "Show available commands"
+  },
+  "templates": {
+    "title": "Prompt Templates",
+    "create": "Create",
+    "empty": "No templates yet. Create your first one.",
+    "createTemplate": "Create Template",
+    "nameLabel": "Template name",
+    "namePlaceholder": "e.g. Query project campaigns",
+    "contentLabel": "Template content (use '{param}' as placeholders)",
+    "contentPlaceholder": "Query campaigns for '{appId}' in '{system}'",
+    "use": "Use",
+    "save": "Save",
+    "send": "Send",
+    "fillParams": "Fill Parameters",
+    "usedCount": "Used {count} times",
+    "deleteConfirm": "Delete this template?",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "richContent": {
+    "planApprove": "Approve",
+    "planReject": "Reject",
+    "planApproveMessage": "Approve the plan above",
+    "planRejectMessage": "Reject the plan above",
+    "planApproved": "Approved",
+    "planRejected": "Rejected",
+    "planStepCount": "{count} steps",
+    "stepRead": "Read",
+    "stepWrite": "Write",
+    "budgetWarning": "Budget change",
+    "tableSearch": "Search table...",
+    "tableExport": "Export CSV",
+    "tableCopy": "Copy table",
+    "tableCopied": "Copied",
+    "tableRows": "{count} rows",
+    "errorRetry": "Send recovery suggestion",
+    "errorSent": "Sent"
   },
   "theme": {
     "chooseTheme": "Choose Theme",

@@ -1,18 +1,22 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, act, cleanup, fireEvent, waitFor } from "@testing-library/react";
+import { render, act, cleanup, fireEvent, waitFor, screen } from "@testing-library/react";
+import { useState } from "react";
 import { mapRole } from "@/components/chat-panel";
-import type { ChatMessage, Session } from "@/types/chat";
+import type { ActivityEvent, ChatMessage, Session } from "@/types/chat";
 
 function makeMsg(role: ChatMessage["role"], content = "test"): ChatMessage {
   return { id: `msg_${role}_${Math.random()}`, role, content, timestamp: Date.now() };
 }
 
-function makeSession(messages: ChatMessage[] = []): Session {
+function makeSession(
+  messages: ChatMessage[] = [],
+  activity: ActivityEvent[] = [],
+): Session {
   return {
     id: "s1",
     label: "Test",
     messages,
-    activity: [],
+    activity,
     createdAt: Date.now(),
     updatedAt: Date.now(),
   };
@@ -578,5 +582,115 @@ describe("ChatPanel component", () => {
       const copyButtons = container.querySelectorAll('button[aria-label*="copy"]');
       expect(copyButtons.length).toBeGreaterThan(0);
     });
+  });
+
+  it("shows formatted token usage on assistant bubble after hover (buildTokenUsageByRound / formatTokenCount)", async () => {
+    const ChatPanel = (await import("@/components/chat-panel")).default;
+    const activity: ActivityEvent[] = [
+      {
+        id: "a1",
+        type: "token_usage",
+        payload: {
+          prompt_tokens: 1500,
+          completion_tokens: 200,
+          total_tokens: 1700,
+        },
+        timestamp: 1,
+      },
+    ];
+    const { container } = render(
+      <ChatPanel
+        session={makeSession(
+          [makeMsg("user", "q"), makeMsg("assistant", "answer text")],
+          activity,
+        )}
+        isStreaming={false}
+        streamingContent=""
+        reasoningContent=""
+        inputValue=""
+        onInputChange={vi.fn()}
+        onSend={vi.fn()}
+        onResend={vi.fn()}
+        onStop={vi.fn()}
+      />,
+    );
+
+    const toolbar = container.querySelector(".message-toolbar");
+    const hoverTarget = toolbar?.parentElement;
+    expect(hoverTarget).toBeTruthy();
+    await act(async () => {
+      fireEvent.mouseEnter(hoverTarget!);
+    });
+
+    expect(container.textContent).toContain("1.5k");
+    expect(container.textContent).toContain("200");
+    expect(container.textContent).toContain("1.7k");
+  });
+
+  it("shows slash command popup when input starts with /", async () => {
+    const ChatPanel = (await import("@/components/chat-panel")).default;
+
+    function Controlled() {
+      const [inputValue, setInputValue] = useState("");
+      return (
+        <ChatPanel
+          session={makeSession()}
+          isStreaming={false}
+          streamingContent=""
+          reasoningContent=""
+          inputValue={inputValue}
+          onInputChange={setInputValue}
+          onSend={vi.fn()}
+          onResend={vi.fn()}
+          onStop={vi.fn()}
+        />
+      );
+    }
+
+    const { container } = render(<Controlled />);
+    const textarea = container.querySelector(
+      'textarea:not([aria-hidden="true"])',
+    );
+    expect(textarea).toBeTruthy();
+    fireEvent.change(textarea!, { target: { value: "/" } });
+
+    const popup = container.querySelector(".slash-popup[role='listbox']");
+    expect(popup).toBeTruthy();
+    expect(
+      container.querySelector('button[role="option"]'),
+    ).toBeTruthy();
+    expect(container.querySelector(".slash-popup-label")).toHaveTextContent(
+      "/query",
+    );
+  });
+
+  it("sends prompt description when a welcome Prompts item is clicked", async () => {
+    const ChatPanel = (await import("@/components/chat-panel")).default;
+    const onSend = vi.fn();
+    render(
+      <ChatPanel
+        session={makeSession()}
+        isStreaming={false}
+        streamingContent=""
+        reasoningContent=""
+        inputValue=""
+        onInputChange={vi.fn()}
+        onSend={onSend}
+        onResend={vi.fn()}
+        onStop={vi.fn()}
+      />,
+    );
+
+    const desc = screen.getByText("chat.promptExecuteDesc");
+    const clickable =
+      desc.closest("button") ??
+      desc.closest("[role='button']") ??
+      desc.closest(".ant-prompts-item");
+    expect(clickable).toBeTruthy();
+    await act(async () => {
+      fireEvent.click(clickable!);
+    });
+
+    expect(onSend).toHaveBeenCalledWith("chat.promptExecuteDesc");
   });
 });

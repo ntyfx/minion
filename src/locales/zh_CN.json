@@ -12,7 +12,14 @@
     "renameConversation": "重命名对话",
     "rename": "重命名",
     "enterNewName": "输入新名称",
-    "chooseIcon": "选择图标"
+    "chooseIcon": "选择图标",
+    "shareSession": "分享对话",
+    "importSession": "导入对话",
+    "importSuccess": "对话导入成功",
+    "importFailed": "导入失败，文件格式不正确",
+    "editTags": "编辑标签",
+    "tagsHint": "输入标签，用逗号分隔",
+    "tagsPlaceholder": "广告投放, 礼包管理"
   },
   "chat": {
     "welcomeTitle": "Minion Chat",
@@ -39,7 +46,9 @@
     "resend": "重新发送",
     "tokenPrompt": "提示词 Token",
     "tokenCompletion": "补全 Token",
-    "tokenTotal": "总 Token"
+    "tokenTotal": "总 Token",
+    "bookmark": "收藏",
+    "bookmarked": "已收藏"
   },
   "sidebar": {
     "today": "今天",
@@ -51,7 +60,14 @@
     "newChat": "新对话",
     "conversations": "对话列表",
     "menuRename": "重命名",
-    "menuDelete": "删除"
+    "menuPin": "置顶/取消置顶",
+    "menuTag": "编辑标签",
+    "menuArchive": "归档",
+    "menuUnarchive": "取消归档",
+    "menuDelete": "删除",
+    "search": "搜索对话...",
+    "active": "活跃",
+    "archived": "归档"
   },
   "settings": {
     "title": "设置",
@@ -85,7 +101,14 @@
     "showMore": "展开更多",
     "showLess": "收起",
     "collapsePayload": "收起事件内容",
-    "expandPayload": "展开事件内容"
+    "expandPayload": "展开事件内容",
+    "exportJson": "导出 JSON",
+    "filterAll": "全部",
+    "filterRequests": "请求",
+    "filterThinking": "思考",
+    "filterData": "数据",
+    "filterTokens": "Token",
+    "filterErrors": "错误"
   },
   "tools": {
     "title": "工具状态",
@@ -117,6 +140,100 @@
     "completionTokens": "补全",
     "dailyUsage": "每日消耗",
     "noData": "暂无 Token 消耗数据"
+  },
+  "dashboard": {
+    "title": "Minion Chat",
+    "subtitle": "你的智能运营工作台",
+    "totalSessions": "对话总数",
+    "totalTokens": "Token 总用量",
+    "recentSessions": "最近对话",
+    "quickActions": "快速操作",
+    "builtinTemplates": "常用模板",
+    "queryEsystem": "查询 E-system",
+    "queryArtifex": "查询 Artifex",
+    "queryBox": "查询 Box",
+    "queryAdnext": "查询 Adnext",
+    "queryGift": "查询 Gift",
+    "checkPipeline": "检查跨系统链路"
+  },
+  "sequences": {
+    "title": "操作序列",
+    "create": "新建",
+    "empty": "暂无操作序列",
+    "createSequence": "新建操作序列",
+    "namePlaceholder": "序列名称，例如：投放检查流程",
+    "stepPlaceholder": "输入消息（支持 '{参数}' 占位符）",
+    "addStep": "添加步骤",
+    "run": "运行",
+    "save": "保存",
+    "fillParams": "填写参数",
+    "stepCount": "{count} 步",
+    "deleteConfirm": "确定删除此序列？",
+    "yes": "确定",
+    "no": "取消"
+  },
+  "export": {
+    "title": "导出对话",
+    "markdown": "Markdown（全部）",
+    "markdownAiOnly": "Markdown（仅 AI 回复）",
+    "json": "JSON",
+    "html": "HTML"
+  },
+  "bookmarks": {
+    "title": "知识库",
+    "search": "搜索收藏...",
+    "empty": "暂无收藏，在 AI 回复上点击星标即可收藏",
+    "insertToChat": "插入到输入框",
+    "copyContent": "复制内容",
+    "copied": "已复制",
+    "deleteConfirm": "确定删除此收藏？",
+    "yes": "确定",
+    "no": "取消"
+  },
+  "slashCommands": {
+    "cmdQueryDesc": "查询系统数据",
+    "cmdPlanDesc": "规划操作方案",
+    "cmdApproveDesc": "确认待审计划",
+    "cmdExecuteDesc": "执行变更操作",
+    "cmdCheckDesc": "检查跨系统链路",
+    "cmdHelpDesc": "显示可用命令"
+  },
+  "templates": {
+    "title": "提示模板",
+    "create": "新建",
+    "empty": "暂无模板，点击新建创建你的第一个模板",
+    "createTemplate": "新建模板",
+    "nameLabel": "模板名称",
+    "namePlaceholder": "例如：查询项目 campaign",
+    "contentLabel": "模板内容（使用 '{参数名}' 作为占位符）",
+    "contentPlaceholder": "查询 '{appId}' 在 '{system}' 的 campaign 列表",
+    "use": "使用",
+    "save": "保存",
+    "send": "发送",
+    "fillParams": "填写参数",
+    "usedCount": "已用 {count} 次",
+    "deleteConfirm": "确定删除此模板？",
+    "yes": "确定",
+    "no": "取消"
+  },
+  "richContent": {
+    "planApprove": "确认执行",
+    "planReject": "拒绝",
+    "planApproveMessage": "确认执行以上计划",
+    "planRejectMessage": "拒绝执行以上计划",
+    "planApproved": "已确认",
+    "planRejected": "已拒绝",
+    "planStepCount": "{count} 个步骤",
+    "stepRead": "查询",
+    "stepWrite": "变更",
+    "budgetWarning": "涉及预算变更",
+    "tableSearch": "搜索表格...",
+    "tableExport": "导出 CSV",
+    "tableCopy": "复制表格",
+    "tableCopied": "已复制",
+    "tableRows": "{count} 行",
+    "errorRetry": "执行恢复建议",
+    "errorSent": "已发送"
   },
   "theme": {
     "chooseTheme": "选择主题",

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useRef } from "react";
+import { useMemoizedFn } from "ahooks";
 import {
   streamChat,
   readChunkContent,
@@ -42,8 +43,7 @@ export function useStreaming({
   const controllerRef = useRef<AbortController | null>(null);
   const sendingRef = useRef(false);
 
-  const handleSend = useCallback(
-    async (userMessage: string) => {
+  const handleSend = useMemoizedFn(async (userMessage: string) => {
       if (!activeSessionId || sendingRef.current) return;
 
       if (!settings.accessToken) {
@@ -259,21 +259,16 @@ export function useStreaming({
         setStreamingContent("");
         setReasoningContent("");
       }
-    },
-    [activeSessionId, settings, sessionsRef, setSessions, setActiveSessionId, updateSession, onMissingToken],
-  );
+    });
 
-  const handleResend = useCallback(
-    (messageContent: string) => {
-      if (!activeSessionId || sendingRef.current) return;
-      handleSend(messageContent);
-    },
-    [activeSessionId, handleSend],
-  );
+  const handleResend = useMemoizedFn((messageContent: string) => {
+    if (!activeSessionId || sendingRef.current) return;
+    handleSend(messageContent);
+  });
 
-  const handleStop = useCallback(() => {
+  const handleStop = useMemoizedFn(() => {
     controllerRef.current?.abort();
-  }, []);
+  });
 
   return {
     isStreaming,

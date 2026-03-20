@@ -27,6 +27,9 @@ export interface Session {
   id: string;
   label: string;
   icon?: string;
+  tags?: string[];
+  pinned?: boolean;
+  archived?: boolean;
   messages: ChatMessage[];
   activity: ActivityEvent[];
   createdAt: number;

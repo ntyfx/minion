@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState } from "react";
+import { useMemoizedFn } from "ahooks";
 import { Layout, Badge, Modal, Input, Flex, Tooltip, message, Space, Spin } from "antd";
 import {
   SafetyCertificateOutlined,
@@ -9,6 +10,8 @@ import {
   GithubOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
+  ShareAltOutlined,
+  ImportOutlined,
 } from "@ant-design/icons";
 import { CHAT_ICON_KEYS, getChatIcon } from "@/lib/chat-icons";
 import { useTranslations } from "next-intl";
@@ -19,6 +22,14 @@ import ActivityFeed, { ActivityToggle } from "@/components/activity-feed";
 import { ToolsToggle } from "@/components/tools-status";
 import { TokenReportToggle } from "@/components/token-report";
 import SettingsPanel from "@/components/settings-panel";
+import TemplatePanel, { TemplateToggle } from "@/components/template-panel";
+import BookmarkPanel, { BookmarkToggle } from "@/components/bookmark-panel";
+import { ExportMenu } from "@/components/export-menu";
+import Dashboard from "@/components/dashboard";
+import SequencePanel, { SequenceToggle } from "@/components/sequence-panel";
+import { downloadShareFile, readShareFile, shareableToSession } from "@/lib/sharing";
+import { createSession as createNewSession } from "@/lib/sessions";
+import { saveBookmark, createBookmarkId } from "@/lib/bookmark-db";
 import {
   loadSettings,
   saveSettings as persistSettings,
@@ -40,6 +51,9 @@ export default function Home() {
   const [activityOpen, setActivityOpen] = useState(false);
   const [seenEventCount, setSeenEventCount] = useState(0);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [templatesOpen, setTemplatesOpen] = useState(false);
+  const [bookmarksOpen, setBookmarksOpen] = useState(false);
+  const [sequencesOpen, setSequencesOpen] = useState(false);
 
   const [messageApi, contextHolder] = message.useMessage();
   const updateNotificationHolder = useUpdateNotification();
@@ -91,35 +105,103 @@ export default function Home() {
     handleRenameCancel,
   } = useRenameModal({ sessions, updateSession });
 
-  const handleSelectSession = useCallback(
-    (id: string) => {
-      baseSelectSession(id);
-      setInputValue("");
-      setSeenEventCount(0);
-      setActivityOpen(false);
-    },
-    [baseSelectSession, setInputValue],
-  );
+  const handleSelectSession = useMemoizedFn((id: string) => {
+    baseSelectSession(id);
+    setInputValue("");
+    setSeenEventCount(0);
+    setActivityOpen(false);
+  });
 
-  const handleSaveSettings = useCallback((next: AppSettings) => {
+  const handleSaveSettings = useMemoizedFn((next: AppSettings) => {
     setSettings(next);
     persistSettings(next);
-  }, []);
+  });
 
-  const handleClearActivity = useCallback(() => {
+  const handlePinSession = useMemoizedFn((id: string) => {
+    updateSession(id, (s) => ({ ...s, pinned: !s.pinned }));
+  });
+
+  const handleArchiveSession = useMemoizedFn((id: string) => {
+    updateSession(id, (s) => ({ ...s, archived: !s.archived }));
+  });
+
+  const [tagModalOpen, setTagModalOpen] = useState(false);
+  const [tagSessionId, setTagSessionId] = useState<string | null>(null);
+  const [tagInput, setTagInput] = useState("");
+
+  const handleTagSession = useMemoizedFn((id: string) => {
+    setTagSessionId(id);
+    const s = sessions.find((s) => s.id === id);
+    setTagInput((s?.tags ?? []).join(", "));
+    setTagModalOpen(true);
+  });
+
+  const handleTagConfirm = useMemoizedFn(() => {
+    if (!tagSessionId) return;
+    const tags = tagInput
+      .split(/[,，]/)
+      .map((t) => t.trim())
+      .filter(Boolean);
+    updateSession(tagSessionId, (s) => ({ ...s, tags }));
+    setTagModalOpen(false);
+    setTagSessionId(null);
+  });
+
+  const handleShareSession = useMemoizedFn(() => {
+    if (activeSession) {
+      downloadShareFile(activeSession);
+    }
+  });
+
+  const handleImportSession = useMemoizedFn(() => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".minion,.json";
+    input.onchange = async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+      try {
+        const shared = await readShareFile(file);
+        const newSess = shareableToSession(shared, createNewSession().id);
+        setSessions((prev) => [...prev, newSess]);
+        setActiveSessionId(newSess.id);
+        messageApi.success(t("importSuccess"));
+      } catch {
+        messageApi.error(t("importFailed"));
+      }
+    };
+    input.click();
+  });
+
+  const handleBookmark = useMemoizedFn((content: string, messageId: string) => {
+    const session = activeSession;
+    if (!session) return;
+    saveBookmark({
+      id: createBookmarkId(),
+      content,
+      role: "assistant",
+      tags: session.tags ?? [],
+      sessionId: session.id,
+      sessionLabel: session.label,
+      messageId,
+      createdAt: Date.now(),
+    });
+  });
+
+  const handleClearActivity = useMemoizedFn(() => {
     if (!activeSessionId) return;
     updateSession(activeSessionId, (s) => ({ ...s, activity: [] }));
     setSeenEventCount(0);
-  }, [activeSessionId, updateSession]);
+  });
 
-  const handleToggleActivity = useCallback(() => {
+  const handleToggleActivity = useMemoizedFn(() => {
     setActivityOpen((prev) => {
       if (!prev) {
         setSeenEventCount(activeSession?.activity.length ?? 0);
       }
       return !prev;
     });
-  }, [activeSession?.activity.length]);
+  });
 
   const unseenEventCount = Math.max(
     0,
@@ -205,6 +287,9 @@ export default function Home() {
               onCreateSession={handleCreateSession}
               onDeleteSession={handleDeleteSession}
               onRenameSession={handleRenameSession}
+              onPinSession={handlePinSession}
+              onArchiveSession={handleArchiveSession}
+              onTagSession={handleTagSession}
             />
           </div>
           {!siderCollapsed && (
@@ -305,6 +390,26 @@ export default function Home() {
           </Flex>
 
           <Flex gap={4} align="center">
+            <Tooltip title={t("importSession")}>
+              <button className="icon-button" onClick={handleImportSession} aria-label={t("importSession")}>
+                <ImportOutlined />
+              </button>
+            </Tooltip>
+            <Tooltip title={t("shareSession")}>
+              <button
+                className="icon-button"
+                onClick={handleShareSession}
+                aria-label={t("shareSession")}
+                disabled={!activeSession || activeSession.messages.length === 0}
+                style={{ opacity: activeSession?.messages.length ? 1 : 0.4 }}
+              >
+                <ShareAltOutlined />
+              </button>
+            </Tooltip>
+            <SequenceToggle onClick={() => setSequencesOpen(true)} />
+            <ExportMenu session={activeSession} />
+            <BookmarkToggle onClick={() => setBookmarksOpen(true)} />
+            <TemplateToggle onClick={() => setTemplatesOpen(true)} />
             <TokenReportToggle sessions={sessions} />
             <ToolsToggle
               baseUrl={settings.baseUrl}
@@ -319,6 +424,7 @@ export default function Home() {
                 onClick={() => setSettingsOpen(true)}
                 className="icon-button"
                 aria-label={t("openSettings")}
+                data-testid="settings-button"
               >
                 <SettingOutlined />
               </button>
@@ -338,17 +444,29 @@ export default function Home() {
         </header>
 
         <main style={{ flex: 1, overflow: "hidden" }}>
-          <ChatPanel
-            session={activeSession}
-            isStreaming={isStreaming}
-            streamingContent={streamingContent}
-            reasoningContent={reasoningContent}
-            inputValue={inputValue}
-            onInputChange={setInputValue}
-            onSend={handleSend}
-            onResend={handleResend}
-            onStop={handleStop}
-          />
+          {!activeSession ? (
+            <Dashboard
+              sessions={sessions}
+              onSelectSession={handleSelectSession}
+              onQuickAction={(text) => {
+                handleCreateSession();
+                setInputValue(text);
+              }}
+            />
+          ) : (
+            <ChatPanel
+              session={activeSession}
+              isStreaming={isStreaming}
+              streamingContent={streamingContent}
+              reasoningContent={reasoningContent}
+              inputValue={inputValue}
+              onInputChange={setInputValue}
+              onSend={handleSend}
+              onResend={handleResend}
+              onStop={handleStop}
+              onBookmark={handleBookmark}
+            />
+          )}
         </main>
       </Layout>
 
@@ -366,6 +484,52 @@ export default function Home() {
         onToggle={() => setSettingsOpen(false)}
         sessionCount={sessions.length}
       />
+
+      <TemplatePanel
+        open={templatesOpen}
+        onClose={() => setTemplatesOpen(false)}
+        onUse={(text) => {
+          setInputValue(text);
+        }}
+      />
+
+      <SequencePanel
+        open={sequencesOpen}
+        onClose={() => setSequencesOpen(false)}
+        onRun={(messages) => {
+          if (messages.length > 0) {
+            handleSend(messages[0]);
+          }
+        }}
+      />
+
+      <BookmarkPanel
+        open={bookmarksOpen}
+        onClose={() => setBookmarksOpen(false)}
+        onInsert={(text) => {
+          setInputValue((prev) => prev + (prev ? "\n" : "") + text);
+        }}
+      />
+
+      <Modal
+        title={t("editTags")}
+        open={tagModalOpen}
+        onOk={handleTagConfirm}
+        onCancel={() => setTagModalOpen(false)}
+        okText={t("rename")}
+        destroyOnHidden
+      >
+        <div style={{ marginBottom: 8, fontSize: 13, color: "var(--text-secondary)" }}>
+          {t("tagsHint")}
+        </div>
+        <Input
+          value={tagInput}
+          onChange={(e) => setTagInput(e.target.value)}
+          onPressEnter={handleTagConfirm}
+          placeholder={t("tagsPlaceholder")}
+          autoFocus
+        />
+      </Modal>
 
       <Modal
         title={t("renameConversation")}
