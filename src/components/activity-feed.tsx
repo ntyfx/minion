@@ -1,8 +1,8 @@
 "use client";
 
 import { useMemo, useState, memo } from "react";
-import { Typography, Button, Empty, Drawer, Badge, Tag, Tooltip, Flex } from "antd";
-import { ClearOutlined, ThunderboltOutlined, DownOutlined } from "@ant-design/icons";
+import { Typography, Button, Empty, Drawer, Badge, Tag, Tooltip, Flex, Segmented } from "antd";
+import { ClearOutlined, ThunderboltOutlined, DownOutlined, ExportOutlined } from "@ant-design/icons";
 import { useTranslations } from "next-intl";
 import type { ActivityEvent } from "@/types/chat";
 
@@ -25,9 +25,27 @@ export function eventColor(type: string): string {
     case "chunk":
     case "summary":
       return "var(--info)";
+    case "token_usage":
+      return "var(--accent-text)";
     default:
       return "var(--text-muted)";
   }
+}
+
+const EVENT_LABELS: Record<string, { zh: string; en: string }> = {
+  request: { zh: "发送请求", en: "Request sent" },
+  chunk: { zh: "接收数据", en: "Data received" },
+  thinking: { zh: "AI 思考中", en: "AI thinking" },
+  summary: { zh: "生成摘要", en: "Summary generated" },
+  done: { zh: "处理完成", en: "Processing done" },
+  error: { zh: "服务端错误", en: "Server error" },
+  client_error: { zh: "客户端错误", en: "Client error" },
+  token_usage: { zh: "Token 用量", en: "Token usage" },
+  message: { zh: "消息事件", en: "Message event" },
+};
+
+function getEventLabel(type: string): string {
+  return EVENT_LABELS[type]?.zh ?? type;
 }
 
 export function formatPayload(payload: unknown): string {
@@ -38,6 +56,23 @@ export function formatPayload(payload: unknown): string {
     return String(payload);
   }
 }
+
+function formatTokenPayload(payload: unknown): string | null {
+  if (!payload || typeof payload !== "object") return null;
+  const p = payload as Record<string, unknown>;
+  const parts: string[] = [];
+  if (typeof p.prompt_tokens === "number")
+    parts.push(`Prompt: ${p.prompt_tokens}`);
+  if (typeof p.completion_tokens === "number")
+    parts.push(`Completion: ${p.completion_tokens}`);
+  if (typeof p.total_tokens === "number")
+    parts.push(`Total: ${p.total_tokens}`);
+  if (typeof p.tools_count === "number" && p.tools_count > 0)
+    parts.push(`Tools: ${p.tools_count}`);
+  return parts.length > 0 ? parts.join(" · ") : null;
+}
+
+type FilterType = "all" | "request" | "thinking" | "data" | "token_usage" | "error";
 
 const EventCard = memo(function EventCard({
   evt,
@@ -53,103 +88,111 @@ const EventCard = memo(function EventCard({
   expandAriaLabel: string;
 }) {
   const [expanded, setExpanded] = useState(false);
-  const text = formatPayload(evt.payload);
+  const tokenText = evt.type === "token_usage" ? formatTokenPayload(evt.payload) : null;
+  const text = tokenText ?? formatPayload(evt.payload);
   const isLong = text.length > 200;
 
   const color = eventColor(evt.type);
 
   return (
-    <div
-      style={{
-        background: `color-mix(in srgb, ${color} 8%, var(--bg-elevated))`,
-        border: `1px solid ${color}`,
-        borderRadius: 8,
-        padding: "10px 12px",
-        marginBottom: 8,
-      }}
-    >
-      <Flex justify="space-between" align="center" style={{ marginBottom: 6 }}>
-        <Typography.Text
-          style={{
-            fontSize: 11,
-            textTransform: "uppercase",
-            letterSpacing: "0.06em",
-            fontWeight: 600,
-            fontFamily: "var(--font-mono), ui-monospace, monospace",
-            color: color,
-          }}
-        >
-          {evt.type}
-        </Typography.Text>
-        <Typography.Text
-          style={{
-            fontSize: 11,
-            fontFamily: "var(--font-mono), ui-monospace, monospace",
-            color: "var(--text-muted)",
-            fontVariantNumeric: "tabular-nums",
-          }}
-        >
-          {new Date(evt.timestamp).toLocaleTimeString()}
-        </Typography.Text>
-      </Flex>
-      <div style={{ position: "relative" }}>
-        <pre
-          style={{
-            margin: 0,
-            whiteSpace: "pre-wrap",
-            wordBreak: "break-word",
-            fontFamily: "var(--font-mono), ui-monospace, monospace",
-            fontSize: 11,
-            color: "var(--text-secondary)",
-            lineHeight: 1.55,
-            maxHeight: expanded || !isLong ? "none" : 68,
-            overflow: "hidden",
-          }}
-        >
-          {text}
-        </pre>
-        {isLong && !expanded && (
-          <div
+    <div className="activity-card">
+      <div className="activity-card-dot" style={{ background: color }} />
+      <div className="activity-card-body">
+        <Flex justify="space-between" align="center" style={{ marginBottom: 4 }}>
+          <Flex align="center" gap={6}>
+            <Typography.Text
+              style={{
+                fontSize: 12,
+                fontWeight: 600,
+                color: color,
+              }}
+            >
+              {getEventLabel(evt.type)}
+            </Typography.Text>
+            <Tag
+              style={{
+                fontSize: 10,
+                lineHeight: "16px",
+                padding: "0 4px",
+                margin: 0,
+                borderRadius: 4,
+                textTransform: "uppercase",
+                fontFamily: "var(--font-mono), ui-monospace, monospace",
+              }}
+            >
+              {evt.type}
+            </Tag>
+          </Flex>
+          <Typography.Text
             style={{
-              position: "absolute",
-              bottom: 0,
-              left: 0,
-              right: 0,
-              height: 28,
-              background: `linear-gradient(transparent, color-mix(in srgb, ${color} 8%, var(--bg-elevated)))`,
-              pointerEvents: "none",
+              fontSize: 11,
+              fontFamily: "var(--font-mono), ui-monospace, monospace",
+              color: "var(--text-muted)",
+              fontVariantNumeric: "tabular-nums",
             }}
-          />
+          >
+            {new Date(evt.timestamp).toLocaleTimeString()}
+          </Typography.Text>
+        </Flex>
+        <div style={{ position: "relative" }}>
+          <pre
+            style={{
+              margin: 0,
+              whiteSpace: "pre-wrap",
+              wordBreak: "break-word",
+              fontFamily: "var(--font-mono), ui-monospace, monospace",
+              fontSize: 11,
+              color: "var(--text-secondary)",
+              lineHeight: 1.55,
+              maxHeight: expanded || !isLong ? "none" : 52,
+              overflow: "hidden",
+            }}
+          >
+            {text}
+          </pre>
+          {isLong && !expanded && (
+            <div
+              style={{
+                position: "absolute",
+                bottom: 0,
+                left: 0,
+                right: 0,
+                height: 24,
+                background: "linear-gradient(transparent, var(--bg-elevated))",
+                pointerEvents: "none",
+              }}
+            />
+          )}
+        </div>
+        {isLong && (
+          <button
+            onClick={() => setExpanded(!expanded)}
+            aria-expanded={expanded}
+            aria-label={expanded ? collapseAriaLabel : expandAriaLabel}
+            style={{
+              background: "none",
+              border: "none",
+              color: "var(--accent-text)",
+              fontSize: 11,
+              cursor: "pointer",
+              padding: "2px 0 0",
+              fontFamily: "var(--font-mono), ui-monospace, monospace",
+              display: "flex",
+              alignItems: "center",
+              gap: 4,
+            }}
+          >
+            <DownOutlined
+              style={{
+                fontSize: 9,
+                transform: expanded ? "rotate(180deg)" : "none",
+                transition: "transform 0.15s ease-out",
+              }}
+            />
+            {expanded ? showLessLabel : showMoreLabel}
+          </button>
         )}
       </div>
-      {isLong && (
-        <button
-          onClick={() => setExpanded(!expanded)}
-          aria-expanded={expanded}
-          aria-label={expanded ? collapseAriaLabel : expandAriaLabel}
-          style={{
-            background: "none",
-            border: "none",
-            color: "var(--accent-text)",
-            fontSize: 11,
-            cursor: "pointer",
-            padding: "4px 0 0",
-            fontFamily: "var(--font-mono), ui-monospace, monospace",
-            display: "flex",
-            alignItems: "center",
-            gap: 4,
-          }}
-        >
-          <DownOutlined
-            style={{
-              fontSize: 9,
-              transform: expanded ? "rotate(180deg)" : "none",
-              transition: "transform 0.15s ease-out",
-            }}
-          />
-          {expanded ? showLessLabel : showMoreLabel}
-        </button>
-      )}
     </div>
   );
 });
@@ -169,6 +212,7 @@ export function ActivityToggle({
           onClick={onClick}
           className="icon-button"
           aria-label={t("openFeed")}
+          data-testid="activity-button"
         >
           <ThunderboltOutlined />
         </button>
@@ -184,7 +228,40 @@ export default function ActivityFeed({
   onToggle,
 }: ActivityFeedProps) {
   const t = useTranslations("activity");
-  const reversed = useMemo(() => [...events].reverse(), [events]);
+  const [filter, setFilter] = useState<FilterType>("all");
+
+  const filtered = useMemo(() => {
+    let list = [...events].reverse();
+    switch (filter) {
+      case "request":
+        list = list.filter((e) => e.type === "request" || e.type === "done");
+        break;
+      case "thinking":
+        list = list.filter((e) => e.type === "thinking");
+        break;
+      case "data":
+        list = list.filter((e) => e.type === "chunk" || e.type === "summary");
+        break;
+      case "token_usage":
+        list = list.filter((e) => e.type === "token_usage");
+        break;
+      case "error":
+        list = list.filter((e) => e.type === "error" || e.type === "client_error");
+        break;
+    }
+    return list;
+  }, [events, filter]);
+
+  const handleExport = () => {
+    const content = JSON.stringify(events, null, 2);
+    const blob = new Blob([content], { type: "application/json;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `activity-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <Drawer
@@ -214,15 +291,26 @@ export default function ActivityFeed({
               </Tag>
             )}
           </Flex>
-          <Button
-            size="small"
-            icon={<ClearOutlined />}
-            onClick={onClear}
-            type="text"
-            aria-label={t("clearAll")}
-          >
-            {t("clear")}
-          </Button>
+          <Flex gap={4}>
+            <Tooltip title={t("exportJson")}>
+              <Button
+                size="small"
+                icon={<ExportOutlined />}
+                onClick={handleExport}
+                type="text"
+                disabled={events.length === 0}
+              />
+            </Tooltip>
+            <Button
+              size="small"
+              icon={<ClearOutlined />}
+              onClick={onClear}
+              type="text"
+              aria-label={t("clearAll")}
+            >
+              {t("clear")}
+            </Button>
+          </Flex>
         </Flex>
       }
       placement="right"
@@ -230,20 +318,36 @@ export default function ActivityFeed({
       onClose={onToggle}
       closable
       styles={{
-        wrapper: { width: 380 },
+        wrapper: { width: 400 },
         header: { padding: "10px 16px" },
         body: { padding: "12px 16px" },
       }}
+      data-testid="activity-feed-drawer"
     >
-      {reversed.length === 0 ? (
+      <Segmented
+        size="small"
+        value={filter}
+        onChange={(v) => setFilter(v as FilterType)}
+        options={[
+          { label: t("filterAll"), value: "all" },
+          { label: t("filterRequests"), value: "request" },
+          { label: t("filterThinking"), value: "thinking" },
+          { label: t("filterData"), value: "data" },
+          { label: t("filterTokens"), value: "token_usage" },
+          { label: t("filterErrors"), value: "error" },
+        ]}
+        style={{ marginBottom: 12, width: "100%" }}
+        block
+      />
+      {filtered.length === 0 ? (
         <Empty
           image={Empty.PRESENTED_IMAGE_SIMPLE}
           description={t("noEvents")}
           style={{ marginTop: 60 }}
         />
       ) : (
-        <Flex vertical gap={0}>
-          {reversed.map((evt) => (
+        <div className="activity-timeline">
+          {filtered.map((evt) => (
             <EventCard
               key={evt.id}
               evt={evt}
@@ -253,7 +357,7 @@ export default function ActivityFeed({
               expandAriaLabel={t("expandPayload")}
             />
           ))}
-        </Flex>
+        </div>
       )}
     </Drawer>
   );

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, act } from "@testing-library/react";
+import { render, screen, act, fireEvent, waitFor } from "@testing-library/react";
 import { formatTimeAgo } from "@/components/sidebar";
 import Sidebar from "@/components/sidebar";
 import type { Session } from "@/types/chat";
@@ -26,6 +26,14 @@ describe("formatTimeAgo", () => {
   it("returns days for 24+ hours", () => {
     expect(formatTimeAgo(Date.now() - DAY, "now")).toBe("1d");
     expect(formatTimeAgo(Date.now() - 7 * DAY, "now")).toBe("7d");
+  });
+
+  it("returns 1h at exactly 60 minutes", () => {
+    expect(formatTimeAgo(Date.now() - 60 * 60000, "now")).toBe("1h");
+  });
+
+  it("returns 1d at exactly 24 hours", () => {
+    expect(formatTimeAgo(Date.now() - 24 * 3600000, "now")).toBe("1d");
   });
 });
 
@@ -125,5 +133,138 @@ describe("Sidebar component", () => {
       });
       expect(onCreateSession).toHaveBeenCalledOnce();
     }
+  });
+
+  it("filters sessions by search (label, tag, message)", () => {
+    const sessions: Session[] = [
+      {
+        id: "a",
+        label: "Alpha project",
+        messages: [{ id: "m1", role: "user", content: "hello", timestamp: 1 }],
+        activity: [],
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      },
+      {
+        id: "b",
+        label: "Other",
+        tags: ["billing"],
+        messages: [],
+        activity: [],
+        createdAt: Date.now(),
+        updatedAt: Date.now() - 1000,
+      },
+      {
+        id: "c",
+        label: "Gamma",
+        messages: [
+          {
+            id: "m2",
+            role: "user",
+            content: "unique-snippet-xyz",
+            timestamp: 2,
+          },
+        ],
+        activity: [],
+        createdAt: Date.now(),
+        updatedAt: Date.now() - 2000,
+      },
+    ];
+    const { container } = render(
+      <Sidebar {...defaultProps} sessions={sessions} activeSessionId="a" />,
+    );
+    const searchInput = screen.getByPlaceholderText("sidebar.search");
+    fireEvent.change(searchInput, { target: { value: "alpha" } });
+    expect(screen.getByText("Alpha project")).toBeInTheDocument();
+    expect(screen.queryByText("Other")).not.toBeInTheDocument();
+    expect(screen.queryByText("Gamma")).not.toBeInTheDocument();
+
+    fireEvent.change(searchInput, { target: { value: "billing" } });
+    expect(screen.getByText("Other")).toBeInTheDocument();
+    expect(screen.queryByText("Alpha project")).not.toBeInTheDocument();
+
+    fireEvent.change(searchInput, { target: { value: "unique-snippet-xyz" } });
+    expect(screen.getByText("Gamma")).toBeInTheDocument();
+    expect(screen.queryByText("Alpha project")).not.toBeInTheDocument();
+
+    const items = container.querySelectorAll(".ant-conversations-item");
+    expect(items.length).toBe(1);
+  });
+
+  it("toggles Active vs Archived session lists", () => {
+    const sessions: Session[] = [
+      {
+        id: "active-1",
+        label: "Visible active",
+        messages: [],
+        activity: [],
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      },
+      {
+        id: "arch-1",
+        label: "Archived only",
+        archived: true,
+        messages: [],
+        activity: [],
+        createdAt: Date.now(),
+        updatedAt: Date.now() - 1000,
+      },
+    ];
+    render(
+      <Sidebar {...defaultProps} sessions={sessions} activeSessionId="active-1" />,
+    );
+    expect(screen.getByText("Visible active")).toBeInTheDocument();
+    expect(screen.queryByText("Archived only")).not.toBeInTheDocument();
+
+    const nav = screen.getByRole("navigation", {
+      name: "sidebar.conversations",
+    });
+    const filterBtns = nav.querySelectorAll("button.sidebar-filter-btn");
+    expect(filterBtns.length).toBeGreaterThanOrEqual(2);
+    fireEvent.click(filterBtns[1]);
+    expect(screen.queryByText("Visible active")).not.toBeInTheDocument();
+    expect(screen.getByText("Archived only")).toBeInTheDocument();
+
+    fireEvent.click(filterBtns[0]);
+    expect(screen.getByText("Visible active")).toBeInTheDocument();
+    expect(screen.queryByText("Archived only")).not.toBeInTheDocument();
+  });
+
+  it("invokes Pin, Tag, and Archive from the conversation menu", async () => {
+    const onPinSession = vi.fn();
+    const onTagSession = vi.fn();
+    const onArchiveSession = vi.fn();
+    const { container } = render(
+      <Sidebar
+        {...defaultProps}
+        onPinSession={onPinSession}
+        onTagSession={onTagSession}
+        onArchiveSession={onArchiveSession}
+      />,
+    );
+    const menuIcon = container.querySelector(".ant-conversations-menu-icon");
+    expect(menuIcon).toBeTruthy();
+    fireEvent.click(menuIcon as HTMLElement);
+
+    await waitFor(() => {
+      expect(screen.getByText("sidebar.menuPin")).toBeInTheDocument();
+    });
+    fireEvent.click(screen.getByText("sidebar.menuPin"));
+    expect(onPinSession).toHaveBeenCalledWith("s1");
+
+    fireEvent.click(menuIcon as HTMLElement);
+    await waitFor(() => {
+      expect(screen.getByText("sidebar.menuTag")).toBeInTheDocument();
+    });
+    fireEvent.click(screen.getByText("sidebar.menuTag"));
+    expect(onTagSession).toHaveBeenCalledWith("s1");
+
+    fireEvent.click(menuIcon as HTMLElement);
+    await waitFor(() => {
+      expect(screen.getByText("sidebar.menuArchive")).toBeInTheDocument();
+    });
+    fireEvent.click(screen.getByText("sidebar.menuArchive"));
+    expect(onArchiveSession).toHaveBeenCalledWith("s1");
   });
 });

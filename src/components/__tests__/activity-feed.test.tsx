@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, act, cleanup } from "@testing-library/react";
+import { render, screen, act, cleanup, fireEvent } from "@testing-library/react";
 import { eventColor, formatPayload } from "@/components/activity-feed";
 import { ActivityToggle } from "@/components/activity-feed";
 import type { ActivityEvent } from "@/types/chat";
@@ -241,7 +241,7 @@ describe("ActivityFeed component", () => {
     expect(onClear).toHaveBeenCalledOnce();
   });
 
-  it("applies eventColor to border of event card", async () => {
+  it("applies eventColor to dot of event card", async () => {
     const ActivityFeed = (await import("@/components/activity-feed")).default;
     const { baseElement } = render(
       <ActivityFeed
@@ -251,14 +251,12 @@ describe("ActivityFeed component", () => {
         onToggle={vi.fn()}
       />,
     );
-    const card = baseElement.querySelector<HTMLDivElement>(
-      'div[style*="border"]',
-    );
-    expect(card).toBeTruthy();
-    expect(card?.style.border).toContain("var(--error)");
+    const dot = baseElement.querySelector<HTMLDivElement>(".activity-card-dot");
+    expect(dot).toBeTruthy();
+    expect(dot?.style.background).toBe("var(--error)");
   });
 
-  it("applies eventColor-based background to event card", async () => {
+  it("applies eventColor to event label text", async () => {
     const ActivityFeed = (await import("@/components/activity-feed")).default;
     const { baseElement } = render(
       <ActivityFeed
@@ -268,15 +266,13 @@ describe("ActivityFeed component", () => {
         onToggle={vi.fn()}
       />,
     );
-    const card = baseElement.querySelector<HTMLDivElement>(
-      'div[style*="background"]',
-    );
+    const card = baseElement.querySelector<HTMLDivElement>(".activity-card");
     expect(card).toBeTruthy();
-    expect(card?.style.background).toContain("color-mix");
-    expect(card?.style.background).toContain("var(--accent)");
+    const label = card?.querySelector<HTMLElement>(".ant-typography");
+    expect(label?.style.color).toBe("var(--accent)");
   });
 
-  it("applies eventColor-based gradient to fade overlay for long payloads", async () => {
+  it("applies fade overlay gradient for long payloads", async () => {
     const ActivityFeed = (await import("@/components/activity-feed")).default;
     const longPayload = "x".repeat(250);
     const { baseElement } = render(
@@ -291,7 +287,99 @@ describe("ActivityFeed component", () => {
       'div[style*="linear-gradient"]',
     );
     expect(fadeOverlay).toBeTruthy();
-    expect(fadeOverlay?.style.background).toContain("color-mix");
-    expect(fadeOverlay?.style.background).toContain("var(--warning)");
+    expect(fadeOverlay?.style.background).toContain("linear-gradient");
+    expect(fadeOverlay?.style.background).toContain("var(--bg-elevated)");
+  });
+
+  it("exports activity as JSON via blob URL and anchor click", async () => {
+    const createUrl = vi.spyOn(URL, "createObjectURL").mockReturnValue("blob:mock");
+    const revoke = vi.spyOn(URL, "revokeObjectURL").mockImplementation(() => {});
+    const realCreate = document.createElement.bind(document);
+    const click = vi.fn();
+    vi.spyOn(document, "createElement").mockImplementation((tag: string) => {
+      if (tag === "a") {
+        const a = realCreate("a");
+        a.click = click;
+        return a;
+      }
+      return realCreate(tag);
+    });
+
+    const ActivityFeed = (await import("@/components/activity-feed")).default;
+    const events = [makeEvent("chunk", { x: 1 })];
+    const { baseElement } = render(
+      <ActivityFeed
+        events={events}
+        onClear={vi.fn()}
+        open={true}
+        onToggle={vi.fn()}
+      />,
+    );
+
+    const exportBtn = baseElement
+      .querySelector(".anticon-export")
+      ?.closest("button");
+    expect(exportBtn).toBeTruthy();
+    act(() => {
+      exportBtn!.click();
+    });
+
+    expect(createUrl).toHaveBeenCalled();
+    expect(click).toHaveBeenCalled();
+    expect(revoke).toHaveBeenCalledWith("blob:mock");
+
+    vi.restoreAllMocks();
+  });
+
+  it("filters events when Segmented filter changes", async () => {
+    const ActivityFeed = (await import("@/components/activity-feed")).default;
+    const events = [
+      makeEvent("chunk", "data-a"),
+      makeEvent("thinking", "think-b"),
+    ];
+    const { baseElement } = render(
+      <ActivityFeed
+        events={events}
+        onClear={vi.fn()}
+        open={true}
+        onToggle={vi.fn()}
+      />,
+    );
+
+    expect(baseElement.textContent).toContain("think-b");
+
+    const thinkingLabel = screen.getByText("activity.filterThinking");
+    const thinkingOption =
+      thinkingLabel.closest("label") ??
+      thinkingLabel.closest('[role="tab"]') ??
+      thinkingLabel.parentElement;
+    expect(thinkingOption).toBeTruthy();
+    fireEvent.click(thinkingOption!);
+
+    expect(baseElement.textContent).toContain("think-b");
+    expect(baseElement.textContent).not.toContain("data-a");
+  });
+
+  it("renders token_usage events with formatted token summary (formatTokenPayload)", async () => {
+    const ActivityFeed = (await import("@/components/activity-feed")).default;
+    const payload = {
+      prompt_tokens: 10,
+      completion_tokens: 20,
+      total_tokens: 30,
+      tools_count: 2,
+    };
+    const { baseElement } = render(
+      <ActivityFeed
+        events={[makeEvent("token_usage", payload)]}
+        onClear={vi.fn()}
+        open={true}
+        onToggle={vi.fn()}
+      />,
+    );
+    const pre = baseElement.querySelector("pre");
+    expect(pre?.textContent).toContain("Prompt: 10");
+    expect(pre?.textContent).toContain("Completion: 20");
+    expect(pre?.textContent).toContain("Total: 30");
+    expect(pre?.textContent).toContain("Tools: 2");
   });
 });

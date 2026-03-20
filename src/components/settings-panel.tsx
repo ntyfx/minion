@@ -102,6 +102,7 @@ export default function SettingsPanel({
           <OkBtn />
         </Flex>
       )}
+      data-testid="settings-modal"
     >
       {contextHolder}
       <Flex vertical gap={20}>
@@ -135,6 +136,7 @@ export default function SettingsPanel({
                     onClick={() => setTheme(tm.id as ThemeId)}
                     aria-label={tTheme("switchTo", { name: tTheme(`themeName.${tm.id}`) })}
                     aria-pressed={isActive}
+                    data-testid={`theme-button-${tm.id}`}
                     style={{
                       width: 28,
                       height: 28,

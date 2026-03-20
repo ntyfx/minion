@@ -1,6 +1,17 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, act, fireEvent, cleanup } from "@testing-library/react";
 
+const { mockSetTheme } = vi.hoisted(() => ({ mockSetTheme: vi.fn() }));
+
+vi.mock("@/lib/theme", () => ({
+  useTheme: () => ({
+    themeId: "dark",
+    colorScheme: "dark" as const,
+    setTheme: mockSetTheme,
+  }),
+  ThemeProvider: ({ children }: { children: React.ReactNode }) => children,
+}));
+
 function findButtonByText(root: HTMLElement, text: string) {
   return Array.from(root.querySelectorAll("button")).find((b) =>
     b.textContent?.includes(text),
@@ -11,6 +22,7 @@ describe("SettingsPanel component", () => {
   beforeEach(() => {
     cleanup();
     vi.clearAllMocks();
+    mockSetTheme.mockClear();
   });
 
   afterEach(() => {
@@ -141,5 +153,60 @@ describe("SettingsPanel component", () => {
     const alert = apiFieldset?.querySelector(".ant-alert");
     expect(alert).toBeTruthy();
     expect(apiFieldset?.textContent).toContain("settings.alertInfo");
+  });
+
+  it("calls setTheme when a theme swatch is clicked", async () => {
+    const SettingsPanel = (await import("@/components/settings-panel")).default;
+    const { baseElement } = render(<SettingsPanel {...defaultProps} />);
+
+    const lightBtn = baseElement.querySelector<HTMLButtonElement>(
+      '[data-testid="theme-button-light"]',
+    );
+    expect(lightBtn).toBeTruthy();
+    act(() => {
+      lightBtn!.click();
+    });
+
+    expect(mockSetTheme).toHaveBeenCalledWith("light");
+  });
+
+  it("updates access token input value", async () => {
+    const SettingsPanel = (await import("@/components/settings-panel")).default;
+    const { baseElement } = render(<SettingsPanel {...defaultProps} />);
+
+    const input = baseElement.querySelector(
+      'input[aria-label="settings.accessToken"]',
+    ) as HTMLInputElement;
+    expect(input).toBeTruthy();
+    expect(input.value).toBe("tok123");
+
+    fireEvent.change(input, { target: { value: "new-secret-token" } });
+    expect(input.value).toBe("new-secret-token");
+  });
+
+  it("clears access token and saves when clear control is used", async () => {
+    const onSave = vi.fn();
+    const SettingsPanel = (await import("@/components/settings-panel")).default;
+    const { baseElement } = render(
+      <SettingsPanel {...defaultProps} onSave={onSave} />,
+    );
+
+    const clearIcon = baseElement.querySelector<HTMLElement>(
+      '[aria-label="settings.clearToken"]',
+    );
+    expect(clearIcon).toBeTruthy();
+    act(() => {
+      clearIcon!.click();
+    });
+
+    const input = baseElement.querySelector(
+      'input[aria-label="settings.accessToken"]',
+    ) as HTMLInputElement;
+    expect(input.value).toBe("");
+    expect(onSave).toHaveBeenCalledWith({
+      baseUrl: "http://localhost:8080",
+      accessToken: "",
+    });
+    expect(baseElement.textContent).toContain("settings.tokenCleared");
   });
 });

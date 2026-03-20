@@ -69,7 +69,6 @@ export function ToolsToggle({ baseUrl, accessToken }: ToolsStatusProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [skills, setSkills] = useState<SkillItem[]>([]);
-  const [activeVersion, setActiveVersion] = useState("-");
   const [loadedAt, setLoadedAt] = useState("-");
   const [open, setOpen] = useState(false);
 
@@ -88,7 +87,6 @@ export function ToolsToggle({ baseUrl, accessToken }: ToolsStatusProps) {
         active_version: s.active_version || "-",
       }));
       setSkills(withVersion);
-      setActiveVersion(payload.active_version || "-");
       setLoadedAt(payload.loaded_at || "-");
       if (!list.length) {
         setError(t("noSkills"));

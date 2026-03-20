@@ -1,5 +1,10 @@
 import "@testing-library/jest-dom/vitest";
-import { vi } from "vitest";
+import { afterEach, vi } from "vitest";
+import { cleanup } from "@testing-library/react";
+
+afterEach(() => {
+  cleanup();
+});
 
 vi.mock("next-intl", () => {
   function useTranslations(ns: string) {
@@ -72,3 +77,7 @@ class IntersectionObserverStub {
   takeRecords(): IntersectionObserverEntry[] { return []; }
 }
 globalThis.IntersectionObserver ??= IntersectionObserverStub as unknown as typeof IntersectionObserver;
+
+if (typeof Element !== "undefined") {
+  Element.prototype.scrollIntoView = function scrollIntoView() {};
+}

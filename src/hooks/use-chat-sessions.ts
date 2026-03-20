@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useRef, useEffect } from "react";
+import { useLatest, useMemoizedFn } from "ahooks";
 import {
   loadActiveSessionId,
   saveActiveSessionId,
@@ -18,10 +19,7 @@ export function useChatSessions() {
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
 
-  const sessionsRef = useRef(sessions);
-  useEffect(() => {
-    sessionsRef.current = sessions;
-  }, [sessions]);
+  const sessionsRef = useLatest(sessions);
 
   const initializedRef = useRef(false);
 
@@ -75,16 +73,13 @@ export function useChatSessions() {
     setActiveSessionId(id);
   }, []);
 
-  const handleDeleteSession = useCallback(
-    (id: string) => {
-      setSessions((prev) => prev.filter((s) => s.id !== id));
-      if (activeSessionId === id) {
-        const remaining = sessionsRef.current.filter((s) => s.id !== id);
-        setActiveSessionId(remaining.length > 0 ? remaining[0].id : null);
-      }
-    },
-    [activeSessionId],
-  );
+  const handleDeleteSession = useMemoizedFn((id: string) => {
+    setSessions((prev) => prev.filter((s) => s.id !== id));
+    if (activeSessionId === id) {
+      const remaining = sessionsRef.current.filter((s) => s.id !== id);
+      setActiveSessionId(remaining.length > 0 ? remaining[0].id : null);
+    }
+  });
 
   return {
     sessions,
