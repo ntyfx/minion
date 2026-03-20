@@ -35,7 +35,11 @@
     "collapseThinking": "收起思考內容",
     "expandThinking": "展開思考內容",
     "copy": "複製",
-    "copied": "已複製"
+    "copied": "已複製",
+    "resend": "重新傳送",
+    "tokenPrompt": "提示詞 Token",
+    "tokenCompletion": "補全 Token",
+    "tokenTotal": "總 Token"
   },
   "sidebar": {
     "today": "今天",
@@ -104,6 +108,15 @@
     "title": "發現新版本",
     "description": "版本 {version} 已發佈，重新整理頁面即可取得最新功能。",
     "refresh": "重新整理"
+  },
+  "tokenReport": {
+    "title": "Token 消耗報告",
+    "openReport": "開啟 Token 消耗報告",
+    "totalTokens": "總計",
+    "promptTokens": "提示詞",
+    "completionTokens": "補全",
+    "dailyUsage": "每日消耗",
+    "noData": "暫無 Token 消耗資料"
   },
   "theme": {
     "chooseTheme": "選擇主題",

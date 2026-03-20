@@ -35,7 +35,11 @@
     "collapseThinking": "생각 내용 접기",
     "expandThinking": "생각 내용 펼치기",
     "copy": "복사",
-    "copied": "복사됨"
+    "copied": "복사됨",
+    "resend": "재전송",
+    "tokenPrompt": "프롬프트 토큰",
+    "tokenCompletion": "완성 토큰",
+    "tokenTotal": "총 토큰"
   },
   "sidebar": {
     "today": "오늘",
@@ -104,6 +108,15 @@
     "title": "새 버전 사용 가능",
     "description": "버전 {version}이(가) 출시되었습니다. 새로고침하여 최신 기능을 이용하세요.",
     "refresh": "새로고침"
+  },
+  "tokenReport": {
+    "title": "토큰 사용 보고서",
+    "openReport": "토큰 사용 보고서 열기",
+    "totalTokens": "합계",
+    "promptTokens": "프롬프트",
+    "completionTokens": "완성",
+    "dailyUsage": "일별 사용량",
+    "noData": "토큰 사용 데이터가 아직 없습니다"
   },
   "theme": {
     "chooseTheme": "테마 선택",

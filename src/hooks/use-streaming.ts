@@ -120,11 +120,9 @@ export function useStreaming({
         }
 
         if (type === "thinking") {
-          if (payload.kind === "reasoning") {
-            const text = readReasoningContent(payload);
-            reasoningText += text ? ` ${text}` : "";
-            setReasoningContent(reasoningText.trimStart());
-          }
+          const text = readReasoningContent(payload);
+          reasoningText += text ? ` ${text}` : "";
+          setReasoningContent(reasoningText.trimStart());
           updateSession(sessionId, (s) => ({
             ...s,
             activity: [
@@ -161,6 +159,18 @@ export function useStreaming({
               ...s.messages,
               { id: generateMessageId(), role: "error" as const, content: readChunkContent(payload), timestamp: Date.now() },
             ],
+            activity: [
+              ...s.activity,
+              { id: generateEventId(), type, payload, timestamp: Date.now() },
+            ],
+            updatedAt: Date.now(),
+          }));
+          return;
+        }
+
+        if (type === "token_usage") {
+          updateSession(sessionId, (s) => ({
+            ...s,
             activity: [
               ...s.activity,
               { id: generateEventId(), type, payload, timestamp: Date.now() },
@@ -253,6 +263,14 @@ export function useStreaming({
     [activeSessionId, settings, sessionsRef, setSessions, setActiveSessionId, updateSession, onMissingToken],
   );
 
+  const handleResend = useCallback(
+    (messageContent: string) => {
+      if (!activeSessionId || sendingRef.current) return;
+      handleSend(messageContent);
+    },
+    [activeSessionId, handleSend],
+  );
+
   const handleStop = useCallback(() => {
     controllerRef.current?.abort();
   }, []);
@@ -264,6 +282,7 @@ export function useStreaming({
     inputValue,
     setInputValue,
     handleSend,
+    handleResend,
     handleStop,
   };
 }
