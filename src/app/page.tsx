@@ -17,6 +17,7 @@ import { BrandLogo, BrandMark } from "@/components/brand-logo";
 import ChatPanel from "@/components/chat-panel";
 import ActivityFeed, { ActivityToggle } from "@/components/activity-feed";
 import { ToolsToggle } from "@/components/tools-status";
+import { TokenReportToggle } from "@/components/token-report";
 import SettingsPanel from "@/components/settings-panel";
 import {
   loadSettings,
@@ -64,6 +65,7 @@ export default function Home() {
     inputValue,
     setInputValue,
     handleSend,
+    handleResend,
     handleStop,
   } = useStreaming({
     activeSessionId,
@@ -303,6 +305,7 @@ export default function Home() {
           </Flex>
 
           <Flex gap={4} align="center">
+            <TokenReportToggle sessions={sessions} />
             <ToolsToggle
               baseUrl={settings.baseUrl}
               accessToken={settings.accessToken}
@@ -343,6 +346,7 @@ export default function Home() {
             inputValue={inputValue}
             onInputChange={setInputValue}
             onSend={handleSend}
+            onResend={handleResend}
             onStop={handleStop}
           />
         </main>

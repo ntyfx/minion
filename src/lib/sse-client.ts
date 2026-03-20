@@ -7,6 +7,7 @@ export type SSEEventType =
   | "error"
   | "done"
   | "message"
+  | "token_usage"
   | (string & {});
 
 export interface SSEEvent {
@@ -127,6 +128,7 @@ export function readChunkContent(payload: SSEChunkPayload): string {
   if (typeof payload.delta === "string") return payload.delta;
   if (typeof payload.summary === "string") return payload.summary;
   if (typeof payload.message === "string") return payload.message;
+  if (typeof payload.error === "string") return payload.error;
   return JSON.stringify(payload, null, 2);
 }
 

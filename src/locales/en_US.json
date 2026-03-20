@@ -35,7 +35,11 @@
     "collapseThinking": "Collapse thinking content",
     "expandThinking": "Expand thinking content",
     "copy": "Copy",
-    "copied": "Copied"
+    "copied": "Copied",
+    "resend": "Resend",
+    "tokenPrompt": "Prompt tokens",
+    "tokenCompletion": "Completion tokens",
+    "tokenTotal": "Total tokens"
   },
   "sidebar": {
     "today": "Today",
@@ -104,6 +108,15 @@
     "title": "New Version Available",
     "description": "Version {version} is available. Refresh to get the latest features.",
     "refresh": "Refresh"
+  },
+  "tokenReport": {
+    "title": "Token Usage Report",
+    "openReport": "Open token usage report",
+    "totalTokens": "Total",
+    "promptTokens": "Prompt",
+    "completionTokens": "Completion",
+    "dailyUsage": "Daily Usage",
+    "noData": "No token usage data yet"
   },
   "theme": {
     "chooseTheme": "Choose Theme",

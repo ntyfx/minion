@@ -61,7 +61,9 @@ describe("ChatPanel component", () => {
         inputValue=""
         onInputChange={vi.fn()}
         onSend={vi.fn()}
+        onResend={vi.fn()}
         onStop={vi.fn()}
+
       />,
     );
     expect(container.textContent).toContain("chat.welcomeTitle");
@@ -79,7 +81,9 @@ describe("ChatPanel component", () => {
         inputValue=""
         onInputChange={vi.fn()}
         onSend={vi.fn()}
+        onResend={vi.fn()}
         onStop={vi.fn()}
+
       />,
     );
     expect(container.textContent).toContain("chat.welcomeEmptyTitle");
@@ -97,7 +101,9 @@ describe("ChatPanel component", () => {
         inputValue=""
         onInputChange={vi.fn()}
         onSend={vi.fn()}
+        onResend={vi.fn()}
         onStop={vi.fn()}
+
       />,
     );
     expect(container.textContent).toContain("chat.hint");
@@ -118,7 +124,9 @@ describe("ChatPanel component", () => {
         inputValue=""
         onInputChange={vi.fn()}
         onSend={vi.fn()}
+        onResend={vi.fn()}
         onStop={vi.fn()}
+
       />,
     );
     expect(container.textContent).toContain("Hello there");
@@ -136,7 +144,9 @@ describe("ChatPanel component", () => {
         inputValue=""
         onInputChange={vi.fn()}
         onSend={vi.fn()}
+        onResend={vi.fn()}
         onStop={vi.fn()}
+
       />,
     );
     expect(container.textContent).toContain("streaming answer...");
@@ -153,7 +163,9 @@ describe("ChatPanel component", () => {
         inputValue=""
         onInputChange={vi.fn()}
         onSend={vi.fn()}
+        onResend={vi.fn()}
         onStop={vi.fn()}
+
       />,
     );
     expect(container.textContent).toContain("chat.thinking");
@@ -170,7 +182,9 @@ describe("ChatPanel component", () => {
         inputValue=""
         onInputChange={vi.fn()}
         onSend={vi.fn()}
+        onResend={vi.fn()}
         onStop={vi.fn()}
+
       />,
     );
     expect(container.textContent).toContain("Something went wrong");
@@ -191,7 +205,9 @@ describe("ChatPanel component", () => {
         inputValue=""
         onInputChange={vi.fn()}
         onSend={vi.fn()}
+        onResend={vi.fn()}
         onStop={vi.fn()}
+
       />,
     );
     expect(container.textContent).toContain("chat.thinking");
@@ -209,7 +225,9 @@ describe("ChatPanel component", () => {
         inputValue=""
         onInputChange={vi.fn()}
         onSend={onSend}
+        onResend={vi.fn()}
         onStop={vi.fn()}
+
       />,
     );
     const sender = container.querySelector(".ant-sender");
@@ -229,7 +247,9 @@ describe("ChatPanel component", () => {
         inputValue=""
         onInputChange={onInputChange}
         onSend={vi.fn()}
+        onResend={vi.fn()}
         onStop={vi.fn()}
+
       />,
     );
     const textarea = container.querySelector("textarea");
@@ -249,7 +269,9 @@ describe("ChatPanel component", () => {
         inputValue=""
         onInputChange={vi.fn()}
         onSend={vi.fn()}
+        onResend={vi.fn()}
         onStop={vi.fn()}
+
       />,
     );
     expect(container.querySelector(".ant-bubble-list")).toBeTruthy();
@@ -274,7 +296,9 @@ describe("ChatPanel component", () => {
         inputValue=""
         onInputChange={vi.fn()}
         onSend={vi.fn()}
+        onResend={vi.fn()}
         onStop={vi.fn()}
+
       />,
     );
     expect(container.textContent).toContain("chat.thinking");
@@ -311,7 +335,9 @@ describe("ChatPanel component", () => {
         inputValue=""
         onInputChange={vi.fn()}
         onSend={vi.fn()}
+        onResend={vi.fn()}
         onStop={vi.fn()}
+
       />,
     );
     expect(container.textContent).toContain("chat.thinking");
@@ -356,7 +382,9 @@ describe("ChatPanel component", () => {
           inputValue=""
           onInputChange={vi.fn()}
           onSend={vi.fn()}
+          onResend={vi.fn()}
           onStop={vi.fn()}
+  
         />,
       );
 
@@ -383,7 +411,9 @@ describe("ChatPanel component", () => {
           inputValue=""
           onInputChange={vi.fn()}
           onSend={vi.fn()}
+          onResend={vi.fn()}
           onStop={vi.fn()}
+  
         />,
       );
 
@@ -423,7 +453,9 @@ describe("ChatPanel component", () => {
           inputValue=""
           onInputChange={vi.fn()}
           onSend={vi.fn()}
+          onResend={vi.fn()}
           onStop={vi.fn()}
+  
         />,
       );
 
@@ -466,7 +498,9 @@ describe("ChatPanel component", () => {
           inputValue=""
           onInputChange={vi.fn()}
           onSend={vi.fn()}
+          onResend={vi.fn()}
           onStop={vi.fn()}
+  
         />,
       );
 
@@ -504,7 +538,9 @@ describe("ChatPanel component", () => {
           inputValue=""
           onInputChange={vi.fn()}
           onSend={vi.fn()}
+          onResend={vi.fn()}
           onStop={vi.fn()}
+  
         />,
       );
 
@@ -532,7 +568,9 @@ describe("ChatPanel component", () => {
           inputValue=""
           onInputChange={vi.fn()}
           onSend={vi.fn()}
+          onResend={vi.fn()}
           onStop={vi.fn()}
+  
         />,
       );
 

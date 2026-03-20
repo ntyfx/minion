@@ -35,7 +35,11 @@
     "collapseThinking": "思考内容を折りたたむ",
     "expandThinking": "思考内容を展開",
     "copy": "コピー",
-    "copied": "コピーしました"
+    "copied": "コピーしました",
+    "resend": "再送信",
+    "tokenPrompt": "プロンプトトークン",
+    "tokenCompletion": "補完トークン",
+    "tokenTotal": "合計トークン"
   },
   "sidebar": {
     "today": "今日",
@@ -104,6 +108,15 @@
     "title": "新しいバージョンがあります",
     "description": "バージョン {version} が利用可能です。ページを更新して最新機能をご利用ください。",
     "refresh": "更新"
+  },
+  "tokenReport": {
+    "title": "トークン使用レポート",
+    "openReport": "トークン使用レポートを開く",
+    "totalTokens": "合計",
+    "promptTokens": "プロンプト",
+    "completionTokens": "補完",
+    "dailyUsage": "日別使用量",
+    "noData": "トークン使用データはまだありません"
   },
   "theme": {
     "chooseTheme": "テーマを選択",

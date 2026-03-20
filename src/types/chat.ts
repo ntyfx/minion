@@ -13,7 +13,8 @@ export type ActivityEventType =
   | "done"
   | "error"
   | "client_error"
-  | "message";
+  | "message"
+  | "token_usage";
 
 export interface ActivityEvent {
   id: string;
@@ -55,13 +56,37 @@ export interface SSEChunkPayload {
   kind?: string;
   reasoning_details?: ReasoningDetail[];
   raw?: string;
+  
+  // Token usage fields
+  round?: number;
+  phase?: string;
+  usage_source?: string;
+  prompt_tokens?: number;
+  completion_tokens?: number;
+  total_tokens?: number;
+  tools_count?: number;
+  
+  // Done event fields
+  rounds?: number;
+  
   [key: string]: unknown;
 }
 
 export interface ReasoningDetail {
-  text?: string;
+  type?: string;
+  format?: string;
   summary?: string;
+  text?: string;
+  id?: string;
   data?: string;
+}
+
+export interface TokenUsage {
+  promptTokens: number;
+  completionTokens: number;
+  totalTokens: number;
+  rounds: number;
+  toolsCalls: number;
 }
 
 export interface AppSettings {

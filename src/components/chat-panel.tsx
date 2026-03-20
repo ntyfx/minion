@@ -5,7 +5,7 @@ import { useHover } from "ahooks";
 import { Bubble, Sender, Welcome, Think, Prompts } from "@ant-design/x";
 import { XMarkdown } from "@ant-design/x-markdown";
 import "@ant-design/x-markdown/themes/dark.css";
-import { Typography, Avatar, Flex, Button, message } from "antd";
+import { Typography, Avatar, Flex, Button, message, Tooltip } from "antd";
 import {
   RobotOutlined,
   UserOutlined,
@@ -15,10 +15,42 @@ import {
   SearchOutlined,
   ThunderboltOutlined,
   ApartmentOutlined,
-  CopyFilled,
+  CopyOutlined,
+  CheckOutlined,
+  ReloadOutlined,
 } from "@ant-design/icons";
 import { useTranslations } from "next-intl";
-import type { Session, ChatMessage } from "@/types/chat";
+import type { Session, ChatMessage, TokenUsage, SSEChunkPayload } from "@/types/chat";
+
+function buildTokenUsageByRound(session: Session): TokenUsage[] {
+  const rounds: TokenUsage[] = [];
+  let current: TokenUsage = { promptTokens: 0, completionTokens: 0, totalTokens: 0, rounds: 0, toolsCalls: 0 };
+  let hasUsage = false;
+
+  for (const evt of session.activity) {
+    if (evt.type === "request" && hasUsage) {
+      rounds.push(current);
+      current = { promptTokens: 0, completionTokens: 0, totalTokens: 0, rounds: 0, toolsCalls: 0 };
+      hasUsage = false;
+    } else if (evt.type === "token_usage") {
+      const p = evt.payload as SSEChunkPayload;
+      current.promptTokens += p.prompt_tokens ?? 0;
+      current.completionTokens += p.completion_tokens ?? 0;
+      current.totalTokens += p.total_tokens ?? 0;
+      current.toolsCalls += p.tools_count ?? 0;
+      hasUsage = true;
+    } else if (evt.type === "done") {
+      const p = evt.payload as SSEChunkPayload;
+      current.rounds = p.rounds != null ? Number(p.rounds) : current.rounds + 1;
+    }
+  }
+
+  if (hasUsage) {
+    rounds.push(current);
+  }
+
+  return rounds;
+}
 
 interface ChatPanelProps {
   session: Session | null;
@@ -28,6 +60,7 @@ interface ChatPanelProps {
   inputValue: string;
   onInputChange: (value: string) => void;
   onSend: (message: string) => void;
+  onResend: (message: string) => void;
   onStop: () => void;
 }
 
@@ -49,75 +82,160 @@ export function mapRole(msg: ChatMessage) {
 
 const ICON_STYLE = { fontSize: 15, color: "var(--text-secondary)" };
 
-const MarkdownContent = memo(function MarkdownContent({
+function formatTokenCount(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}k`;
+  return String(n);
+}
+
+const MessageToolbar = memo(function MessageToolbar({
   content,
-  isStreaming,
+  tokenUsage,
+  visible,
 }: {
   content: string;
-  isStreaming: boolean;
+  tokenUsage: TokenUsage | null;
+  visible: boolean;
 }) {
   const [copied, setCopied] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const isHovered = useHover(containerRef);
   const t = useTranslations("chat");
   const [messageApi, contextHolder] = message.useMessage();
-  
+
   const handleCopy = useCallback(async () => {
     try {
       await navigator.clipboard.writeText(String(content));
       setCopied(true);
       messageApi.success(t("copied"));
-      
-      // Reset copied state after 2 seconds
-      setTimeout(() => {
-        setCopied(false);
-      }, 2000);
+      setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       console.error("Failed to copy text: ", err);
       messageApi.error("Failed to copy");
     }
   }, [content, t, messageApi]);
 
+  const hasUsage = tokenUsage && tokenUsage.totalTokens > 0;
+
   return (
     <>
       {contextHolder}
-      <div 
-        ref={containerRef}
-        style={{ position: "relative" }}
+      <div
+        className="message-toolbar"
+        style={{
+          opacity: visible ? 1 : 0,
+          pointerEvents: visible ? "auto" : "none",
+        }}
       >
-        <XMarkdown
-          content={String(content)}
-          streaming={
-            isStreaming
-              ? { hasNextChunk: true, enableAnimation: true }
-              : undefined
-          }
-          openLinksInNewTab
-          className="chat-markdown"
-        />
-        <Button
-          type="text"
-          size="small"
-          icon={<CopyFilled style={{ fontSize: 12 }} />}
-          onClick={handleCopy}
-          style={{
-            position: "absolute",
-            top: 0,
-            right: 0,
-            opacity: isHovered ? 1 : 0,
-            padding: 0,
-            minWidth: "auto",
-            width: 24,
-            height: 24,
-            color: copied ? "var(--accent)" : "var(--text-secondary)",
-            transition: "opacity 0.2s ease",
-            pointerEvents: isHovered ? "auto" : "none",
-          }}
-          aria-label={copied ? t("copied") : t("copy")}
-          title={copied ? t("copied") : t("copy")}
-        />
+        <div className="message-toolbar-actions">
+          <Tooltip title={copied ? t("copied") : t("copy")} placement="bottom">
+            <button
+              className="toolbar-action-btn"
+              onClick={handleCopy}
+              aria-label={copied ? t("copied") : t("copy")}
+              style={{
+                color: copied ? "var(--accent)" : undefined,
+              }}
+            >
+              {copied ? (
+                <CheckOutlined style={{ fontSize: 12 }} />
+              ) : (
+                <CopyOutlined style={{ fontSize: 12 }} />
+              )}
+            </button>
+          </Tooltip>
+        </div>
+
+        {hasUsage && (
+          <div className="message-toolbar-usage">
+            <Tooltip title={t("tokenPrompt")} placement="bottom">
+              <span className="usage-chip">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden>
+                  <path d="M2 4h12M2 8h8M2 12h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                </svg>
+                {formatTokenCount(tokenUsage.promptTokens)}
+              </span>
+            </Tooltip>
+            <Tooltip title={t("tokenCompletion")} placement="bottom">
+              <span className="usage-chip">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden>
+                  <path d="M2 3l4 5-4 5M8 13h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                {formatTokenCount(tokenUsage.completionTokens)}
+              </span>
+            </Tooltip>
+            <span className="usage-divider" />
+            <Tooltip title={t("tokenTotal")} placement="bottom">
+              <span className="usage-chip usage-chip-total">
+                {formatTokenCount(tokenUsage.totalTokens)}
+              </span>
+            </Tooltip>
+          </div>
+        )}
       </div>
     </>
+  );
+});
+
+const MarkdownContent = memo(function MarkdownContent({
+  content,
+  isStreaming,
+  tokenUsage,
+}: {
+  content: string;
+  isStreaming: boolean;
+  tokenUsage: TokenUsage | null;
+}) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const isHovered = useHover(containerRef);
+
+  return (
+    <div ref={containerRef}>
+      <XMarkdown
+        content={String(content)}
+        streaming={
+          isStreaming
+            ? { hasNextChunk: true, enableAnimation: true }
+            : undefined
+        }
+        openLinksInNewTab
+        className="chat-markdown"
+      />
+      <MessageToolbar
+        content={content}
+        tokenUsage={isStreaming ? null : tokenUsage}
+        visible={isHovered && !isStreaming}
+      />
+    </div>
+  );
+});
+
+const UserBubbleContent = memo(function UserBubbleContent({
+  content,
+  onResend,
+  isStreaming,
+}: {
+  content: string;
+  onResend: (msg: string) => void;
+  isStreaming: boolean;
+}) {
+  const t = useTranslations("chat");
+
+  return (
+    <div className={`user-bubble-wrap${isStreaming ? " is-streaming" : ""}`}>
+      <span>{content}</span>
+      <div className="user-bubble-resend">
+        <Tooltip title={t("resend")} placement="left">
+          <Button
+            type="text"
+            size="small"
+            icon={<ReloadOutlined />}
+            onClick={() => onResend(content)}
+            disabled={isStreaming}
+            aria-label={t("resend")}
+            className="resend-btn"
+          />
+        </Tooltip>
+      </div>
+    </div>
   );
 });
 
@@ -319,11 +437,17 @@ export default function ChatPanel({
   inputValue,
   onInputChange,
   onSend,
+  onResend,
   onStop,
 }: ChatPanelProps) {
   const t = useTranslations("chat");
   const hasMessages =
     session && (session.messages.length > 0 || isStreaming);
+
+  const tokenUsageByRound = useMemo(
+    () => (session ? buildTokenUsageByRound(session) : []),
+    [session],
+  );
 
   const promptsItems = useMemo(
     () => [
@@ -412,16 +536,20 @@ export default function ChatPanel({
 
   const renderAiContent = useCallback(
     (content: unknown) => (
-      <MarkdownContent content={String(content)} isStreaming={isStreaming} />
+      <MarkdownContent content={String(content)} isStreaming={isStreaming} tokenUsage={null} />
     ),
     [isStreaming],
   );
 
-  const renderCompletedAiContent = useCallback(
+  const renderUserContent = useCallback(
     (content: unknown) => (
-      <MarkdownContent content={String(content)} isStreaming={false} />
+      <UserBubbleContent
+        content={String(content)}
+        onResend={onResend}
+        isStreaming={isStreaming}
+      />
     ),
-    [],
+    [onResend, isStreaming],
   );
 
   const thinkingTitle = t("thinking");
@@ -489,36 +617,49 @@ export default function ChatPanel({
         ) : (
           <Bubble.List
             autoScroll
-            items={bubbleItems.map((item) => {
-              if (item.role === "ai" && item.key === "__streaming__") {
-                return { ...item, contentRender: renderAiContent };
-              }
-              if (item.role === "ai") {
-                return { ...item, contentRender: renderCompletedAiContent };
-              }
-              if (item.role === "reasoning") {
-                const isLive = item.key === "__reasoning__";
-                return {
-                  ...item,
-                  contentRender: (content: unknown) => (
-                    <Think
-                      title={thinkingTitle}
-                      loading={isLive && isStreaming}
-                      defaultExpanded={false}
-                    >
-                      <ThinkContent
-                        text={String(content)}
-                        collapseLabel={collapseLabel}
-                        showAllLabel={showAllLabel}
-                        collapseAriaLabel={collapseAriaLabel}
-                        expandAriaLabel={expandAriaLabel}
-                      />
-                    </Think>
-                  ),
-                };
-              }
-              return item;
-            })}
+            items={(() => {
+              let aiIndex = 0;
+              return bubbleItems.map((item) => {
+                if (item.role === "ai" && item.key === "__streaming__") {
+                  return { ...item, contentRender: renderAiContent };
+                }
+                if (item.role === "ai") {
+                  const usage = tokenUsageByRound[aiIndex] ?? null;
+                  aiIndex++;
+                  return {
+                    ...item,
+                    contentRender: (content: unknown) => (
+                      <MarkdownContent content={String(content)} isStreaming={false} tokenUsage={usage} />
+                    ),
+                  };
+                }
+                if (item.role === "user") {
+                  return { ...item, contentRender: renderUserContent };
+                }
+                if (item.role === "reasoning") {
+                  const isLive = item.key === "__reasoning__";
+                  return {
+                    ...item,
+                    contentRender: (content: unknown) => (
+                      <Think
+                        title={thinkingTitle}
+                        loading={isLive && isStreaming}
+                        defaultExpanded={false}
+                      >
+                        <ThinkContent
+                          text={String(content)}
+                          collapseLabel={collapseLabel}
+                          showAllLabel={showAllLabel}
+                          collapseAriaLabel={collapseAriaLabel}
+                          expandAriaLabel={expandAriaLabel}
+                        />
+                      </Think>
+                    ),
+                  };
+                }
+                return item;
+              });
+            })()}
             role={ROLE_CONFIG}
             style={{ flex: 1 }}
           />
