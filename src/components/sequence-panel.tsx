@@ -183,7 +183,7 @@ export default memo(function SequencePanel({
                   </Tag>
                 </Flex>
                 <Steps
-                  direction="vertical"
+                  orientation="vertical"
                   size="small"
                   current={-1}
                   style={{ marginTop: 8 }}

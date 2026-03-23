@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMemoizedFn } from "ahooks";
 import { Layout, Modal, Input, Space, Spin } from "antd";
 import { CHAT_ICON_KEYS, getChatIcon } from "@/lib/chat-icons";
@@ -23,7 +23,6 @@ import {
 import { downloadShareFile, readShareFile, shareableToSession } from "@/lib/sharing";
 import { createSession as createNewSession } from "@/lib/sessions";
 import { saveBookmark, createBookmarkId, loadBookmarks } from "@/lib/bookmark-db";
-import { useEffect } from "react";
 import {
   loadSettings,
   saveSettings as persistSettings,
@@ -54,12 +53,15 @@ export default function Home() {
 
   const [messageApi, contextHolder] = message.useMessage();
 
-  // Load bookmarked message IDs on mount
   useEffect(() => {
-    loadBookmarks().then((bookmarks) => {
-      const ids = new Set(bookmarks.map((b) => b.messageId));
-      setBookmarkedMessageIds(ids);
-    });
+    loadBookmarks()
+      .then((bookmarks) => {
+        const ids = new Set(bookmarks.map((b) => b.messageId));
+        setBookmarkedMessageIds(ids);
+      })
+      .catch(() => {
+        setBookmarkedMessageIds(new Set());
+      });
   }, []);
   const updateNotificationHolder = useUpdateNotification();
 
