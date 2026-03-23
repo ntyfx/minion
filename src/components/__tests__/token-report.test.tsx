@@ -1,13 +1,15 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, act, waitFor, cleanup } from "@testing-library/react";
 import {
-  lightenColor,
-  formatTokenCount,
   formatMonthLabel,
   getMonthRange,
   aggregateByMonth,
   TokenReportToggle,
 } from "@/components/token-report";
+import {
+  lightenColor,
+  formatTokenCount,
+} from "@/lib/utils";
 import type { Session } from "@/types/chat";
 
 vi.mock("@ant-design/charts", () => ({
@@ -265,7 +267,7 @@ describe("TokenReportToggle component", () => {
     });
 
     const prevBtn = baseElement.querySelector<HTMLButtonElement>(
-      'button[aria-label="Previous month"]',
+      'button[aria-label="tokenReport.previousMonth"]',
     )!;
     expect(prevBtn).toBeTruthy();
 
@@ -294,7 +296,7 @@ describe("TokenReportToggle component", () => {
 
     await waitFor(() => {
       const nextBtn = baseElement.querySelector<HTMLButtonElement>(
-        'button[aria-label="Next month"]',
+        'button[aria-label="tokenReport.nextMonth"]',
       );
       expect(nextBtn).toBeTruthy();
       expect(nextBtn!.disabled).toBe(true);

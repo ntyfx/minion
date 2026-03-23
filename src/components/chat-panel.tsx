@@ -30,7 +30,8 @@ import {
   StarOutlined,
 } from "@ant-design/icons";
 import { useTranslations } from "next-intl";
-import type { Session, ChatMessage, TokenUsage, SSEChunkPayload } from "@/types/chat";
+import { formatTokenCount, getTokenUsage, isSSEChunkPayload } from "@/lib/utils";
+import type { Session, ChatMessage, TokenUsage } from "@/types/chat";
 
 function buildTokenUsageByRound(session: Session): TokenUsage[] {
   const rounds: TokenUsage[] = [];
@@ -42,16 +43,16 @@ function buildTokenUsageByRound(session: Session): TokenUsage[] {
       rounds.push(current);
       current = { promptTokens: 0, completionTokens: 0, totalTokens: 0, rounds: 0, toolsCalls: 0 };
       hasUsage = false;
-    } else if (evt.type === "token_usage") {
-      const p = evt.payload as SSEChunkPayload;
-      current.promptTokens += p.prompt_tokens ?? 0;
-      current.completionTokens += p.completion_tokens ?? 0;
-      current.totalTokens += p.total_tokens ?? 0;
-      current.toolsCalls += p.tools_count ?? 0;
+    } else if (evt.type === "token_usage" && isSSEChunkPayload(evt.payload)) {
+      const usage = getTokenUsage(evt.payload);
+      current.promptTokens += usage.prompt_tokens;
+      current.completionTokens += usage.completion_tokens;
+      current.totalTokens += usage.total_tokens;
+      current.toolsCalls += usage.tools_count;
       hasUsage = true;
-    } else if (evt.type === "done") {
-      const p = evt.payload as SSEChunkPayload;
-      current.rounds = p.rounds != null ? Number(p.rounds) : current.rounds + 1;
+    } else if (evt.type === "done" && isSSEChunkPayload(evt.payload)) {
+      const usage = getTokenUsage(evt.payload);
+      current.rounds = usage.rounds > 0 ? usage.rounds : current.rounds + 1;
     }
   }
 
@@ -92,12 +93,6 @@ export function mapRole(msg: ChatMessage) {
 }
 
 const ICON_STYLE = { fontSize: 15, color: "var(--text-secondary)" };
-
-function formatTokenCount(n: number): string {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}k`;
-  return String(n);
-}
 
 const MessageToolbar = memo(function MessageToolbar({
   content,
@@ -469,6 +464,94 @@ const WELCOME_STYLES = {
   },
 };
 
+interface BubbleListWithItemsProps {
+  bubbleItems: Array<{
+    key: string;
+    role: string;
+    content: string;
+    variant?: "filled" | "outlined" | "shadow" | "borderless";
+    streaming?: boolean;
+    loading?: boolean;
+  }>;
+  tokenUsageByRound: TokenUsage[];
+  isStreaming: boolean;
+  onSend: (message: string) => void;
+  onBookmark?: (content: string, messageId: string) => void;
+  renderAiContent: (content: unknown) => React.ReactNode;
+  renderUserContent: (content: unknown) => React.ReactNode;
+  thinkingTitle: string;
+  collapseLabel: string;
+  showAllLabel: string;
+  collapseAriaLabel: string;
+  expandAriaLabel: string;
+}
+
+const BubbleListWithItems = memo(function BubbleListWithItems({
+  bubbleItems,
+  tokenUsageByRound,
+  isStreaming,
+  onSend,
+  onBookmark,
+  renderAiContent,
+  renderUserContent,
+  thinkingTitle,
+  collapseLabel,
+  showAllLabel,
+  collapseAriaLabel,
+  expandAriaLabel,
+}: BubbleListWithItemsProps) {
+  let aiIndex = 0;
+  const items = bubbleItems.map((item) => {
+    if (item.role === "ai" && item.key === "__streaming__") {
+      return { ...item, contentRender: renderAiContent };
+    }
+    if (item.role === "ai") {
+      const usage = tokenUsageByRound[aiIndex] ?? null;
+      aiIndex++;
+      const msgId = item.key;
+      return {
+        ...item,
+        contentRender: (content: unknown) => (
+          <MarkdownContent
+            content={String(content)}
+            isStreaming={false}
+            tokenUsage={usage}
+            onAction={onSend}
+            onBookmark={onBookmark ? () => onBookmark(String(content), msgId) : undefined}
+          />
+        ),
+      };
+    }
+    if (item.role === "user") {
+      return { ...item, contentRender: renderUserContent };
+    }
+    if (item.role === "reasoning") {
+      const isLive = item.key === "__reasoning__";
+      return {
+        ...item,
+        contentRender: (content: unknown) => (
+          <Think
+            title={thinkingTitle}
+            loading={isLive && isStreaming}
+            defaultExpanded={false}
+          >
+            <ThinkContent
+              text={String(content)}
+              collapseLabel={collapseLabel}
+              showAllLabel={showAllLabel}
+              collapseAriaLabel={collapseAriaLabel}
+              expandAriaLabel={expandAriaLabel}
+            />
+          </Think>
+        ),
+      };
+    }
+    return item;
+  });
+
+  return <Bubble.List autoScroll items={items} role={ROLE_CONFIG} style={{ flex: 1 }} />;
+});
+
 export default function ChatPanel({
   session,
   isStreaming,
@@ -732,60 +815,19 @@ export default function ChatPanel({
             />
           </Flex>
         ) : (
-          <Bubble.List
-            autoScroll
-            items={(() => {
-              let aiIndex = 0;
-              return bubbleItems.map((item) => {
-                if (item.role === "ai" && item.key === "__streaming__") {
-                  return { ...item, contentRender: renderAiContent };
-                }
-                if (item.role === "ai") {
-                  const usage = tokenUsageByRound[aiIndex] ?? null;
-                  aiIndex++;
-                  const msgId = item.key;
-                  return {
-                    ...item,
-                    contentRender: (content: unknown) => (
-                      <MarkdownContent
-                        content={String(content)}
-                        isStreaming={false}
-                        tokenUsage={usage}
-                        onAction={onSend}
-                        onBookmark={onBookmark ? () => onBookmark(String(content), msgId) : undefined}
-                      />
-                    ),
-                  };
-                }
-                if (item.role === "user") {
-                  return { ...item, contentRender: renderUserContent };
-                }
-                if (item.role === "reasoning") {
-                  const isLive = item.key === "__reasoning__";
-                  return {
-                    ...item,
-                    contentRender: (content: unknown) => (
-                      <Think
-                        title={thinkingTitle}
-                        loading={isLive && isStreaming}
-                        defaultExpanded={false}
-                      >
-                        <ThinkContent
-                          text={String(content)}
-                          collapseLabel={collapseLabel}
-                          showAllLabel={showAllLabel}
-                          collapseAriaLabel={collapseAriaLabel}
-                          expandAriaLabel={expandAriaLabel}
-                        />
-                      </Think>
-                    ),
-                  };
-                }
-                return item;
-              });
-            })()}
-            role={ROLE_CONFIG}
-            style={{ flex: 1 }}
+          <BubbleListWithItems
+            bubbleItems={bubbleItems}
+            tokenUsageByRound={tokenUsageByRound}
+            isStreaming={isStreaming}
+            onSend={onSend}
+            onBookmark={onBookmark}
+            renderAiContent={renderAiContent}
+            renderUserContent={renderUserContent}
+            thinkingTitle={thinkingTitle}
+            collapseLabel={collapseLabel}
+            showAllLabel={showAllLabel}
+            collapseAriaLabel={collapseAriaLabel}
+            expandAriaLabel={expandAriaLabel}
           />
         )}
       </Flex>

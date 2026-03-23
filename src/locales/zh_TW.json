@@ -13,6 +13,8 @@
     "rename": "重新命名",
     "enterNewName": "輸入新名稱",
     "chooseIcon": "選擇圖示",
+    "share": "分享",
+    "exportSession": "匯出會話（.minion）",
     "shareSession": "分享對話",
     "importSession": "匯入對話",
     "importSuccess": "對話匯入成功",
@@ -139,7 +141,9 @@
     "promptTokens": "提示詞",
     "completionTokens": "補全",
     "dailyUsage": "每日消耗",
-    "noData": "暫無 Token 消耗資料"
+    "noData": "暫無 Token 消耗資料",
+    "previousMonth": "上個月",
+    "nextMonth": "下個月"
   },
   "dashboard": {
     "title": "Minion Chat",
@@ -248,6 +252,24 @@
       "dusk": "黃昏",
       "dawn": "清晨",
       "china-red": "中國紅"
+    }
+  },
+  "errorBoundary": {
+    "chat": {
+      "message": "聊天消息載入失敗",
+      "retry": "重新整理頁面"
+    },
+    "sidebar": {
+      "message": "會話列表載入失敗",
+      "retry": "重試"
+    },
+    "dashboard": {
+      "message": "儀表板載入失敗",
+      "retry": "重新整理頁面"
+    },
+    "tokenReport": {
+      "message": "Token 報告載入失敗",
+      "retry": "重試"
     }
   }
 }

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, act, fireEvent, waitFor } from "@testing-library/react";
-import { formatTimeAgo } from "@/components/sidebar";
+import { formatTimeAgo } from "@/lib/utils";
 import Sidebar from "@/components/sidebar";
 import type { Session } from "@/types/chat";
 

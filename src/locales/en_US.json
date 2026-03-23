@@ -13,6 +13,8 @@
     "rename": "Rename",
     "enterNewName": "Enter new name",
     "chooseIcon": "Choose icon",
+    "share": "Share",
+    "exportSession": "Export session (.minion)",
     "shareSession": "Share conversation",
     "importSession": "Import conversation",
     "importSuccess": "Conversation imported successfully",
@@ -139,7 +141,9 @@
     "promptTokens": "Prompt",
     "completionTokens": "Completion",
     "dailyUsage": "Daily Usage",
-    "noData": "No token usage data yet"
+    "noData": "No token usage data yet",
+    "previousMonth": "Previous month",
+    "nextMonth": "Next month"
   },
   "dashboard": {
     "title": "Minion Chat",
@@ -248,6 +252,24 @@
       "dusk": "Dusk",
       "dawn": "Dawn",
       "china-red": "China Red"
+    }
+  },
+  "errorBoundary": {
+    "chat": {
+      "message": "Failed to load chat messages",
+      "retry": "Reload page"
+    },
+    "sidebar": {
+      "message": "Failed to load conversation list",
+      "retry": "Retry"
+    },
+    "dashboard": {
+      "message": "Failed to load dashboard",
+      "retry": "Reload page"
+    },
+    "tokenReport": {
+      "message": "Failed to load token report",
+      "retry": "Retry"
     }
   }
 }

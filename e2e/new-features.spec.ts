@@ -27,11 +27,11 @@ test.describe("Sidebar search and filters", () => {
 });
 
 test.describe("Header actions", () => {
-  test("shows export button in header", async ({ page }) => {
+  test("shows share button in header", async ({ page }) => {
     const header = page.locator("header");
     await expect(header).toBeVisible({ timeout: 10_000 });
     await expect(
-      header.getByRole("button", { name: "Export conversation" }),
+      header.getByRole("button", { name: "Share" }),
     ).toBeVisible({ timeout: 10_000 });
   });
 

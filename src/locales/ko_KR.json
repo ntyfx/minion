@@ -13,6 +13,8 @@
     "rename": "변경",
     "enterNewName": "새 이름 입력",
     "chooseIcon": "아이콘 선택",
+    "share": "공유",
+    "exportSession": "세션 날보기기 (.minion)",
     "shareSession": "대화 공유",
     "importSession": "대화 가져오기",
     "importSuccess": "대화를 가져왔습니다",
@@ -139,7 +141,9 @@
     "promptTokens": "프롬프트",
     "completionTokens": "완성",
     "dailyUsage": "일별 사용량",
-    "noData": "토큰 사용 데이터가 아직 없습니다"
+    "noData": "토큰 사용 데이터가 아직 없습니다",
+    "previousMonth": "이전 달",
+    "nextMonth": "다음 달"
   },
   "dashboard": {
     "title": "Minion Chat",
@@ -248,6 +252,24 @@
       "dusk": "황혼",
       "dawn": "새벽",
       "china-red": "차이나 레드"
+    }
+  },
+  "errorBoundary": {
+    "chat": {
+      "message": "채팅 메시지를 불러오지 못했습니다",
+      "retry": "페이지 새로고침"
+    },
+    "sidebar": {
+      "message": "대화 목록을 불러오지 못했습니다",
+      "retry": "재시도"
+    },
+    "dashboard": {
+      "message": "대시보드를 불러오지 못했습니다",
+      "retry": "페이지 새로고침"
+    },
+    "tokenReport": {
+      "message": "토큰 보고서를 불러오지 못했습니다",
+      "retry": "재시도"
     }
   }
 }

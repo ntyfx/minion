@@ -1062,6 +1062,9 @@ body {
 .rich-table-wrapper .ant-table {
   background: transparent !important;
   font-size: 13px;
+
+  /* Remove antd table border radius */
+  --ant-table-header-border-radius: 0 !important;
 }
 
 .rich-table-wrapper .ant-table-thead > tr > th {

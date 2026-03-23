@@ -4,6 +4,7 @@ import { useMemo, memo, useState, useCallback } from "react";
 import { Conversations } from "@ant-design/x";
 import { Input, Tooltip, Tag, Flex } from "antd";
 import { useTranslations } from "next-intl";
+import { formatTimeAgo } from "@/lib/utils";
 import type { Session } from "@/types/chat";
 import {
   DeleteOutlined,
@@ -26,17 +27,6 @@ interface SidebarProps {
   onPinSession?: (id: string) => void;
   onArchiveSession?: (id: string) => void;
   onTagSession?: (id: string) => void;
-}
-
-export function formatTimeAgo(ts: number, nowLabel: string): string {
-  const diff = Date.now() - ts;
-  const min = Math.floor(diff / 60000);
-  if (min < 1) return nowLabel;
-  if (min < 60) return `${min}m`;
-  const hr = Math.floor(min / 60);
-  if (hr < 24) return `${hr}h`;
-  const d = Math.floor(hr / 24);
-  return `${d}d`;
 }
 
 export default memo(function Sidebar({

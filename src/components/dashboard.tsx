@@ -1,16 +1,10 @@
 "use client";
 
-import { memo, useMemo } from "react";
+import { memo, useMemo, useCallback } from "react";
 import { Typography, Flex, Tag, Tooltip } from "antd";
 import {
   MessageOutlined,
   FieldTimeOutlined,
-  ThunderboltOutlined,
-  SearchOutlined,
-  FileTextOutlined,
-  ApartmentOutlined,
-  GiftOutlined,
-  PictureOutlined,
   BulbOutlined,
 } from "@ant-design/icons";
 import { useTranslations } from "next-intl";
@@ -18,22 +12,14 @@ import type { Session } from "@/types/chat";
 import { BUILTIN_TEMPLATES } from "@/lib/sharing";
 import { BrandLogo } from "@/components/brand-logo";
 import { getChatIcon } from "@/lib/chat-icons";
-import { formatTimeAgo } from "@/components/sidebar";
+import { formatTimeAgo } from "@/lib/utils";
+import { DEFAULT_QUICK_ACTIONS } from "@/lib/quick-actions";
 
 interface DashboardProps {
   sessions: Session[];
   onSelectSession: (id: string) => void;
   onQuickAction: (text: string) => void;
 }
-
-const QUICK_ACTIONS = [
-  { icon: <SearchOutlined />, labelKey: "queryEsystem", text: "查询 E-system " },
-  { icon: <PictureOutlined />, labelKey: "queryArtifex", text: "在 Artifex 查询 " },
-  { icon: <FileTextOutlined />, labelKey: "queryBox", text: "在 G123 Box 搜索 " },
-  { icon: <ThunderboltOutlined />, labelKey: "queryAdnext", text: "查询 Adnext " },
-  { icon: <GiftOutlined />, labelKey: "queryGift", text: "查询 Gift " },
-  { icon: <ApartmentOutlined />, labelKey: "checkPipeline", text: "检查跨系统链路 " },
-];
 
 export default memo(function Dashboard({
   sessions,
@@ -64,11 +50,11 @@ export default memo(function Dashboard({
     return total;
   }, [sessions]);
 
-  const sessionSummary = (s: Session): string => {
+  const sessionSummary = useCallback((s: Session): string => {
     const lastAi = [...s.messages].reverse().find((m) => m.role === "assistant");
     if (!lastAi) return "";
     return lastAi.content.slice(0, 80) + (lastAi.content.length > 80 ? "…" : "");
-  };
+  }, []);
 
   return (
     <div className="dashboard-root">
@@ -144,13 +130,13 @@ export default memo(function Dashboard({
           {t("quickActions")}
         </Typography.Text>
         <Flex gap={8} wrap>
-          {QUICK_ACTIONS.map((action) => (
-            <Tooltip key={action.labelKey} title={t(action.labelKey)}>
+          {DEFAULT_QUICK_ACTIONS.map((action) => (
+            <Tooltip key={action.key} title={t(action.labelKey)}>
               <button
                 className="dashboard-quick-btn"
                 onClick={() => onQuickAction(action.text)}
               >
-                {action.icon}
+                <action.icon />
                 <span>{t(action.labelKey)}</span>
               </button>
             </Tooltip>
