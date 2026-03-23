@@ -1,13 +1,20 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import dynamic from "next/dynamic";
 import { useToggle, useMemoizedFn, useMount } from "ahooks";
 import { Modal, Tooltip, Typography, Flex, Empty } from "antd";
 import { BarChartOutlined, LeftOutlined, RightOutlined } from "@ant-design/icons";
-import { Column } from "@ant-design/charts";
 import { useTranslations } from "next-intl";
+
+// Lazy load the chart component to reduce initial bundle size
+const Column = dynamic(
+  () => import("@ant-design/charts").then((mod) => mod.Column),
+  { ssr: false, loading: () => <div style={{ height: 160 }} /> }
+);
 import { useAppLocale } from "@/lib/locale";
-import type { Session, SSEChunkPayload } from "@/types/chat";
+import { formatTokenCount, lightenColor, getTokenUsage, isSSEChunkPayload } from "@/lib/utils";
+import type { Session } from "@/types/chat";
 
 interface DailyRecord {
   date: string;
@@ -18,17 +25,6 @@ interface DailyRecord {
 function resolveColor(varName: string): string {
   if (typeof document === "undefined") return "#888";
   return getComputedStyle(document.documentElement).getPropertyValue(varName).trim() || "#888";
-}
-
-export function lightenColor(hex: string, amount = 0.4): string {
-  const raw = hex.replace("#", "");
-  const r = parseInt(raw.substring(0, 2), 16);
-  const g = parseInt(raw.substring(2, 4), 16);
-  const b = parseInt(raw.substring(4, 6), 16);
-  const lr = Math.round(r + (255 - r) * amount);
-  const lg = Math.round(g + (255 - g) * amount);
-  const lb = Math.round(b + (255 - b) * amount);
-  return `#${lr.toString(16).padStart(2, "0")}${lg.toString(16).padStart(2, "0")}${lb.toString(16).padStart(2, "0")}`;
 }
 
 export function getMonthRange(offset: number): { start: number; end: number } {
@@ -52,11 +48,12 @@ export function aggregateByMonth(
   for (const session of sessions) {
     for (const evt of session.activity) {
       if (evt.type !== "token_usage" || evt.timestamp < start || evt.timestamp > end) continue;
-      const p = evt.payload as SSEChunkPayload;
+      if (!isSSEChunkPayload(evt.payload)) continue;
+      const usage = getTokenUsage(evt.payload);
       const key = new Date(evt.timestamp).toLocaleDateString("en-CA");
       const entry = dayMap.get(key) ?? { prompt: 0, completion: 0 };
-      entry.prompt += p.prompt_tokens ?? 0;
-      entry.completion += p.completion_tokens ?? 0;
+      entry.prompt += usage.prompt_tokens;
+      entry.completion += usage.completion_tokens;
       dayMap.set(key, entry);
     }
   }
@@ -83,11 +80,6 @@ export function aggregateByMonth(
   return { records, totalPrompt, totalCompletion };
 }
 
-export function formatTokenCount(n: number): string {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}k`;
-  return String(n);
-}
 
 function RatioBar({ prompt, completion }: { prompt: number; completion: number }) {
   const total = prompt + completion;
@@ -238,7 +230,12 @@ function TokenChart({ records, promptLabel }: { records: DailyRecord[]; promptLa
   const [colors, setColors] = useState<[string, string]>(["#10b981", "#3b82f6"]);
 
   useMount(() => {
-    setColors([resolveColor("--accent"), resolveColor("--info")]);
+    const accent = resolveColor("--accent");
+    const info = resolveColor("--info");
+    // Only update if colors are different from defaults to avoid unnecessary re-render
+    if (accent !== colors[0] || info !== colors[1]) {
+      setColors([accent, info]);
+    }
   });
 
   const config = useMemo(
@@ -353,7 +350,7 @@ function TokenReportContent({ sessions }: { sessions: Session[] }) {
           <button
             className="icon-button"
             onClick={goPrev}
-            aria-label="Previous month"
+            aria-label={t("previousMonth")}
             style={{ fontSize: 12, width: 26, height: 26 }}
           >
             <LeftOutlined />
@@ -374,7 +371,7 @@ function TokenReportContent({ sessions }: { sessions: Session[] }) {
             className="icon-button"
             onClick={goNext}
             disabled={monthOffset >= 0}
-            aria-label="Next month"
+            aria-label={t("nextMonth")}
             style={{ fontSize: 12, width: 26, height: 26 }}
           >
             <RightOutlined />

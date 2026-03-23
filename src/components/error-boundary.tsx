@@ -3,7 +3,6 @@
 import { Component, type ReactNode, type ErrorInfo } from "react";
 import { Button, Flex, Typography } from "antd";
 import { ReloadOutlined } from "@ant-design/icons";
-import { useTranslations } from "next-intl";
 
 interface Props {
   children: ReactNode;
@@ -14,8 +13,9 @@ interface State {
   error: Error | null;
 }
 
+// Note: DefaultFallback cannot use useTranslations because it may render
+// outside the NextIntlClientProvider context when catching errors at the layout level
 function DefaultFallback({ error, onReset }: { error: Error; onReset: () => void }) {
-  const t = useTranslations("error");
   return (
     <Flex
       vertical
@@ -25,7 +25,7 @@ function DefaultFallback({ error, onReset }: { error: Error; onReset: () => void
       style={{ height: "100dvh", padding: 40 }}
     >
       <Typography.Title level={4} style={{ margin: 0 }}>
-        {t("title")}
+        Something went wrong
       </Typography.Title>
       <Typography.Text
         type="secondary"
@@ -33,14 +33,14 @@ function DefaultFallback({ error, onReset }: { error: Error; onReset: () => void
       >
         {process.env.NODE_ENV === "development"
           ? error.message
-          : t("description")}
+          : "An unexpected error occurred. Please try again."}
       </Typography.Text>
       <Button
         type="primary"
         icon={<ReloadOutlined />}
         onClick={onReset}
       >
-        {t("tryAgain")}
+        Try Again
       </Button>
     </Flex>
   );

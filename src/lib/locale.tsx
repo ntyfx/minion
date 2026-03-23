@@ -113,8 +113,6 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
     document.documentElement.lang = id;
   }, []);
 
-  if (!mounted) return null;
-
   const messages = MESSAGES[locale] ?? MESSAGES["zh-CN"];
 
   return (

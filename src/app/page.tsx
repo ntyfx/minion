@@ -2,31 +2,24 @@
 
 import { useState } from "react";
 import { useMemoizedFn } from "ahooks";
-import { Layout, Badge, Modal, Input, Flex, Tooltip, message, Space, Spin } from "antd";
-import {
-  SafetyCertificateOutlined,
-  LinkOutlined,
-  SettingOutlined,
-  GithubOutlined,
-  MenuFoldOutlined,
-  MenuUnfoldOutlined,
-  ShareAltOutlined,
-  ImportOutlined,
-} from "@ant-design/icons";
+import { Layout, Modal, Input, Space, Spin } from "antd";
 import { CHAT_ICON_KEYS, getChatIcon } from "@/lib/chat-icons";
 import { useTranslations } from "next-intl";
 import Sidebar from "@/components/sidebar";
 import { BrandLogo, BrandMark } from "@/components/brand-logo";
 import ChatPanel from "@/components/chat-panel";
-import ActivityFeed, { ActivityToggle } from "@/components/activity-feed";
-import { ToolsToggle } from "@/components/tools-status";
-import { TokenReportToggle } from "@/components/token-report";
+import ActivityFeed from "@/components/activity-feed";
 import SettingsPanel from "@/components/settings-panel";
-import TemplatePanel, { TemplateToggle } from "@/components/template-panel";
-import BookmarkPanel, { BookmarkToggle } from "@/components/bookmark-panel";
-import { ExportMenu } from "@/components/export-menu";
+import TemplatePanel from "@/components/template-panel";
+import BookmarkPanel from "@/components/bookmark-panel";
 import Dashboard from "@/components/dashboard";
-import SequencePanel, { SequenceToggle } from "@/components/sequence-panel";
+import SequencePanel from "@/components/sequence-panel";
+import { AppHeader } from "@/components/app-header";
+import {
+  ChatErrorBoundary,
+  SidebarErrorBoundary,
+  DashboardErrorBoundary,
+} from "@/components/error-boundary-wrapper";
 import { downloadShareFile, readShareFile, shareableToSession } from "@/lib/sharing";
 import { createSession as createNewSession } from "@/lib/sessions";
 import { saveBookmark, createBookmarkId } from "@/lib/bookmark-db";
@@ -38,7 +31,9 @@ import { useTheme } from "@/lib/theme";
 import { useChatSessions } from "@/hooks/use-chat-sessions";
 import { useStreaming } from "@/hooks/use-streaming";
 import { useRenameModal } from "@/hooks/use-rename-modal";
+import { useTagModal } from "@/hooks/use-tag-modal";
 import { useUpdateNotification } from "@/hooks/use-update-notification";
+import { message } from "antd";
 import type { AppSettings } from "@/types/chat";
 
 const { Sider } = Layout;
@@ -105,6 +100,15 @@ export default function Home() {
     handleRenameCancel,
   } = useRenameModal({ sessions, updateSession });
 
+  const {
+    tagModalOpen,
+    tagInput,
+    setTagInput,
+    handleTagSession,
+    handleTagConfirm,
+    handleTagCancel,
+  } = useTagModal({ sessions, updateSession });
+
   const handleSelectSession = useMemoizedFn((id: string) => {
     baseSelectSession(id);
     setInputValue("");
@@ -123,28 +127,6 @@ export default function Home() {
 
   const handleArchiveSession = useMemoizedFn((id: string) => {
     updateSession(id, (s) => ({ ...s, archived: !s.archived }));
-  });
-
-  const [tagModalOpen, setTagModalOpen] = useState(false);
-  const [tagSessionId, setTagSessionId] = useState<string | null>(null);
-  const [tagInput, setTagInput] = useState("");
-
-  const handleTagSession = useMemoizedFn((id: string) => {
-    setTagSessionId(id);
-    const s = sessions.find((s) => s.id === id);
-    setTagInput((s?.tags ?? []).join(", "));
-    setTagModalOpen(true);
-  });
-
-  const handleTagConfirm = useMemoizedFn(() => {
-    if (!tagSessionId) return;
-    const tags = tagInput
-      .split(/[,，]/)
-      .map((t) => t.trim())
-      .filter(Boolean);
-    updateSession(tagSessionId, (s) => ({ ...s, tags }));
-    setTagModalOpen(false);
-    setTagSessionId(null);
   });
 
   const handleShareSession = useMemoizedFn(() => {
@@ -208,13 +190,9 @@ export default function Home() {
     (activeSession?.activity.length ?? 0) - seenEventCount,
   );
 
-  const tokenPreview = settings.accessToken
-    ? `${settings.accessToken.slice(0, 6)}…${settings.accessToken.slice(-4)}`
-    : t("tokenNotSet");
-
   if (sessionsLoading) {
     return (
-      <div style={{ height: "100dvh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--bg-base)" }}>
+      <div className="flex items-center justify-center" style={{ height: "100dvh", background: "var(--bg-base)" }}>
         <Spin size="large" />
       </div>
     );
@@ -235,63 +213,55 @@ export default function Home() {
         </defs>
       </svg>
 
-      <Sider
-        width={260}
-        collapsedWidth={48}
-        collapsible
-        collapsed={siderCollapsed}
-        trigger={null}
-        style={{
-          background: "var(--bg-surface)",
-          boxShadow: "1px 0 0 var(--border)",
-          overflow: "hidden",
-        }}
-        theme={colorScheme}
-      >
-        <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
-          <div
-            style={{
-              height: 45,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: siderCollapsed ? "center" : "flex-start",
-              padding: siderCollapsed ? "0" : "0 16px",
-              borderBottom: "1px solid var(--border)",
-              flexShrink: 0,
-            }}
-          >
-            {siderCollapsed ? (
-              <BrandMark size={24} />
-            ) : (
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 8,
-                  fontWeight: 600,
-                  fontSize: 15,
-                  letterSpacing: "-0.01em",
-                }}
-              >
-                <BrandLogo size={28} />
-                <span className="brand-gradient-text">Minion Chat</span>
-              </div>
-            )}
-          </div>
-          <div style={{ flex: 1, overflow: "hidden" }}>
-            <Sidebar
-              sessions={sessions}
-              activeSessionId={activeSessionId}
-              collapsed={siderCollapsed}
-              onSelectSession={handleSelectSession}
-              onCreateSession={handleCreateSession}
-              onDeleteSession={handleDeleteSession}
-              onRenameSession={handleRenameSession}
-              onPinSession={handlePinSession}
-              onArchiveSession={handleArchiveSession}
-              onTagSession={handleTagSession}
-            />
-          </div>
+      <SidebarErrorBoundary>
+        <Sider
+          width={260}
+          collapsedWidth={48}
+          collapsible
+          collapsed={siderCollapsed}
+          trigger={null}
+          style={{
+            background: "var(--bg-surface)",
+            boxShadow: "1px 0 0 var(--border)",
+            overflow: "hidden",
+          }}
+          theme={colorScheme}
+        >
+          <div className="flex flex-col h-full">
+            <div
+              style={{
+                height: 45,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: siderCollapsed ? "center" : "flex-start",
+                padding: siderCollapsed ? "0" : "0 16px",
+                borderBottom: "1px solid var(--border)",
+                flexShrink: 0,
+              }}
+            >
+              {siderCollapsed ? (
+                <BrandMark size={24} />
+              ) : (
+                <div className="flex items-center gap-2" style={{ fontWeight: 600, fontSize: 15, letterSpacing: "-0.01em" }}>
+                  <BrandLogo size={28} />
+                  <span className="brand-gradient-text">Minion Chat</span>
+                </div>
+              )}
+            </div>
+            <div style={{ flex: 1, overflow: "hidden" }}>
+              <Sidebar
+                sessions={sessions}
+                activeSessionId={activeSessionId}
+                collapsed={siderCollapsed}
+                onSelectSession={handleSelectSession}
+                onCreateSession={handleCreateSession}
+                onDeleteSession={handleDeleteSession}
+                onRenameSession={handleRenameSession}
+                onPinSession={handlePinSession}
+                onArchiveSession={handleArchiveSession}
+                onTagSession={handleTagSession}
+              />
+            </div>
           {!siderCollapsed && (
             <div
               style={{
@@ -306,166 +276,54 @@ export default function Home() {
             </div>
           )}
         </div>
-      </Sider>
+        </Sider>
+      </SidebarErrorBoundary>
 
       <Layout style={{ background: "var(--bg-base)" }}>
-        <header
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: "0 16px 0 8px",
-            borderBottom: "1px solid var(--border)",
-            flexShrink: 0,
-            background: "var(--bg-surface)",
-            height: 45,
-            gap: 8,
-          }}
-        >
-          <Flex gap={8} wrap align="center" style={{ minWidth: 0 }}>
-            <Tooltip title={siderCollapsed ? t("expandSidebar") : t("collapseSidebar")}>
-              <button
-                className="icon-button icon-button-muted"
-                onClick={() => setSiderCollapsed((c) => !c)}
-                aria-label={siderCollapsed ? t("expandSidebar") : t("collapseSidebar")}
-              >
-                {siderCollapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-              </button>
-            </Tooltip>
-            <span
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 6,
-                fontSize: 12,
-                color: "var(--text-secondary)",
-                fontFamily: "var(--font-mono), ui-monospace, monospace",
-              }}
-            >
-              <Badge
-                status={isStreaming ? "processing" : "default"}
-                style={{ marginRight: 0 }}
-              />
-              {isStreaming ? t("streaming") : t("idle")}
-            </span>
-            <span
-              style={{
-                width: 1,
-                height: 14,
-                background: "var(--border)",
-                flexShrink: 0,
-              }}
-            />
-            <span
-              style={{
-                fontSize: 12,
-                color: "var(--text-muted)",
-                fontFamily: "var(--font-mono), ui-monospace, monospace",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                whiteSpace: "nowrap",
-              }}
-            >
-              <LinkOutlined style={{ fontSize: 11, marginRight: 4 }} />
-              {settings.baseUrl.replace(/^https?:\/\//, "")}
-            </span>
-            <span
-              style={{
-                width: 1,
-                height: 14,
-                background: "var(--border)",
-                flexShrink: 0,
-              }}
-            />
-            <span
-              style={{
-                fontSize: 12,
-                color: "var(--text-muted)",
-                fontFamily: "var(--font-mono), ui-monospace, monospace",
-              }}
-            >
-              <SafetyCertificateOutlined style={{ fontSize: 11, marginRight: 4 }} />
-              {tokenPreview}
-            </span>
-          </Flex>
-
-          <Flex gap={4} align="center">
-            <Tooltip title={t("importSession")}>
-              <button className="icon-button" onClick={handleImportSession} aria-label={t("importSession")}>
-                <ImportOutlined />
-              </button>
-            </Tooltip>
-            <Tooltip title={t("shareSession")}>
-              <button
-                className="icon-button"
-                onClick={handleShareSession}
-                aria-label={t("shareSession")}
-                disabled={!activeSession || activeSession.messages.length === 0}
-                style={{ opacity: activeSession?.messages.length ? 1 : 0.4 }}
-              >
-                <ShareAltOutlined />
-              </button>
-            </Tooltip>
-            <SequenceToggle onClick={() => setSequencesOpen(true)} />
-            <ExportMenu session={activeSession} />
-            <BookmarkToggle onClick={() => setBookmarksOpen(true)} />
-            <TemplateToggle onClick={() => setTemplatesOpen(true)} />
-            <TokenReportToggle sessions={sessions} />
-            <ToolsToggle
-              baseUrl={settings.baseUrl}
-              accessToken={settings.accessToken}
-            />
-            <ActivityToggle
-              count={unseenEventCount}
-              onClick={handleToggleActivity}
-            />
-            <Tooltip title={t("settings")}>
-              <button
-                onClick={() => setSettingsOpen(true)}
-                className="icon-button"
-                aria-label={t("openSettings")}
-                data-testid="settings-button"
-              >
-                <SettingOutlined />
-              </button>
-            </Tooltip>
-            <Tooltip title="GitHub">
-              <a
-                href="https://github.com/ntyfx/minion"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="icon-button icon-button-gradient"
-                aria-label="GitHub"
-              >
-                <GithubOutlined />
-              </a>
-            </Tooltip>
-          </Flex>
-        </header>
+        <AppHeader
+          siderCollapsed={siderCollapsed}
+          setSiderCollapsed={setSiderCollapsed}
+          isStreaming={isStreaming}
+          settings={settings}
+          activeSession={activeSession}
+          sessions={sessions}
+          unseenEventCount={unseenEventCount}
+          onImportSession={handleImportSession}
+          onShareSession={handleShareSession}
+          onToggleActivity={handleToggleActivity}
+          onOpenSettings={() => setSettingsOpen(true)}
+          onOpenTemplates={() => setTemplatesOpen(true)}
+          onOpenBookmarks={() => setBookmarksOpen(true)}
+          onOpenSequences={() => setSequencesOpen(true)}
+        />
 
         <main style={{ flex: 1, overflow: "hidden" }}>
           {!activeSession ? (
-            <Dashboard
-              sessions={sessions}
-              onSelectSession={handleSelectSession}
-              onQuickAction={(text) => {
-                handleCreateSession();
-                setInputValue(text);
-              }}
-            />
+            <DashboardErrorBoundary>
+              <Dashboard
+                sessions={sessions}
+                onSelectSession={handleSelectSession}
+                onQuickAction={(text) => {
+                  handleCreateSession();
+                  setInputValue(text);
+                }}
+              />
+            </DashboardErrorBoundary>
           ) : (
-            <ChatPanel
-              session={activeSession}
-              isStreaming={isStreaming}
-              streamingContent={streamingContent}
-              reasoningContent={reasoningContent}
-              inputValue={inputValue}
-              onInputChange={setInputValue}
-              onSend={handleSend}
-              onResend={handleResend}
-              onStop={handleStop}
-              onBookmark={handleBookmark}
-            />
+            <ChatErrorBoundary>
+              <ChatPanel
+                session={activeSession}
+                isStreaming={isStreaming}
+                streamingContent={streamingContent}
+                reasoningContent={reasoningContent}
+                inputValue={inputValue}
+                onInputChange={setInputValue}
+                onSend={handleSend}
+                onResend={handleResend}
+                onStop={handleStop}
+                onBookmark={handleBookmark}
+              />
+            </ChatErrorBoundary>
           )}
         </main>
       </Layout>
@@ -515,7 +373,7 @@ export default function Home() {
         title={t("editTags")}
         open={tagModalOpen}
         onOk={handleTagConfirm}
-        onCancel={() => setTagModalOpen(false)}
+        onCancel={handleTagCancel}
         okText={t("rename")}
         destroyOnHidden
       >
@@ -539,7 +397,7 @@ export default function Home() {
         okText={t("rename")}
         destroyOnHidden
       >
-        <Space orientation="vertical" size="middle" style={{ width: "100%" }}>
+        <Space direction="vertical" size="middle" style={{ width: "100%" }}>
           <div>
             <div style={{ marginBottom: 8, fontSize: 13, color: "var(--text-secondary)" }}>
               {t("chooseIcon")}
@@ -557,22 +415,15 @@ export default function Home() {
                   type="button"
                   onClick={() => setIconValue(key)}
                   aria-label={key}
+                  className={`flex items-center justify-center w-9 h-9 rounded-lg cursor-pointer text-base transition-colors ${
+                    iconValue === key
+                      ? "border-2 border-[var(--accent)] text-[var(--accent)]"
+                      : "border border-[var(--border)] text-[var(--text-secondary)]"
+                  }`}
                   style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    width: 36,
-                    height: 36,
-                    borderRadius: 8,
-                    border: iconValue === key
-                      ? "2px solid var(--accent)"
-                      : "1px solid var(--border)",
                     background: iconValue === key
                       ? "color-mix(in srgb, var(--accent) 12%, transparent)"
                       : "transparent",
-                    cursor: "pointer",
-                    fontSize: 16,
-                    color: iconValue === key ? "var(--accent)" : "var(--text-secondary)",
                   }}
                 >
                   {getChatIcon(key)}
