@@ -302,4 +302,68 @@ describe("TokenReportToggle component", () => {
       expect(nextBtn!.disabled).toBe(true);
     });
   });
+
+  it("aggregates only token_usage events", async () => {
+    const { start } = getMonthRange(0);
+    const session: Session = {
+      id: "s1",
+      label: "Test",
+      messages: [],
+      activity: [
+        { id: "e1", type: "token_usage", timestamp: start + 1000, payload: { prompt_tokens: 100, completion_tokens: 50 } },
+        { id: "e2", type: "thinking", timestamp: start + 2000, payload: { content: "test" } },
+        { id: "e3", type: "request", timestamp: start + 3000, payload: {} },
+      ],
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    };
+
+    const result = aggregateByMonth([session], 0, { prompt: "P", completion: "C" });
+    expect(result.totalPrompt).toBe(100);
+    expect(result.totalCompletion).toBe(50);
+  });
+
+  it("skips events with null payload", async () => {
+    const { start } = getMonthRange(0);
+    const session: Session = {
+      id: "s1",
+      label: "Test",
+      messages: [],
+      activity: [
+        { id: "e1", type: "token_usage", timestamp: start + 1000, payload: { prompt_tokens: 100, completion_tokens: 50 } },
+        { id: "e2", type: "token_usage", timestamp: start + 2000, payload: null },
+      ],
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    };
+
+    const result = aggregateByMonth([session], 0, { prompt: "P", completion: "C" });
+    expect(result.totalPrompt).toBe(100);
+    expect(result.totalCompletion).toBe(50);
+  });
+
+  it("renders TokenChart with data", async () => {
+    vi.doMock("@ant-design/charts", () => ({
+      Column: (props: object) => <div data-testid="mock-column-chart" data-props={JSON.stringify(props)} />,
+    }));
+
+    const { start } = getMonthRange(0);
+    const session = makeSession([makeTokenEvent(start + 86400000, 1000, 500)]);
+
+    const { container, baseElement } = render(<TokenReportToggle sessions={[session]} />);
+    const btn = container.querySelector<HTMLButtonElement>(
+      'button[aria-label="tokenReport.openReport"]',
+    )!;
+
+    act(() => {
+      btn.click();
+    });
+
+    await waitFor(() => {
+      const chart = baseElement.querySelector('[data-testid="mock-column-chart"]');
+      expect(chart).toBeTruthy();
+    });
+
+    vi.doUnmock("@ant-design/charts");
+  });
 });
