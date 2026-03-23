@@ -31,6 +31,7 @@ import {
 } from "@ant-design/icons";
 import { useTranslations } from "next-intl";
 import { formatTokenCount, getTokenUsage, isSSEChunkPayload } from "@/lib/utils";
+import { detectErrorReport } from "@/lib/response-parser";
 import type { Session, ChatMessage, TokenUsage } from "@/types/chat";
 
 function buildTokenUsageByRound(session: Session): TokenUsage[] {
@@ -520,8 +521,10 @@ const BubbleListWithItems = memo(function BubbleListWithItems({
       aiIndex++;
       const msgId = item.key;
       const isBookmarked = bookmarkedMessageIds?.has(msgId);
+      const isError = detectErrorReport(String(item.content)) !== null;
       return {
         ...item,
+        className: isError ? "ant-x-bubble-error" : undefined,
         contentRender: (content: unknown) => (
           <MarkdownContent
             content={String(content)}

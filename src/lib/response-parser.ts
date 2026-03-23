@@ -129,7 +129,7 @@ const ERROR_FIELD_MAP: Record<string, RegExp> = {
   recovery: /恢复建议|恢复动作|recovery|可选恢复|suggestion/i,
 };
 
-function detectErrorReport(content: string): ErrorReportData | null {
+export function detectErrorReport(content: string): ErrorReportData | null {
   const lines = content.split("\n");
   let title = "";
   const fields: Array<{ label: string; value: string }> = [];

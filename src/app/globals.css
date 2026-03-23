@@ -1132,6 +1132,16 @@ body {
   border-top: 1px solid var(--error-border);
 }
 
+/* Error bubble styling - used when AI message contains Operation Failed */
+.ant-x-bubble-error .ant-bubble-content {
+  background: var(--error-subtle) !important;
+  border: 1px solid var(--error-border) !important;
+  border-radius: 12px 12px 12px 4px !important;
+  color: var(--error) !important;
+  font-family: var(--font-mono), ui-monospace, monospace !important;
+  font-size: 13px !important;
+}
+
 /* ── Slash command & mention popups ── */
 
 .slash-popup {
