@@ -1,0 +1,103 @@
+/* ── Popups & Overlays ── */
+
+/* Slash command & mention popups */
+.slash-popup {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  right: 0;
+  margin-bottom: 6px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  z-index: 50;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.slash-popup-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 14px;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  cursor: pointer;
+  font-size: 13px;
+  text-align: left;
+  transition: background 0.1s;
+}
+
+.slash-popup-item:hover,
+.slash-popup-item-active {
+  background: var(--accent-subtle);
+}
+
+.slash-popup-icon {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  background: var(--bg-muted);
+  color: var(--accent-text);
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.slash-popup-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.slash-popup-label {
+  font-weight: 500;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 13px;
+}
+
+.slash-popup-desc {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* Drawer */
+.ant-drawer-content {
+  background: var(--bg-surface) !important;
+}
+
+.ant-drawer-header {
+  background: var(--bg-surface) !important;
+  border-bottom: 1px solid var(--border) !important;
+}
+
+.ant-drawer-body {
+  background: var(--bg-surface) !important;
+}
+
+/* Modal */
+.ant-modal-content {
+  background: var(--bg-elevated) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+/* Popover */
+.ant-popover-inner {
+  background: var(--bg-elevated) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+/* Tooltip */
+.ant-tooltip-inner {
+  font-size: 12px !important;
+  border-radius: 6px !important;
+}

@@ -1,0 +1,47 @@
+/* ── Sidebar ── */
+
+.ant-conversations {
+  background: transparent !important;
+}
+
+.ant-conversations-item {
+  border-radius: 8px !important;
+  margin: 1px 0 !important;
+  padding-block: 8px !important;
+  height: auto !important;
+  min-height: 0 !important;
+}
+
+.ant-conversations-item:hover {
+  background: var(--bg-hover) !important;
+}
+
+.ant-conversations-item-active {
+  background: var(--accent-subtle) !important;
+}
+
+.ant-layout-sider-collapsed .ant-conversations-creation-label {
+  display: none !important;
+}
+
+.ant-conversations-group-title {
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  color: var(--text-muted) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.04em !important;
+  padding-left: 10px !important;
+}
+
+/* Table styling within sidebar/tools */
+.ant-table-wrapper .ant-table-tbody > tr:nth-child(even) > td {
+  background: var(--bg-hover) !important;
+}
+
+.tools-status-table .ant-table {
+  --ant-table-header-border-radius: 8px !important;
+}
+
+.tools-status-table .ant-table-tbody tr:last-child > td {
+  border-bottom: none !important;
+}

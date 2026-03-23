@@ -1,0 +1,112 @@
+/* ── Icon button ── */
+.icon-button {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 15px;
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+}
+
+.icon-button:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.icon-button-muted {
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.icon-button:focus-visible {
+  box-shadow: var(--ring-focus);
+}
+
+.icon-button-gradient .anticon svg {
+  fill: url(#brand-svg-gradient);
+}
+
+/* ── Ant Design overrides ── */
+
+.ant-btn-primary {
+  background: var(--accent) !important;
+  color: var(--text-inverse) !important;
+  font-weight: 500 !important;
+  border: none !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+
+.ant-btn-primary:hover:not(:disabled) {
+  background: var(--accent-hover) !important;
+}
+
+.ant-btn-text:hover:not(:disabled) {
+  background: var(--bg-hover) !important;
+}
+
+.ant-input:focus,
+.ant-input-focused,
+.ant-input-password:focus-within {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 2px var(--accent-subtle) !important;
+}
+
+/* ── Ant Segmented ── */
+
+.ant-segmented {
+  background: var(--bg-muted) !important;
+  border-radius: 8px !important;
+}
+
+.ant-segmented-item-selected {
+  background: var(--bg-elevated) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+
+/* ── Template card ── */
+
+.template-card {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-elevated);
+  transition: border-color 0.15s;
+}
+
+.template-card:hover {
+  border-color: var(--accent);
+}
+
+/* ── Sidebar filter buttons ── */
+
+.sidebar-filter-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.sidebar-filter-btn:hover {
+  color: var(--text-secondary);
+  border-color: var(--border-strong);
+}
+
+.sidebar-filter-btn-active {
+  background: var(--accent-subtle);
+  color: var(--accent-text);
+  border-color: var(--accent);
+}

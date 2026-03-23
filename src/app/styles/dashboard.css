@@ -1,0 +1,113 @@
+/* ── Dashboard ── */
+
+.dashboard-root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px 24px;
+  max-width: 680px;
+  margin: 0 auto;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.dashboard-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.dashboard-stats {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.dashboard-stat {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-elevated);
+}
+
+.dashboard-stat-value {
+  font-size: 18px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+}
+
+.dashboard-stat-label {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.dashboard-section {
+  width: 100%;
+  margin-bottom: 24px;
+}
+
+.dashboard-recent-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 8px;
+}
+
+.dashboard-recent-card {
+  text-align: left;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-elevated);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  display: block;
+  width: 100%;
+}
+
+.dashboard-recent-card:hover {
+  border-color: var(--accent);
+  background: var(--accent-subtle);
+}
+
+.dashboard-quick-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.dashboard-quick-btn:hover {
+  border-color: var(--accent);
+  background: var(--accent-subtle);
+  color: var(--accent-text);
+}
+
+.dashboard-template-btn {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-elevated);
+  cursor: pointer;
+  text-align: left;
+  flex: 1 1 200px;
+  min-width: 0;
+  transition: border-color 0.15s;
+}
+
+.dashboard-template-btn:hover {
+  border-color: var(--accent);
+}

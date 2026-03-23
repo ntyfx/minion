@@ -1,0 +1,129 @@
+/* ── Markdown ── */
+
+.chat-markdown {
+  color: var(--text-primary);
+  font-size: 14px;
+  line-height: 1.7;
+  word-break: break-word;
+}
+
+.chat-markdown h1,
+.chat-markdown h2,
+.chat-markdown h3,
+.chat-markdown h4,
+.chat-markdown h5,
+.chat-markdown h6 {
+  color: var(--text-primary);
+  margin: 20px 0 8px;
+  font-weight: 600;
+  line-height: 1.35;
+  text-wrap: balance;
+}
+
+.chat-markdown h1 { font-size: 1.375em; }
+.chat-markdown h2 { font-size: 1.2em; }
+.chat-markdown h3 { font-size: 1.075em; }
+
+.chat-markdown p {
+  margin: 0 0 10px;
+  text-wrap: pretty;
+}
+
+.chat-markdown p:last-child {
+  margin-bottom: 0;
+}
+
+.chat-markdown ul,
+.chat-markdown ol {
+  margin: 6px 0 10px;
+  padding-left: 1.5em;
+}
+
+.chat-markdown li {
+  margin-bottom: 3px;
+}
+
+.chat-markdown li::marker {
+  color: var(--text-muted);
+}
+
+.chat-markdown code {
+  background: var(--code-bg);
+  color: var(--code-text);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.875em;
+}
+
+.chat-markdown pre {
+  background: var(--pre-bg) !important;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin: 10px 0;
+  overflow-x: auto;
+}
+
+.chat-markdown pre code {
+  background: transparent;
+  color: var(--pre-text);
+  padding: 0;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.chat-markdown blockquote {
+  border-left: 2px solid var(--accent);
+  margin: 10px 0;
+  padding: 4px 14px;
+  color: var(--text-secondary);
+}
+
+.chat-markdown table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 10px 0;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.chat-markdown th,
+.chat-markdown td {
+  border: 1px solid var(--border);
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.chat-markdown th {
+  background: var(--bg-muted);
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.chat-markdown a {
+  color: var(--accent-text);
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 2px;
+}
+
+.chat-markdown a:hover {
+  text-decoration-color: var(--accent-text);
+}
+
+.chat-markdown hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 16px 0;
+}
+
+.chat-markdown strong {
+  font-weight: 600;
+}
+
+.chat-markdown img {
+  max-width: 100%;
+  border-radius: 8px;
+}

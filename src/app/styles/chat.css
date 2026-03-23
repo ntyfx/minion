@@ -1,0 +1,282 @@
+/* ── Chat Components ── */
+
+/* Bubble List */
+.ant-bubble-list {
+  padding: 16px 0 !important;
+}
+
+/* Ant Think */
+.ant-think .ant-think-status-wrapper {
+  padding: 0;
+  margin-inline-start: 2px;
+}
+
+.ant-think .ant-think-content {
+  margin-top: 8px;
+}
+
+/* Sender Glow Wrapper */
+.sender-glow-wrapper {
+  position: relative;
+  border-radius: 9999px;
+  overflow: hidden;
+  padding: 1.5px;
+  background: var(--border);
+}
+
+.sender-glow-wrapper::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 200%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  background: conic-gradient(
+    var(--brand-g1),
+    var(--brand-g2),
+    var(--brand-g3),
+    var(--brand-g1)
+  );
+  animation: sender-glow-spin 2.5s linear infinite paused;
+}
+
+.sender-glow-wrapper:hover::before,
+.sender-glow-wrapper:focus-within::before {
+  opacity: 1;
+  animation-play-state: running;
+}
+
+@keyframes sender-glow-spin {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Ant Sender */
+.ant-sender {
+  border: none !important;
+  border-radius: 9999px !important;
+  background: var(--bg-elevated) !important;
+  position: relative;
+}
+
+.ant-sender:focus-within {
+  box-shadow: none !important;
+}
+
+.ant-sender .ant-btn.ant-sender-actions-btn:not(.ant-sender-actions-btn-loading-button),
+.ant-sender .ant-btn.ant-sender-actions-btn:not(.ant-sender-actions-btn-loading-button):hover,
+.ant-sender .ant-btn.ant-sender-actions-btn:not(.ant-sender-actions-btn-loading-button):active {
+  background: var(--brand-gradient) !important;
+  border: none !important;
+  color: #fff !important;
+  box-shadow: none !important;
+}
+
+.ant-sender .ant-btn.ant-sender-actions-btn:not(.ant-sender-actions-btn-loading-button):disabled {
+  background: var(--brand-gradient) !important;
+  opacity: 0.4;
+  color: #fff !important;
+}
+
+.ant-sender .ant-btn.ant-sender-actions-btn:not(.ant-sender-actions-btn-loading-button) .anticon {
+  color: #fff !important;
+}
+
+.ant-sender .ant-sender-main {
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 9999px !important;
+  overflow: hidden;
+}
+
+.ant-sender .ant-sender-actions-list-presets {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ant-sender .ant-sender-actions-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.ant-sender .ant-sender-actions-btn-loading-icon {
+  width: 1em;
+  height: 1em;
+  display: block;
+}
+
+.ant-sender .ant-sender-input,
+.ant-sender .ant-sender-input-slot,
+.ant-sender textarea,
+.ant-sender input {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+/* ── Message toolbar (below AI bubbles) ── */
+
+.message-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 2px -16px -12px;
+  padding: 0px 8px;
+  min-height: 28px;
+  border-top: 1px solid var(--border);
+  background: color-mix(in srgb, var(--bg-surface) 60%, transparent);
+  border-radius: 0 0 12px 4px;
+  transition: opacity 0.15s ease;
+}
+
+.message-toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.toolbar-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+}
+
+.toolbar-action-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.toolbar-action-btn:focus-visible {
+  box-shadow: var(--ring-focus);
+}
+
+.message-toolbar-usage {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+  user-select: none;
+}
+
+.usage-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--bg-hover);
+  cursor: default;
+  transition: color 0.15s;
+}
+
+.usage-chip:hover {
+  color: var(--text-secondary);
+}
+
+.usage-chip svg {
+  flex-shrink: 0;
+}
+
+.usage-chip-total {
+  color: var(--accent-text);
+  background: var(--accent-subtle);
+  font-weight: 500;
+}
+
+.usage-chip-total:hover {
+  color: var(--accent-text);
+}
+
+.usage-divider {
+  width: 1px;
+  height: 10px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+/* ── User bubble + resend ── */
+
+.user-bubble-wrap {
+  position: relative;
+  padding-left: 50px;
+  margin-left: -50px;
+}
+
+.user-bubble-resend {
+  position: absolute;
+  left: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease 0.3s;
+}
+
+.user-bubble-wrap:hover .user-bubble-resend,
+.user-bubble-resend:hover {
+  opacity: 1;
+  pointer-events: auto;
+  transition-delay: 0s;
+}
+
+.user-bubble-wrap.is-streaming .user-bubble-resend {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+.resend-btn.ant-btn {
+  width: 26px !important;
+  height: 26px !important;
+  min-width: 26px !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  color: var(--text-muted) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.resend-btn.ant-btn .anticon {
+  font-size: 12px;
+}
+
+.resend-btn.ant-btn:hover:not(:disabled) {
+  color: var(--accent) !important;
+  background: var(--accent-subtle) !important;
+}
+
+.resend-btn.ant-btn:disabled {
+  opacity: 0.3;
+}
+
+/* ── Error bubble styling ── */
+.ant-x-bubble-error .ant-bubble-content {
+  background: var(--error-subtle) !important;
+  border: 1px solid var(--error-border) !important;
+  border-radius: 12px 12px 12px 4px !important;
+  color: var(--error) !important;
+  font-family: var(--font-mono), ui-monospace, monospace !important;
+  font-size: 13px !important;
+}
+
+.ant-x-bubble-error .rich-error-card {
+  margin: -12px -16px 0;
+}
