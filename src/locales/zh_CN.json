@@ -153,11 +153,11 @@
     "recentSessions": "最近对话",
     "quickActions": "快速操作",
     "builtinTemplates": "常用模板",
-    "queryEsystem": "查询 E-system",
-    "queryArtifex": "查询 Artifex",
-    "queryBox": "查询 Box",
-    "queryAdnext": "查询 Adnext",
-    "queryGift": "查询 Gift",
+    "querySystemA": "查询 System A",
+    "querySystemB": "查询 System B",
+    "querySystemC": "查询 System C",
+    "querySystemD": "查询 System D",
+    "querySystemE": "查询 System E",
     "checkPipeline": "检查跨系统链路"
   },
   "sequences": {

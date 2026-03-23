@@ -153,11 +153,11 @@
     "recentSessions": "最近の会話",
     "quickActions": "クイックアクション",
     "builtinTemplates": "よく使うテンプレート",
-    "queryEsystem": "E-system 照会",
-    "queryArtifex": "Artifex 照会",
-    "queryBox": "Box 照会",
-    "queryAdnext": "Adnext 照会",
-    "queryGift": "Gift 照会",
+    "querySystemA": "System A 照会",
+    "querySystemB": "System B 照会",
+    "querySystemC": "System C 照会",
+    "querySystemD": "System D 照会",
+    "querySystemE": "System E 照会",
     "checkPipeline": "クロスシステムチェック"
   },
   "sequences": {

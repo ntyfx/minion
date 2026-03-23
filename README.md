@@ -23,13 +23,13 @@ Read-only queries that return results directly:
 - Workspaces, canvases, models, approvals, subscriptions
 - Files, folders, search results, metadata
 - Campaigns, ad creatives, delivery configurations
-- Gift packs, templates, products, pricing
+- Product packs, templates, products, pricing
 
 ### 3. Execute Changes (write)
 
 All mutations generate a plan and **wait for your confirmation** before executing:
 
-- Create / update / delete: campaigns, gift packs, assets, tasks, workflow objects, short links, etc.
+- Create / update / delete: campaigns, product packs, assets, tasks, workflow objects, short links, etc.
 - Trigger approvals, pushes, archiving, syncing
 - **Budget changes** (budget, daily budget, bids) require explicit separate confirmation
 - On failure: report only — no automatic rollback

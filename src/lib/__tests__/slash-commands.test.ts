@@ -34,10 +34,10 @@ describe("matchSystemNames", () => {
     expect(matchSystemNames("hello world")).toEqual([]);
   });
 
-  it("returns matching systems for @E, @art, case insensitive", () => {
-    expect(matchSystemNames("ping @e")).toEqual(expect.arrayContaining(["E-system"]));
-    expect(matchSystemNames("pick @art")).toEqual(expect.arrayContaining(["Artifex"]));
-    expect(matchSystemNames("Mixed @ADNEXT")).toEqual(expect.arrayContaining(["Adnext"]));
+  it("returns matching systems for @A, @B, case insensitive", () => {
+    expect(matchSystemNames("ping @a")).toEqual(expect.arrayContaining(["System A"]));
+    expect(matchSystemNames("pick @b")).toEqual(expect.arrayContaining(["System B"]));
+    expect(matchSystemNames("Mixed @D")).toEqual(expect.arrayContaining(["System D"]));
   });
 });
 
@@ -71,11 +71,11 @@ describe("resolveSlashCommand", () => {
 
 describe("applySystemMention", () => {
   it("replaces from @ through end of string with system plus trailing space", () => {
-    expect(applySystemMention("Ask @", "E-system")).toBe("Ask E-system ");
-    expect(applySystemMention("prefix @partial", "Artifex")).toBe("prefix Artifex ");
+    expect(applySystemMention("Ask @", "System A")).toBe("Ask System A ");
+    expect(applySystemMention("prefix @partial", "System B")).toBe("prefix System B ");
   });
 
   it("appends system when there is no @", () => {
-    expect(applySystemMention("hello ", "Gift")).toBe("hello Gift");
+    expect(applySystemMention("hello ", "System E")).toBe("hello System E");
   });
 });

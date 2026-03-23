@@ -15,12 +15,12 @@ export const SLASH_COMMANDS: SlashCommand[] = [
 ];
 
 export const SYSTEM_NAMES = [
-  "E-system",
-  "Artifex",
-  "G123 Box",
-  "Adnext",
-  "Gift",
-  "B-system",
+  "System A",
+  "System B",
+  "System C",
+  "System D",
+  "System E",
+  "System F",
 ] as const;
 
 export type SystemName = (typeof SYSTEM_NAMES)[number];

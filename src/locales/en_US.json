@@ -21,7 +21,7 @@
     "importFailed": "Import failed — invalid file format",
     "editTags": "Edit Tags",
     "tagsHint": "Enter tags, separated by commas",
-    "tagsPlaceholder": "ad campaign, gift packs"
+    "tagsPlaceholder": "ad campaign, product packs"
   },
   "chat": {
     "welcomeTitle": "Minion Chat",
@@ -153,11 +153,11 @@
     "recentSessions": "Recent Sessions",
     "quickActions": "Quick Actions",
     "builtinTemplates": "Common Templates",
-    "queryEsystem": "Query E-system",
-    "queryArtifex": "Query Artifex",
-    "queryBox": "Query Box",
-    "queryAdnext": "Query Adnext",
-    "queryGift": "Query Gift",
+    "querySystemA": "Query System A",
+    "querySystemB": "Query System B",
+    "querySystemC": "Query System C",
+    "querySystemD": "Query System D",
+    "querySystemE": "Query System E",
     "checkPipeline": "Check cross-system flow"
   },
   "sequences": {

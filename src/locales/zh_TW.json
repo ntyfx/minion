@@ -153,11 +153,11 @@
     "recentSessions": "最近對話",
     "quickActions": "快速操作",
     "builtinTemplates": "常用模板",
-    "queryEsystem": "查詢 E-system",
-    "queryArtifex": "查詢 Artifex",
-    "queryBox": "查詢 Box",
-    "queryAdnext": "查詢 Adnext",
-    "queryGift": "查詢 Gift",
+    "querySystemA": "查詢 System A",
+    "querySystemB": "查詢 System B",
+    "querySystemC": "查詢 System C",
+    "querySystemD": "查詢 System D",
+    "querySystemE": "查詢 System E",
     "checkPipeline": "檢查跨系統鏈路"
   },
   "sequences": {

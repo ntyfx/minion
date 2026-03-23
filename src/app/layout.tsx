@@ -27,7 +27,7 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: "Minion Chat — 游戏运营 AI 助手",
   description:
-    "集说明分析、系统数据查询、变更执行于一体的游戏运营 AI 助手，支持 E-system / Artifex / G123 Box / Adnext / Gift / B-system 多系统协作。",
+    "集说明分析、系统数据查询、变更执行于一体的游戏运营 AI 助手，支持多系统协作。",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",

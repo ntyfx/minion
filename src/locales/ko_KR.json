@@ -153,11 +153,11 @@
     "recentSessions": "최근 대화",
     "quickActions": "빠른 작업",
     "builtinTemplates": "자주 쓰는 템플릿",
-    "queryEsystem": "E-system 조회",
-    "queryArtifex": "Artifex 조회",
-    "queryBox": "Box 조회",
-    "queryAdnext": "Adnext 조회",
-    "queryGift": "Gift 조회",
+    "querySystemA": "System A 조회",
+    "querySystemB": "System B 조회",
+    "querySystemC": "System C 조회",
+    "querySystemD": "System D 조회",
+    "querySystemE": "System E 조회",
     "checkPipeline": "크로스 시스템 확인"
   },
   "sequences": {
