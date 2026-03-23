@@ -21,17 +21,19 @@ body {
   color: var(--text-primary);
   font-family: var(--font-sans), -apple-system, BlinkMacSystemFont, "Segoe UI",
     Roboto, sans-serif;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  letter-spacing: -0.011em;
 }
 
 ::selection {
-  background: var(--accent-subtle);
+  background: color-mix(in srgb, var(--accent) 20%, transparent);
   color: var(--text-primary);
 }
 
 /* ── Scrollbar ── */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
@@ -40,7 +42,8 @@ body {
 
 ::-webkit-scrollbar-thumb {
   background: var(--border);
-  border-radius: 3px;
+  border-radius: 100px;
+  transition: background var(--transition-fast);
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -58,4 +61,10 @@ body {
 .ant-input:focus-visible,
 .ant-input-password:focus-visible {
   box-shadow: none !important;
+}
+
+/* ── Smooth layout transitions ── */
+.ant-layout-sider {
+  transition: width var(--transition-slow) cubic-bezier(0.4, 0, 0.2, 1),
+              min-width var(--transition-slow) cubic-bezier(0.4, 0, 0.2, 1) !important;
 }

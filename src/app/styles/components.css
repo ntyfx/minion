@@ -1,18 +1,65 @@
+/* ── App header ── */
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px 0 6px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  background: var(--bg-surface);
+  height: 45px;
+  gap: 8px;
+}
+
+.header-divider {
+  width: 1px;
+  height: 16px;
+  background: var(--border);
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.header-status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-family: var(--font-mono), ui-monospace, monospace;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: var(--bg-hover);
+}
+
+.header-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--text-muted);
+  font-family: var(--font-mono), ui-monospace, monospace;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 200px;
+}
+
 /* ── Icon button ── */
 .icon-button {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 8px;
+  border-radius: 7px;
   border: none;
   background: transparent;
   color: var(--text-secondary);
   cursor: pointer;
-  font-size: 15px;
+  font-size: 14px;
   text-decoration: none;
-  transition: background 0.15s, color 0.15s;
+  transition: background var(--transition-fast), color var(--transition-fast);
 }
 
 .icon-button:hover {
@@ -22,7 +69,7 @@
 
 .icon-button-muted {
   color: var(--text-muted);
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .icon-button:focus-visible {
@@ -40,7 +87,7 @@
   color: var(--text-inverse) !important;
   font-weight: 500 !important;
   border: none !important;
-  box-shadow: var(--shadow-sm) !important;
+  box-shadow: none !important;
 }
 
 .ant-btn-primary:hover:not(:disabled) {
@@ -75,13 +122,14 @@
 .template-card {
   padding: 10px 12px;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 10px;
   background: var(--bg-elevated);
-  transition: border-color 0.15s;
+  transition: border-color var(--transition-fast), background var(--transition-fast);
 }
 
 .template-card:hover {
-  border-color: var(--accent);
+  border-color: var(--border-strong);
+  background: var(--bg-hover);
 }
 
 /* ── Sidebar filter buttons ── */
@@ -90,23 +138,23 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 2px 8px;
-  border: 1px solid var(--border);
+  padding: 3px 10px;
+  border: none;
   border-radius: 6px;
   background: transparent;
   color: var(--text-muted);
   font-size: 11px;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: all var(--transition-fast);
 }
 
 .sidebar-filter-btn:hover {
   color: var(--text-secondary);
-  border-color: var(--border-strong);
+  background: var(--bg-hover);
 }
 
 .sidebar-filter-btn-active {
   background: var(--accent-subtle);
   color: var(--accent-text);
-  border-color: var(--accent);
 }

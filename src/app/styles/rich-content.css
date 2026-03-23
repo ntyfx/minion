@@ -9,10 +9,10 @@
 /* ── Plan-Review Card ── */
 
 .rich-plan-card {
-  border: 1px solid var(--accent);
-  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--border));
+  border-radius: 12px;
   overflow: hidden;
-  background: color-mix(in srgb, var(--accent) 4%, var(--bg-elevated));
+  background: color-mix(in srgb, var(--accent) 3%, var(--bg-elevated));
 }
 
 .rich-plan-header {
@@ -101,7 +101,7 @@
 
 .rich-table-wrapper {
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 12px;
   overflow: hidden;
   background: var(--bg-elevated);
 }
@@ -140,7 +140,7 @@
 
 .rich-error-card {
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   overflow: hidden;
   background: transparent;
 }

@@ -2,7 +2,7 @@
 
 /* Bubble List */
 .ant-bubble-list {
-  padding: 16px 0 !important;
+  padding: 20px 0 !important;
 }
 
 /* Ant Think */
@@ -22,6 +22,7 @@
   overflow: hidden;
   padding: 1.5px;
   background: var(--border);
+  transition: background var(--transition-normal);
 }
 
 .sender-glow-wrapper::before {
@@ -33,19 +34,18 @@
   aspect-ratio: 1;
   transform: translate(-50%, -50%);
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.4s ease;
   background: conic-gradient(
     var(--brand-g1),
     var(--brand-g2),
     var(--brand-g3),
     var(--brand-g1)
   );
-  animation: sender-glow-spin 2.5s linear infinite paused;
+  animation: sender-glow-spin 3s linear infinite paused;
 }
 
-.sender-glow-wrapper:hover::before,
 .sender-glow-wrapper:focus-within::before {
-  opacity: 1;
+  opacity: 0.8;
   animation-play-state: running;
 }
 
@@ -77,7 +77,7 @@
 
 .ant-sender .ant-btn.ant-sender-actions-btn:not(.ant-sender-actions-btn-loading-button):disabled {
   background: var(--brand-gradient) !important;
-  opacity: 0.4;
+  opacity: 0.35;
   color: #fff !important;
 }
 
@@ -127,33 +127,32 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  margin: 2px -16px -12px;
-  padding: 0px 8px;
+  margin: 4px -16px -12px;
+  padding: 0 8px;
   min-height: 28px;
-  border-top: 1px solid var(--border);
-  background: color-mix(in srgb, var(--bg-surface) 60%, transparent);
+  border-top: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
   border-radius: 0 0 12px 4px;
-  transition: opacity 0.15s ease;
+  transition: opacity var(--transition-fast);
 }
 
 .message-toolbar-actions {
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: 1px;
 }
 
 .toolbar-action-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 26px;
-  height: 26px;
+  width: 24px;
+  height: 24px;
   border: none;
-  border-radius: 6px;
+  border-radius: 5px;
   background: transparent;
   color: var(--text-muted);
   cursor: pointer;
-  transition: color 0.15s, background 0.15s;
+  transition: color var(--transition-fast), background var(--transition-fast);
 }
 
 .toolbar-action-btn:hover {

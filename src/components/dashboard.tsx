@@ -59,25 +59,34 @@ export default memo(function Dashboard({
   return (
     <div className="dashboard-root">
       <div className="dashboard-header">
-        <BrandLogo size={48} />
-        <Typography.Title level={3} style={{ margin: "12px 0 4px", color: "var(--text-primary)" }}>
+        <BrandLogo size={44} />
+        <Typography.Title
+          level={3}
+          style={{
+            margin: "14px 0 6px",
+            color: "var(--text-primary)",
+            fontSize: 22,
+            fontWeight: 700,
+            letterSpacing: "-0.03em",
+          }}
+        >
           <span className="brand-gradient-text">{t("title")}</span>
         </Typography.Title>
-        <Typography.Text type="secondary" style={{ fontSize: 14 }}>
+        <Typography.Text type="secondary" style={{ fontSize: 13, lineHeight: 1.5 }}>
           {t("subtitle")}
         </Typography.Text>
       </div>
 
       <div className="dashboard-stats">
         <div className="dashboard-stat">
-          <MessageOutlined style={{ fontSize: 18, color: "var(--accent)" }} />
+          <MessageOutlined style={{ fontSize: 16, color: "var(--accent)" }} />
           <div>
             <div className="dashboard-stat-value">{sessions.length}</div>
             <div className="dashboard-stat-label">{t("totalSessions")}</div>
           </div>
         </div>
         <div className="dashboard-stat">
-          <FieldTimeOutlined style={{ fontSize: 18, color: "var(--info)" }} />
+          <FieldTimeOutlined style={{ fontSize: 16, color: "var(--info)" }} />
           <div>
             <div className="dashboard-stat-value">{totalTokens.toLocaleString()}</div>
             <div className="dashboard-stat-label">{t("totalTokens")}</div>
@@ -87,9 +96,7 @@ export default memo(function Dashboard({
 
       {recentSessions.length > 0 && (
         <div className="dashboard-section">
-          <Typography.Text strong style={{ fontSize: 13, color: "var(--text-secondary)", display: "block", marginBottom: 8 }}>
-            {t("recentSessions")}
-          </Typography.Text>
+          <div className="dashboard-section-title">{t("recentSessions")}</div>
           <div className="dashboard-recent-grid">
             {recentSessions.map((s) => (
               <button
@@ -98,7 +105,7 @@ export default memo(function Dashboard({
                 onClick={() => onSelectSession(s.id)}
               >
                 <Flex align="center" gap={8}>
-                  <span style={{ fontSize: 16 }}>{getChatIcon(s.icon)}</span>
+                  <span style={{ fontSize: 15, opacity: 0.7 }}>{getChatIcon(s.icon)}</span>
                   <Typography.Text strong ellipsis style={{ fontSize: 13, flex: 1 }}>
                     {s.label}
                   </Typography.Text>
@@ -113,9 +120,9 @@ export default memo(function Dashboard({
                   {sessionSummary(s)}
                 </Typography.Text>
                 {(s.tags ?? []).length > 0 && (
-                  <Flex gap={4} style={{ marginTop: 4 }}>
+                  <Flex gap={4} style={{ marginTop: 5 }}>
                     {(s.tags ?? []).slice(0, 3).map((tag) => (
-                      <Tag key={tag} style={{ fontSize: 10, margin: 0, padding: "0 4px" }}>{tag}</Tag>
+                      <Tag key={tag} style={{ fontSize: 10, margin: 0, padding: "0 4px", borderRadius: 4 }}>{tag}</Tag>
                     ))}
                   </Flex>
                 )}
@@ -126,10 +133,8 @@ export default memo(function Dashboard({
       )}
 
       <div className="dashboard-section">
-        <Typography.Text strong style={{ fontSize: 13, color: "var(--text-secondary)", display: "block", marginBottom: 8 }}>
-          {t("quickActions")}
-        </Typography.Text>
-        <Flex gap={8} wrap>
+        <div className="dashboard-section-title">{t("quickActions")}</div>
+        <Flex gap={6} wrap>
           {DEFAULT_QUICK_ACTIONS.map((action) => (
             <Tooltip key={action.key} title={t(action.labelKey)}>
               <button
@@ -145,11 +150,11 @@ export default memo(function Dashboard({
       </div>
 
       <div className="dashboard-section">
-        <Typography.Text strong style={{ fontSize: 13, color: "var(--text-secondary)", display: "block", marginBottom: 8 }}>
-          <BulbOutlined style={{ marginRight: 4 }} />
+        <div className="dashboard-section-title">
+          <BulbOutlined />
           {t("builtinTemplates")}
-        </Typography.Text>
-        <Flex gap={8} wrap>
+        </div>
+        <Flex gap={6} wrap>
           {BUILTIN_TEMPLATES.slice(0, 4).map((tmpl) => (
             <button
               key={tmpl.name}

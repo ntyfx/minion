@@ -15,14 +15,15 @@
 .chat-markdown h6 {
   color: var(--text-primary);
   margin: 20px 0 8px;
-  font-weight: 600;
+  font-weight: 650;
   line-height: 1.35;
+  letter-spacing: -0.02em;
   text-wrap: balance;
 }
 
-.chat-markdown h1 { font-size: 1.375em; }
-.chat-markdown h2 { font-size: 1.2em; }
-.chat-markdown h3 { font-size: 1.075em; }
+.chat-markdown h1 { font-size: 1.35em; }
+.chat-markdown h2 { font-size: 1.175em; }
+.chat-markdown h3 { font-size: 1.05em; }
 
 .chat-markdown p {
   margin: 0 0 10px;
@@ -50,16 +51,16 @@
 .chat-markdown code {
   background: var(--code-bg);
   color: var(--code-text);
-  padding: 2px 6px;
-  border-radius: 4px;
+  padding: 1.5px 5px;
+  border-radius: 5px;
   font-family: var(--font-mono), ui-monospace, monospace;
-  font-size: 0.875em;
+  font-size: 0.85em;
 }
 
 .chat-markdown pre {
   background: var(--pre-bg) !important;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 14px 16px;
   margin: 10px 0;
   overflow-x: auto;
@@ -91,7 +92,7 @@
 .chat-markdown th,
 .chat-markdown td {
   border: 1px solid var(--border);
-  padding: 8px 12px;
+  padding: 7px 12px;
   text-align: left;
 }
 
@@ -100,13 +101,15 @@
   color: var(--text-secondary);
   font-weight: 600;
   font-size: 12px;
+  letter-spacing: 0.01em;
 }
 
 .chat-markdown a {
   color: var(--accent-text);
   text-decoration: underline;
-  text-decoration-color: transparent;
+  text-decoration-color: color-mix(in srgb, var(--accent-text) 30%, transparent);
   text-underline-offset: 2px;
+  transition: text-decoration-color var(--transition-fast);
 }
 
 .chat-markdown a:hover {
@@ -125,5 +128,5 @@
 
 .chat-markdown img {
   max-width: 100%;
-  border-radius: 8px;
+  border-radius: 10px;
 }

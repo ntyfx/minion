@@ -6,10 +6,11 @@
 
 .ant-conversations-item {
   border-radius: 8px !important;
-  margin: 1px 0 !important;
+  margin: 2px 0 !important;
   padding-block: 8px !important;
   height: auto !important;
   min-height: 0 !important;
+  transition: background var(--transition-fast), opacity var(--transition-fast) !important;
 }
 
 .ant-conversations-item:hover {
@@ -29,8 +30,28 @@
   font-weight: 500 !important;
   color: var(--text-muted) !important;
   text-transform: uppercase !important;
-  letter-spacing: 0.04em !important;
+  letter-spacing: 0.05em !important;
   padding-left: 10px !important;
+}
+
+/* ── Sidebar brand area ── */
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: -0.02em;
+}
+
+.sidebar-footer {
+  padding: 10px 16px;
+  font-size: 11px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  text-align: center;
+  border-top: 1px solid var(--border);
 }
 
 /* Table styling within sidebar/tools */

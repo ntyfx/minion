@@ -236,7 +236,7 @@ export default function Home() {
           trigger={null}
           style={{
             background: "var(--bg-surface)",
-            boxShadow: "1px 0 0 var(--border)",
+            borderRight: "1px solid var(--border)",
             overflow: "hidden",
           }}
           theme={colorScheme}
@@ -251,13 +251,14 @@ export default function Home() {
                 padding: siderCollapsed ? "0" : "0 16px",
                 borderBottom: "1px solid var(--border)",
                 flexShrink: 0,
+                transition: "padding var(--transition-slow)",
               }}
             >
               {siderCollapsed ? (
-                <BrandMark size={24} />
+                <BrandMark size={22} />
               ) : (
-                <div className="flex items-center gap-2" style={{ fontWeight: 600, fontSize: 15, letterSpacing: "-0.01em" }}>
-                  <BrandLogo size={28} />
+                <div className="sidebar-brand">
+                  <BrandLogo size={26} />
                   <span className="brand-gradient-text">Minion Chat</span>
                 </div>
               )}
@@ -277,15 +278,7 @@ export default function Home() {
               />
             </div>
           {!siderCollapsed && (
-            <div
-              style={{
-              padding: "8px 16px",
-              fontSize: 11,
-              color: "var(--text-muted)",
-              flexShrink: 0,
-              textAlign: "center",
-              }}
-            >
+            <div className="sidebar-footer">
               {t("subtitle")}
             </div>
           )}
@@ -412,7 +405,7 @@ export default function Home() {
         okText={t("rename")}
         destroyOnHidden
       >
-        <Space direction="vertical" size="middle" style={{ width: "100%" }}>
+        <Space orientation="vertical" size="middle" style={{ width: "100%" }}>
           <div>
             <div style={{ marginBottom: 8, fontSize: 13, color: "var(--text-secondary)" }}>
               {t("chooseIcon")}

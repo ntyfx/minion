@@ -66,20 +66,8 @@ export function AppHeader({
     : t("tokenNotSet");
 
   return (
-    <header
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        padding: "0 16px 0 8px",
-        borderBottom: "1px solid var(--border)",
-        flexShrink: 0,
-        background: "var(--bg-surface)",
-        height: 45,
-        gap: 8,
-      }}
-    >
-      <Flex gap={8} wrap align="center" style={{ minWidth: 0 }}>
+    <header className="app-header">
+      <Flex gap={6} align="center" style={{ minWidth: 0 }}>
         <Tooltip title={siderCollapsed ? t("expandSidebar") : t("collapseSidebar")}>
           <button
             className="icon-button icon-button-muted"
@@ -89,64 +77,25 @@ export function AppHeader({
             {siderCollapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
           </button>
         </Tooltip>
-        <span
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 6,
-            fontSize: 12,
-            color: "var(--text-secondary)",
-            fontFamily: "var(--font-mono), ui-monospace, monospace",
-          }}
-        >
+        <span className="header-divider" />
+        <span className="header-status-chip">
           <Badge
             status={isStreaming ? "processing" : "default"}
             style={{ marginRight: 0 }}
           />
           {isStreaming ? t("streaming") : t("idle")}
         </span>
-        <span
-          style={{
-            width: 1,
-            height: 14,
-            background: "var(--border)",
-            flexShrink: 0,
-          }}
-        />
-        <span
-          style={{
-            fontSize: 12,
-            color: "var(--text-muted)",
-            fontFamily: "var(--font-mono), ui-monospace, monospace",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            whiteSpace: "nowrap",
-          }}
-        >
-          <LinkOutlined style={{ fontSize: 11, marginRight: 4 }} />
+        <span className="header-meta">
+          <LinkOutlined style={{ fontSize: 10 }} />
           {settings.baseUrl.replace(/^https?:\/\//, "")}
         </span>
-        <span
-          style={{
-            width: 1,
-            height: 14,
-            background: "var(--border)",
-            flexShrink: 0,
-          }}
-        />
-        <span
-          style={{
-            fontSize: 12,
-            color: "var(--text-muted)",
-            fontFamily: "var(--font-mono), ui-monospace, monospace",
-          }}
-        >
-          <SafetyCertificateOutlined style={{ fontSize: 11, marginRight: 4 }} />
+        <span className="header-meta">
+          <SafetyCertificateOutlined style={{ fontSize: 10 }} />
           {tokenPreview}
         </span>
       </Flex>
 
-      <Flex gap={4} align="center">
+      <Flex gap={2} align="center">
         <Tooltip title={t("importSession")}>
           <button className="icon-button" onClick={onImportSession} aria-label={t("importSession")}>
             <ImportOutlined />
@@ -171,6 +120,7 @@ export function AppHeader({
           count={unseenEventCount}
           onClick={onToggleActivity}
         />
+        <span className="header-divider" />
         <Tooltip title={t("settings")}>
           <button
             onClick={onOpenSettings}

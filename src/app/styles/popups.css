@@ -6,15 +6,16 @@
   bottom: 100%;
   left: 0;
   right: 0;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
   background: var(--bg-elevated);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 12px;
   box-shadow: var(--shadow-lg);
   overflow: hidden;
   z-index: 50;
   max-height: 240px;
   overflow-y: auto;
+  animation: popup-enter 0.15s ease;
 }
 
 .slash-popup-item {
@@ -29,12 +30,12 @@
   cursor: pointer;
   font-size: 13px;
   text-align: left;
-  transition: background 0.1s;
+  transition: background var(--transition-fast);
 }
 
 .slash-popup-item:hover,
 .slash-popup-item-active {
-  background: var(--accent-subtle);
+  background: var(--bg-hover);
 }
 
 .slash-popup-icon {
@@ -68,6 +69,17 @@
   color: var(--text-muted);
 }
 
+@keyframes popup-enter {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Drawer */
 .ant-drawer-content {
   background: var(--bg-surface) !important;
@@ -87,6 +99,7 @@
   background: var(--bg-elevated) !important;
   border: 1px solid var(--border) !important;
   box-shadow: var(--shadow-lg) !important;
+  border-radius: 14px !important;
 }
 
 /* Popover */
@@ -99,5 +112,6 @@
 /* Tooltip */
 .ant-tooltip-inner {
   font-size: 12px !important;
-  border-radius: 6px !important;
+  border-radius: 7px !important;
+  padding: 5px 10px !important;
 }

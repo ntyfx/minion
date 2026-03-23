@@ -345,11 +345,11 @@ function ThinkContent({
 const WELCOME_ICON = (
   <Avatar
     icon={<RobotOutlined />}
-    size={56}
+    size={48}
     style={{
       background: "var(--accent)",
       color: "var(--text-inverse)",
-      fontSize: 24,
+      fontSize: 22,
     }}
   />
 );
@@ -360,20 +360,20 @@ const ROLE_CONFIG = {
     avatar: (
       <Avatar
         icon={<RobotOutlined />}
-        size={34}
+        size={32}
         style={{
           background: "var(--accent)",
           color: "var(--text-inverse)",
-          fontSize: 15,
+          fontSize: 14,
         }}
       />
     ),
-    style: { maxWidth: "80%" },
+    style: { maxWidth: "82%" },
     styles: {
       content: {
         background: "var(--bg-elevated)",
         border: "1px solid var(--border)",
-        borderRadius: "12px 12px 12px 4px",
+        borderRadius: "14px 14px 14px 4px",
         color: "var(--text-primary)",
         padding: "12px 16px",
       },
@@ -384,20 +384,19 @@ const ROLE_CONFIG = {
     avatar: (
       <Avatar
         icon={<UserOutlined />}
-        size={34}
+        size={32}
         style={{
           background: "var(--accent-subtle)",
           color: "var(--accent)",
-          fontSize: 15,
+          fontSize: 14,
         }}
       />
     ),
-    style: { maxWidth: "80%" },
+    style: { maxWidth: "82%" },
     styles: {
       content: {
         background: "var(--accent-subtle)",
-        border: "1px solid var(--border)",
-        borderRadius: "12px 12px 4px 12px",
+        borderRadius: "14px 14px 4px 14px",
         color: "var(--text-primary)",
         padding: "12px 16px",
       },
@@ -408,16 +407,16 @@ const ROLE_CONFIG = {
     avatar: (
       <Avatar
         icon={<BulbOutlined />}
-        size={34}
+        size={32}
         style={{
           background: "var(--accent-subtle)",
           color: "var(--accent)",
-          fontSize: 15,
+          fontSize: 14,
         }}
       />
     ),
     style: {
-      maxWidth: "80%",
+      maxWidth: "82%",
       alignItems: "flex-start" as const,
     },
     styles: {
@@ -435,11 +434,11 @@ const ROLE_CONFIG = {
     avatar: (
       <Avatar
         icon={<WarningOutlined />}
-        size={34}
+        size={32}
         style={{
           background: "var(--error-subtle)",
           color: "var(--error)",
-          fontSize: 15,
+          fontSize: 14,
         }}
       />
     ),
@@ -447,7 +446,7 @@ const ROLE_CONFIG = {
       content: {
         background: "var(--error-subtle)",
         border: "1px solid var(--error-border)",
-        borderRadius: "12px 12px 12px 4px",
+        borderRadius: "14px 14px 14px 4px",
         color: "var(--error)",
         fontFamily: "var(--font-mono), ui-monospace, monospace",
         fontSize: 13,
@@ -460,15 +459,16 @@ const ROLE_CONFIG = {
 const WELCOME_STYLES = {
   title: {
     color: "var(--text-primary)",
-    fontSize: 24,
-    fontWeight: 600,
-    letterSpacing: "-0.02em",
+    fontSize: 22,
+    fontWeight: 700,
+    letterSpacing: "-0.03em",
     textWrap: "balance" as const,
   },
   description: {
-    maxWidth: 480,
+    maxWidth: 440,
     color: "var(--text-secondary)",
     lineHeight: 1.6,
+    fontSize: 14,
     textWrap: "pretty" as const,
   },
 };
@@ -823,9 +823,10 @@ export default function ChatPanel({
               wrap
               styles={{
                 item: {
-                  background: "var(--bg-elevated)",
-                  border: "1px solid var(--border)",
+                  background: "var(--bg-hover)",
+                  border: "none",
                   borderRadius: 9999,
+                  transition: "background 120ms ease",
                 },
               }}
             />
@@ -849,7 +850,7 @@ export default function ChatPanel({
         )}
       </Flex>
 
-      <div style={{ padding: "8px 20px 16px", flexShrink: 0 }} onKeyDownCapture={handleKeyDownCapture}>
+      <div style={{ padding: "8px 24px 14px", flexShrink: 0 }} onKeyDownCapture={handleKeyDownCapture}>
         <div style={{ position: "relative" }}>
           {slashMatches.length > 0 && (
             <SlashCommandPopup
@@ -883,8 +884,9 @@ export default function ChatPanel({
             display: "block",
             textAlign: "center",
             fontSize: 11,
-            marginTop: 6,
+            marginTop: 8,
             color: "var(--text-muted)",
+            letterSpacing: "0.01em",
           }}
         >
           {t("hint")}
