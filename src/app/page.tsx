@@ -22,7 +22,8 @@ import {
 } from "@/components/error-boundary-wrapper";
 import { downloadShareFile, readShareFile, shareableToSession } from "@/lib/sharing";
 import { createSession as createNewSession } from "@/lib/sessions";
-import { saveBookmark, createBookmarkId } from "@/lib/bookmark-db";
+import { saveBookmark, createBookmarkId, loadBookmarks } from "@/lib/bookmark-db";
+import { useEffect } from "react";
 import {
   loadSettings,
   saveSettings as persistSettings,
@@ -49,8 +50,17 @@ export default function Home() {
   const [templatesOpen, setTemplatesOpen] = useState(false);
   const [bookmarksOpen, setBookmarksOpen] = useState(false);
   const [sequencesOpen, setSequencesOpen] = useState(false);
+  const [bookmarkedMessageIds, setBookmarkedMessageIds] = useState<Set<string>>(new Set());
 
   const [messageApi, contextHolder] = message.useMessage();
+
+  // Load bookmarked message IDs on mount
+  useEffect(() => {
+    loadBookmarks().then((bookmarks) => {
+      const ids = new Set(bookmarks.map((b) => b.messageId));
+      setBookmarkedMessageIds(ids);
+    });
+  }, []);
   const updateNotificationHolder = useUpdateNotification();
 
   const {
@@ -158,8 +168,9 @@ export default function Home() {
   const handleBookmark = useMemoizedFn((content: string, messageId: string) => {
     const session = activeSession;
     if (!session) return;
+    const bookmarkId = createBookmarkId();
     saveBookmark({
-      id: createBookmarkId(),
+      id: bookmarkId,
       content,
       role: "assistant",
       tags: session.tags ?? [],
@@ -168,6 +179,7 @@ export default function Home() {
       messageId,
       createdAt: Date.now(),
     });
+    setBookmarkedMessageIds((prev) => new Set([...prev, messageId]));
   });
 
   const handleClearActivity = useMemoizedFn(() => {
@@ -322,6 +334,7 @@ export default function Home() {
                 onResend={handleResend}
                 onStop={handleStop}
                 onBookmark={handleBookmark}
+                bookmarkedMessageIds={bookmarkedMessageIds}
               />
             </ChatErrorBoundary>
           )}

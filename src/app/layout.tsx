@@ -34,6 +34,7 @@ export const metadata: Metadata = {
     title: "Minion",
   },
   icons: {
+    icon: `${basePath}/favicon.ico`,
     apple: `${basePath}/icons/apple-touch-icon.png`,
   },
 };

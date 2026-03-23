@@ -74,6 +74,7 @@ interface ChatPanelProps {
   onResend: (message: string) => void;
   onStop: () => void;
   onBookmark?: (content: string, messageId: string) => void;
+  bookmarkedMessageIds?: Set<string>;
 }
 
 export function mapRole(msg: ChatMessage) {
@@ -99,14 +100,16 @@ const MessageToolbar = memo(function MessageToolbar({
   tokenUsage,
   visible,
   onBookmark,
+  isBookmarked,
 }: {
   content: string;
   tokenUsage: TokenUsage | null;
   visible: boolean;
   onBookmark?: () => void;
+  isBookmarked?: boolean;
 }) {
   const [copied, setCopied] = useState(false);
-  const [bookmarked, setBookmarked] = useState(false);
+  const [justBookmarked, setJustBookmarked] = useState(false);
   const t = useTranslations("chat");
   const [messageApi, contextHolder] = message.useMessage();
 
@@ -125,11 +128,13 @@ const MessageToolbar = memo(function MessageToolbar({
   const handleBookmark = useCallback(() => {
     if (onBookmark) {
       onBookmark();
-      setBookmarked(true);
+      setJustBookmarked(true);
       messageApi.success(t("bookmarked"));
-      setTimeout(() => setBookmarked(false), 2000);
+      setTimeout(() => setJustBookmarked(false), 2000);
     }
   }, [onBookmark, t, messageApi]);
+
+  const bookmarked = isBookmarked || justBookmarked;
 
   const hasUsage = tokenUsage && tokenUsage.totalTokens > 0;
 
@@ -211,12 +216,14 @@ const MarkdownContent = memo(function MarkdownContent({
   tokenUsage,
   onAction,
   onBookmark,
+  isBookmarked,
 }: {
   content: string;
   isStreaming: boolean;
   tokenUsage: TokenUsage | null;
   onAction?: (message: string) => void;
   onBookmark?: () => void;
+  isBookmarked?: boolean;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const isHovered = useHover(containerRef);
@@ -238,6 +245,7 @@ const MarkdownContent = memo(function MarkdownContent({
         tokenUsage={isStreaming ? null : tokenUsage}
         visible={isHovered && !isStreaming}
         onBookmark={isStreaming ? undefined : onBookmark}
+        isBookmarked={isBookmarked}
       />
     </div>
   );
@@ -477,6 +485,7 @@ interface BubbleListWithItemsProps {
   isStreaming: boolean;
   onSend: (message: string) => void;
   onBookmark?: (content: string, messageId: string) => void;
+  bookmarkedMessageIds?: Set<string>;
   renderAiContent: (content: unknown) => React.ReactNode;
   renderUserContent: (content: unknown) => React.ReactNode;
   thinkingTitle: string;
@@ -492,6 +501,7 @@ const BubbleListWithItems = memo(function BubbleListWithItems({
   isStreaming,
   onSend,
   onBookmark,
+  bookmarkedMessageIds,
   renderAiContent,
   renderUserContent,
   thinkingTitle,
@@ -509,6 +519,7 @@ const BubbleListWithItems = memo(function BubbleListWithItems({
       const usage = tokenUsageByRound[aiIndex] ?? null;
       aiIndex++;
       const msgId = item.key;
+      const isBookmarked = bookmarkedMessageIds?.has(msgId);
       return {
         ...item,
         contentRender: (content: unknown) => (
@@ -518,6 +529,7 @@ const BubbleListWithItems = memo(function BubbleListWithItems({
             tokenUsage={usage}
             onAction={onSend}
             onBookmark={onBookmark ? () => onBookmark(String(content), msgId) : undefined}
+            isBookmarked={isBookmarked}
           />
         ),
       };
@@ -563,6 +575,7 @@ export default function ChatPanel({
   onResend,
   onStop,
   onBookmark,
+  bookmarkedMessageIds,
 }: ChatPanelProps) {
   const t = useTranslations("chat");
   const hasMessages =
@@ -821,6 +834,7 @@ export default function ChatPanel({
             isStreaming={isStreaming}
             onSend={onSend}
             onBookmark={onBookmark}
+            bookmarkedMessageIds={bookmarkedMessageIds}
             renderAiContent={renderAiContent}
             renderUserContent={renderUserContent}
             thinkingTitle={thinkingTitle}

@@ -1077,12 +1077,12 @@ body {
   padding: 6px 12px !important;
 }
 
-/* Error Report Card */
+/* Error Report Card - Border merged with parent Bubble */
 .rich-error-card {
-  border: 1px solid var(--error-border);
+  border: none;
   border-radius: 10px;
   overflow: hidden;
-  background: color-mix(in srgb, var(--error) 4%, var(--bg-elevated));
+  background: transparent;
 }
 
 .rich-error-header {
