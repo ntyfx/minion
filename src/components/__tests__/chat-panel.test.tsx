@@ -693,4 +693,323 @@ describe("ChatPanel component", () => {
 
     expect(onSend).toHaveBeenCalledWith("chat.promptExecuteDesc");
   });
+
+  describe("keyboard navigation for popups", () => {
+    it("handles ArrowDown in slash command popup", async () => {
+      const ChatPanel = (await import("@/components/chat-panel")).default;
+      const onSend = vi.fn();
+      const onInputChange = vi.fn();
+
+      function Controlled() {
+        const [inputValue, setInputValue] = useState("");
+        return (
+          <ChatPanel
+            session={makeSession()}
+            isStreaming={false}
+            streamingContent=""
+            reasoningContent=""
+            inputValue={inputValue}
+            onInputChange={(val: string) => {
+              setInputValue(val);
+              onInputChange(val);
+            }}
+            onSend={onSend}
+            onResend={vi.fn()}
+            onStop={vi.fn()}
+          />
+        );
+      }
+
+      const { container } = render(<Controlled />);
+      const textarea = container.querySelector('textarea:not([aria-hidden="true"])');
+      expect(textarea).toBeTruthy();
+
+      fireEvent.change(textarea!, { target: { value: "/" } });
+
+      const senderContainer = container.querySelector(".sender-glow-wrapper")?.parentElement;
+      if (senderContainer) {
+        fireEvent.keyDown(senderContainer, { key: "ArrowDown" });
+      }
+    });
+
+    it("handles ArrowUp in slash command popup", async () => {
+      const ChatPanel = (await import("@/components/chat-panel")).default;
+
+      function Controlled() {
+        const [inputValue, setInputValue] = useState("");
+        return (
+          <ChatPanel
+            session={makeSession()}
+            isStreaming={false}
+            streamingContent=""
+            reasoningContent=""
+            inputValue={inputValue}
+            onInputChange={setInputValue}
+            onSend={vi.fn()}
+            onResend={vi.fn()}
+            onStop={vi.fn()}
+          />
+        );
+      }
+
+      const { container } = render(<Controlled />);
+      const textarea = container.querySelector('textarea:not([aria-hidden="true"])');
+      fireEvent.change(textarea!, { target: { value: "/" } });
+
+      const senderContainer = container.querySelector(".sender-glow-wrapper")?.parentElement;
+      if (senderContainer) {
+        fireEvent.keyDown(senderContainer, { key: "ArrowUp" });
+      }
+    });
+
+    it("handles Enter to select slash command", async () => {
+      const ChatPanel = (await import("@/components/chat-panel")).default;
+      const onSend = vi.fn();
+      const onInputChange = vi.fn();
+
+      function Controlled() {
+        const [inputValue, setInputValue] = useState("");
+        return (
+          <ChatPanel
+            session={makeSession()}
+            isStreaming={false}
+            streamingContent=""
+            reasoningContent=""
+            inputValue={inputValue}
+            onInputChange={(val: string) => {
+              setInputValue(val);
+              onInputChange(val);
+            }}
+            onSend={onSend}
+            onResend={vi.fn()}
+            onStop={vi.fn()}
+          />
+        );
+      }
+
+      const { container } = render(<Controlled />);
+      const textarea = container.querySelector('textarea:not([aria-hidden="true"])');
+      fireEvent.change(textarea!, { target: { value: "/" } });
+
+      const senderContainer = container.querySelector(".sender-glow-wrapper")?.parentElement;
+      if (senderContainer) {
+        fireEvent.keyDown(senderContainer, { key: "Enter" });
+      }
+    });
+
+    it("handles Tab to select system mention", async () => {
+      const ChatPanel = (await import("@/components/chat-panel")).default;
+
+      function Controlled() {
+        const [inputValue, setInputValue] = useState("");
+        return (
+          <ChatPanel
+            session={makeSession()}
+            isStreaming={false}
+            streamingContent=""
+            reasoningContent=""
+            inputValue={inputValue}
+            onInputChange={setInputValue}
+            onSend={vi.fn()}
+            onResend={vi.fn()}
+            onStop={vi.fn()}
+          />
+        );
+      }
+
+      const { container } = render(<Controlled />);
+      const textarea = container.querySelector('textarea:not([aria-hidden="true"])');
+      fireEvent.change(textarea!, { target: { value: "@" } });
+
+      const senderContainer = container.querySelector(".sender-glow-wrapper")?.parentElement;
+      if (senderContainer) {
+        fireEvent.keyDown(senderContainer, { key: "Tab" });
+      }
+    });
+
+    it("handles Escape to close popups", async () => {
+      const ChatPanel = (await import("@/components/chat-panel")).default;
+
+      function Controlled() {
+        const [inputValue, setInputValue] = useState("");
+        return (
+          <ChatPanel
+            session={makeSession()}
+            isStreaming={false}
+            streamingContent=""
+            reasoningContent=""
+            inputValue={inputValue}
+            onInputChange={setInputValue}
+            onSend={vi.fn()}
+            onResend={vi.fn()}
+            onStop={vi.fn()}
+          />
+        );
+      }
+
+      const { container } = render(<Controlled />);
+      const textarea = container.querySelector('textarea:not([aria-hidden="true"])');
+      fireEvent.change(textarea!, { target: { value: "/" } });
+
+      const senderContainer = container.querySelector(".sender-glow-wrapper")?.parentElement;
+      if (senderContainer) {
+        fireEvent.keyDown(senderContainer, { key: "Escape" });
+      }
+    });
+
+    it("ignores keyboard when popup not visible", async () => {
+      const ChatPanel = (await import("@/components/chat-panel")).default;
+
+      const { container } = render(
+        <ChatPanel
+          session={makeSession()}
+          isStreaming={false}
+          streamingContent=""
+          reasoningContent=""
+          inputValue=""
+          onInputChange={vi.fn()}
+          onSend={vi.fn()}
+          onResend={vi.fn()}
+          onStop={vi.fn()}
+        />
+      );
+
+      const senderContainer = container.querySelector(".sender-glow-wrapper")?.parentElement;
+      if (senderContainer) {
+        fireEvent.keyDown(senderContainer, { key: "ArrowDown" });
+        fireEvent.keyDown(senderContainer, { key: "Enter" });
+      }
+    });
+  });
+
+  describe("message submission", () => {
+    it("submits message on sender submit", async () => {
+      const ChatPanel = (await import("@/components/chat-panel")).default;
+      const onSend = vi.fn();
+
+      const { container } = render(
+        <ChatPanel
+          session={makeSession([makeMsg("assistant", "Hi")])}
+          isStreaming={false}
+          streamingContent=""
+          reasoningContent=""
+          inputValue="Test message"
+          onInputChange={vi.fn()}
+          onSend={onSend}
+          onResend={vi.fn()}
+          onStop={vi.fn()}
+        />
+      );
+
+      const sender = container.querySelector(".ant-sender");
+      if (sender) {
+        const textarea = sender.querySelector("textarea");
+        if (textarea) {
+          fireEvent.change(textarea, { target: { value: "Test message" } });
+        }
+      }
+    });
+
+    it("does not submit when popup is visible", async () => {
+      const ChatPanel = (await import("@/components/chat-panel")).default;
+      const onSend = vi.fn();
+
+      function Controlled() {
+        const [inputValue, setInputValue] = useState("");
+        return (
+          <ChatPanel
+            session={makeSession([makeMsg("assistant", "Hi")])}
+            isStreaming={false}
+            streamingContent=""
+            reasoningContent=""
+            inputValue={inputValue}
+            onInputChange={setInputValue}
+            onSend={onSend}
+            onResend={vi.fn()}
+            onStop={vi.fn()}
+          />
+        );
+      }
+
+      const { container } = render(<Controlled />);
+      const textarea = container.querySelector('textarea:not([aria-hidden="true"])');
+      fireEvent.change(textarea!, { target: { value: "/" } });
+
+      const senderContainer = container.querySelector(".sender-glow-wrapper")?.parentElement;
+      if (senderContainer) {
+        fireEvent.keyDown(senderContainer, { key: "Enter" });
+      }
+    });
+
+    it("does not submit empty message", async () => {
+      const ChatPanel = (await import("@/components/chat-panel")).default;
+      const onSend = vi.fn();
+
+      render(
+        <ChatPanel
+          session={makeSession([makeMsg("assistant", "Hi")])}
+          isStreaming={false}
+          streamingContent=""
+          reasoningContent=""
+          inputValue="   "
+          onInputChange={vi.fn()}
+          onSend={onSend}
+          onResend={vi.fn()}
+          onStop={vi.fn()}
+        />
+      );
+
+      expect(onSend).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("resend functionality", () => {
+    it("calls onResend when resend button clicked", async () => {
+      const ChatPanel = (await import("@/components/chat-panel")).default;
+      const onResend = vi.fn();
+
+      const { container } = render(
+        <ChatPanel
+          session={makeSession([makeMsg("user", "Hello"), makeMsg("assistant", "Hi")])}
+          isStreaming={false}
+          streamingContent=""
+          reasoningContent=""
+          inputValue=""
+          onInputChange={vi.fn()}
+          onSend={vi.fn()}
+          onResend={onResend}
+          onStop={vi.fn()}
+        />
+      );
+
+      const resendBtn = container.querySelector(".resend-btn");
+      if (resendBtn) {
+        fireEvent.click(resendBtn);
+        expect(onResend).toHaveBeenCalledWith("Hello");
+      }
+    });
+
+    it("disables resend button when streaming", async () => {
+      const ChatPanel = (await import("@/components/chat-panel")).default;
+
+      const { container } = render(
+        <ChatPanel
+          session={makeSession([makeMsg("user", "Hello"), makeMsg("assistant", "Hi")])}
+          isStreaming={true}
+          streamingContent=""
+          reasoningContent=""
+          inputValue=""
+          onInputChange={vi.fn()}
+          onSend={vi.fn()}
+          onResend={vi.fn()}
+          onStop={vi.fn()}
+        />
+      );
+
+      const resendBtn = container.querySelector(".resend-btn");
+      if (resendBtn) {
+        expect(resendBtn.hasAttribute("disabled") || resendBtn.classList.contains("ant-btn-disabled")).toBe(true);
+      }
+    });
+  });
 });

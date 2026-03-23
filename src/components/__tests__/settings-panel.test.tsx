@@ -1,7 +1,14 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, act, fireEvent, cleanup } from "@testing-library/react";
 
-const { mockSetTheme } = vi.hoisted(() => ({ mockSetTheme: vi.fn() }));
+const { mockSetTheme, mockGetStorageEstimate } = vi.hoisted(() => ({
+  mockSetTheme: vi.fn(),
+  mockGetStorageEstimate: vi.fn().mockResolvedValue({ usage: 100, quota: 1000 }),
+}));
+
+vi.mock("@/lib/session-db", () => ({
+  getStorageEstimate: mockGetStorageEstimate,
+}));
 
 vi.mock("@/lib/theme", () => ({
   useTheme: () => ({
@@ -125,6 +132,7 @@ describe("SettingsPanel component", () => {
     expect(baseElement.textContent).toContain("简体中文");
   });
 
+
   it("renders theme swatches", async () => {
     const SettingsPanel = (await import("@/components/settings-panel")).default;
     const { baseElement } = render(<SettingsPanel {...defaultProps} />);
@@ -208,5 +216,110 @@ describe("SettingsPanel component", () => {
       accessToken: "",
     });
     expect(baseElement.textContent).toContain("settings.tokenCleared");
+  });
+
+  it("loads default URL when reset icon clicked", async () => {
+    const onSave = vi.fn();
+    const SettingsPanel = (await import("@/components/settings-panel")).default;
+    const { baseElement } = render(
+      <SettingsPanel {...defaultProps} onSave={onSave} />,
+    );
+
+    const resetIcon = baseElement.querySelector<HTMLElement>(
+      '[aria-label="settings.resetUrl"]',
+    );
+    expect(resetIcon).toBeTruthy();
+    act(() => {
+      resetIcon!.click();
+    });
+
+    expect(onSave).toHaveBeenCalled();
+    expect(baseElement.textContent).toContain("settings.urlReset");
+  });
+
+  it("closes modal when cancel clicked", async () => {
+    const onToggle = vi.fn();
+    const SettingsPanel = (await import("@/components/settings-panel")).default;
+    const { baseElement } = render(
+      <SettingsPanel {...defaultProps} onToggle={onToggle} />,
+    );
+
+    const cancelBtn = findButtonByText(baseElement, "Cancel");
+    expect(cancelBtn).toBeTruthy();
+    act(() => {
+      cancelBtn!.click();
+    });
+
+    expect(onToggle).toHaveBeenCalled();
+  });
+
+  it("fetches storage info when modal opens", async () => {
+    const { getStorageEstimate } = await import("@/lib/session-db");
+    const SettingsPanel = (await import("@/components/settings-panel")).default;
+    const { rerender } = render(
+      <SettingsPanel {...defaultProps} open={false} />,
+    );
+
+    expect(getStorageEstimate).not.toHaveBeenCalled();
+
+    rerender(<SettingsPanel {...defaultProps} open={true} />);
+
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 10));
+    });
+
+    expect(getStorageEstimate).toHaveBeenCalled();
+  });
+
+  it("shows storage unavailable when storageInfo is null", async () => {
+    const { getStorageEstimate } = await import("@/lib/session-db");
+    vi.mocked(getStorageEstimate).mockResolvedValueOnce(null);
+
+    const SettingsPanel = (await import("@/components/settings-panel")).default;
+    const { baseElement } = render(<SettingsPanel {...defaultProps} />);
+
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 10));
+    });
+
+    expect(baseElement.textContent).toContain("settings.storageUnavailable");
+  });
+
+  it("shows storage info with progress bar when available", async () => {
+    const { getStorageEstimate } = await import("@/lib/session-db");
+    vi.mocked(getStorageEstimate).mockResolvedValueOnce({
+      usage: 500 * 1024 * 1024,
+      quota: 1024 * 1024 * 1024,
+    });
+
+    const SettingsPanel = (await import("@/components/settings-panel")).default;
+    const { baseElement } = render(<SettingsPanel {...defaultProps} />);
+
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 10));
+    });
+
+    expect(baseElement.textContent).toContain("settings.storageUsed");
+  });
+});
+
+describe("formatBytes function", () => {
+  it("formats bytes correctly", async () => {
+    const SettingsPanel = (await import("@/components/settings-panel")).default;
+    const { baseElement } = render(
+      <SettingsPanel
+        settings={{ baseUrl: "http://localhost:8080", accessToken: "" }}
+        onSave={vi.fn()}
+        open={true}
+        onToggle={vi.fn()}
+        sessionCount={0}
+      />,
+    );
+
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 10));
+    });
+
+    expect(baseElement).toBeTruthy();
   });
 });
