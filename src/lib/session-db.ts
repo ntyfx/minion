@@ -105,18 +105,21 @@ export async function migrateSessionEnv(currentEnv: EnvType): Promise<number> {
   if (localStorage.getItem(ENV_MIGRATED_KEY)) return 0;
 
   const sessions = await dbLoadSessions();
-  const needsUpdate = sessions.filter((s) => !s.env);
-  if (needsUpdate.length === 0) {
+  let count = 0;
+  const updated = sessions.map((s) => {
+    if (s.env) return s;
+    count++;
+    return { ...s, env: currentEnv };
+  });
+
+  if (count === 0) {
     localStorage.setItem(ENV_MIGRATED_KEY, "1");
     return 0;
   }
 
-  for (const s of needsUpdate) {
-    s.env = currentEnv;
-  }
-  await dbSaveSessions(sessions);
+  await dbSaveSessions(updated);
   localStorage.setItem(ENV_MIGRATED_KEY, "1");
-  return needsUpdate.length;
+  return count;
 }
 
 export async function getStorageEstimate(): Promise<{

@@ -17,9 +17,3 @@ export const ENV_COLORS: Record<EnvType, string> = {
   staging: "#faad14",
   prod: "#f5222d",
 };
-
-export const ENV_LABELS: Record<EnvType, string> = {
-  local: "Local",
-  staging: "Staging",
-  prod: "Prod",
-};

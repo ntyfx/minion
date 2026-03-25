@@ -878,7 +878,7 @@ export default function ChatPanel({
               onCancel={onStop}
               loading={isStreaming}
               disabled={disabled}
-              placeholder={disabled ? disabledReason : t("placeholder")}
+              placeholder={t("placeholder")}
               submitType="enter"
             />
           </div>

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { detectEnvFromUrl, ENV_COLORS, ENV_LABELS, type EnvType } from "@/lib/environment";
+import { detectEnvFromUrl, ENV_COLORS, type EnvType } from "@/lib/environment";
 
 describe("detectEnvFromUrl", () => {
   it("returns 'local' for empty string", () => {
@@ -67,13 +67,3 @@ describe("ENV_COLORS", () => {
   });
 });
 
-describe("ENV_LABELS", () => {
-  it("defines labels for all env types", () => {
-    const envTypes: EnvType[] = ["local", "staging", "prod"];
-    for (const env of envTypes) {
-      expect(ENV_LABELS[env]).toBeDefined();
-      expect(typeof ENV_LABELS[env]).toBe("string");
-      expect(ENV_LABELS[env].length).toBeGreaterThan(0);
-    }
-  });
-});

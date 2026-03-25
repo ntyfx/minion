@@ -5,8 +5,7 @@ import { Conversations } from "@ant-design/x";
 import { Input, Tooltip, Tag, Flex } from "antd";
 import { useTranslations } from "next-intl";
 import { formatTimeAgo } from "@/lib/utils";
-import { ENV_COLORS } from "@/lib/environment";
-import type { EnvType } from "@/lib/environment";
+import { ENV_COLORS, type EnvType } from "@/lib/environment";
 import type { Session } from "@/types/chat";
 import {
   DeleteOutlined,
