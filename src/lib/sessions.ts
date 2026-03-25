@@ -1,4 +1,5 @@
 import type { Session, ChatMessage, ActivityEvent } from "@/types/chat";
+import type { EnvType } from "@/lib/environment";
 import { DEFAULT_CHAT_ICON } from "@/lib/chat-icons";
 
 const ACTIVE_KEY = "minion-active-session";
@@ -14,12 +15,13 @@ function generateMessageId(): string {
   return `msg_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 }
 
-export function createSession(label?: string, icon?: string): Session {
+export function createSession(label?: string, icon?: string, env?: EnvType): Session {
   const id = generateId();
   return {
     id,
     label: label || "New Chat",
     icon: icon || DEFAULT_CHAT_ICON,
+    env,
     messages: [],
     activity: [],
     createdAt: Date.now(),

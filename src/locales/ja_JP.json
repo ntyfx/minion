@@ -21,7 +21,8 @@
     "importFailed": "インポート失敗：無効なファイル形式",
     "editTags": "タグ編集",
     "tagsHint": "タグをカンマ区切りで入力",
-    "tagsPlaceholder": "広告配信, ギフトパック"
+    "tagsPlaceholder": "広告配信, ギフトパック",
+    "envMismatch": "現在の環境は {currentEnv} ですが、この会話は {sessionEnv} 環境です — 入力は無効です"
   },
   "chat": {
     "welcomeTitle": "Minion Chat",
@@ -69,7 +70,10 @@
     "menuDelete": "削除",
     "search": "会話を検索...",
     "active": "アクティブ",
-    "archived": "アーカイブ"
+    "archived": "アーカイブ",
+    "env_local": "ローカル",
+    "env_staging": "ステージング",
+    "env_prod": "本番"
   },
   "settings": {
     "title": "設定",

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useMemoizedFn } from "ahooks";
 import { Layout, Modal, Input, Space, Spin } from "antd";
 import { CHAT_ICON_KEYS, getChatIcon } from "@/lib/chat-icons";
@@ -27,6 +27,7 @@ import {
   loadSettings,
   saveSettings as persistSettings,
 } from "@/lib/settings";
+import { detectEnvFromUrl } from "@/lib/environment";
 import { useTheme } from "@/lib/theme";
 import { useChatSessions } from "@/hooks/use-chat-sessions";
 import { useStreaming } from "@/hooks/use-streaming";
@@ -42,6 +43,7 @@ export default function Home() {
   const { colorScheme } = useTheme();
   const t = useTranslations("page");
   const [settings, setSettings] = useState<AppSettings>(() => loadSettings());
+  const currentEnv = useMemo(() => detectEnvFromUrl(settings.baseUrl), [settings.baseUrl]);
   const [siderCollapsed, setSiderCollapsed] = useState(false);
   const [activityOpen, setActivityOpen] = useState(false);
   const [seenEventCount, setSeenEventCount] = useState(0);
@@ -74,10 +76,12 @@ export default function Home() {
     activeSession,
     loading: sessionsLoading,
     updateSession,
-    handleCreateSession,
+    handleCreateSession: baseCreateSession,
     handleSelectSession: baseSelectSession,
     handleDeleteSession,
-  } = useChatSessions();
+  } = useChatSessions(currentEnv);
+
+  const handleCreateSession = useMemoizedFn(() => baseCreateSession(currentEnv));
 
   const {
     isStreaming,
@@ -202,6 +206,11 @@ export default function Home() {
   const unseenEventCount = Math.max(
     0,
     (activeSession?.activity.length ?? 0) - seenEventCount,
+  );
+
+  const envMismatch = !!(
+    activeSession?.env &&
+    activeSession.env !== currentEnv
   );
 
   if (sessionsLoading) {
@@ -330,6 +339,12 @@ export default function Home() {
                 onStop={handleStop}
                 onBookmark={handleBookmark}
                 bookmarkedMessageIds={bookmarkedMessageIds}
+                disabled={envMismatch}
+                disabledReason={
+                  envMismatch
+                    ? t("envMismatch", { sessionEnv: activeSession?.env ?? "", currentEnv })
+                    : undefined
+                }
               />
             </ChatErrorBoundary>
           )}

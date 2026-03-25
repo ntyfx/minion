@@ -30,6 +30,16 @@ describe("createSession", () => {
     expect(s.label).toBe("My Chat");
   });
 
+  it("creates a session with env field", () => {
+    const s = createSession("Env Chat", undefined, "staging");
+    expect(s.env).toBe("staging");
+  });
+
+  it("creates a session without env when not provided", () => {
+    const s = createSession();
+    expect(s.env).toBeUndefined();
+  });
+
   it("generates unique IDs", () => {
     const a = createSession();
     const b = createSession();

@@ -21,7 +21,8 @@
     "importFailed": "가져오기 실패 — 잘못된 파일 형식",
     "editTags": "태그 편집",
     "tagsHint": "태그를 쉼표로 구분하여 입력하세요",
-    "tagsPlaceholder": "광고 캠페인, 선물 팩"
+    "tagsPlaceholder": "광고 캠페인, 선물 팩",
+    "envMismatch": "현재 환경은 {currentEnv}이지만 이 대화는 {sessionEnv} 환경입니다 — 입력이 비활성화되었습니다"
   },
   "chat": {
     "welcomeTitle": "Minion Chat",
@@ -69,7 +70,10 @@
     "menuDelete": "삭제",
     "search": "대화 검색...",
     "active": "활성",
-    "archived": "보관됨"
+    "archived": "보관됨",
+    "env_local": "로컬",
+    "env_staging": "스테이징",
+    "env_prod": "프로덕션"
   },
   "settings": {
     "title": "설정",

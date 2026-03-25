@@ -963,6 +963,48 @@ describe("ChatPanel component", () => {
     });
   });
 
+  describe("disabled state (env mismatch)", () => {
+    it("shows disabledReason instead of hint when disabled", async () => {
+      const ChatPanel = (await import("@/components/chat-panel")).default;
+      const { container } = render(
+        <ChatPanel
+          session={makeSession()}
+          isStreaming={false}
+          streamingContent=""
+          reasoningContent=""
+          inputValue=""
+          onInputChange={vi.fn()}
+          onSend={vi.fn()}
+          onResend={vi.fn()}
+          onStop={vi.fn()}
+          disabled={true}
+          disabledReason="Environment mismatch: staging vs prod"
+        />,
+      );
+      expect(container.textContent).toContain("Environment mismatch: staging vs prod");
+      expect(container.textContent).not.toContain("chat.hint");
+    });
+
+    it("shows normal hint when not disabled", async () => {
+      const ChatPanel = (await import("@/components/chat-panel")).default;
+      const { container } = render(
+        <ChatPanel
+          session={makeSession()}
+          isStreaming={false}
+          streamingContent=""
+          reasoningContent=""
+          inputValue=""
+          onInputChange={vi.fn()}
+          onSend={vi.fn()}
+          onResend={vi.fn()}
+          onStop={vi.fn()}
+          disabled={false}
+        />,
+      );
+      expect(container.textContent).toContain("chat.hint");
+    });
+  });
+
   describe("resend functionality", () => {
     it("calls onResend when resend button clicked", async () => {
       const ChatPanel = (await import("@/components/chat-panel")).default;

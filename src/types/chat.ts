@@ -23,6 +23,8 @@ export interface ActivityEvent {
   timestamp: number;
 }
 
+export type EnvType = "local" | "staging" | "prod";
+
 export interface Session {
   id: string;
   label: string;
@@ -30,6 +32,7 @@ export interface Session {
   tags?: string[];
   pinned?: boolean;
   archived?: boolean;
+  env?: EnvType;
   messages: ChatMessage[];
   activity: ActivityEvent[];
   createdAt: number;

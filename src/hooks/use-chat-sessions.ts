@@ -7,14 +7,16 @@ import {
   saveActiveSessionId,
   createSession,
 } from "@/lib/sessions";
+import type { EnvType } from "@/lib/environment";
 import {
   dbLoadSessions,
   dbSaveSessions,
   migrateFromLocalStorage,
+  migrateSessionEnv,
 } from "@/lib/session-db";
 import type { Session } from "@/types/chat";
 
-export function useChatSessions() {
+export function useChatSessions(currentEnv?: EnvType) {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
@@ -22,6 +24,7 @@ export function useChatSessions() {
   const sessionsRef = useLatest(sessions);
 
   const initializedRef = useRef(false);
+  const envRef = useLatest(currentEnv);
 
   useEffect(() => {
     if (initializedRef.current) return;
@@ -29,6 +32,9 @@ export function useChatSessions() {
 
     (async () => {
       await migrateFromLocalStorage();
+      if (envRef.current) {
+        await migrateSessionEnv(envRef.current);
+      }
       const loaded = await dbLoadSessions();
       const initial = loaded.length > 0 ? loaded : [createSession()];
       const activeId = loadActiveSessionId() ?? initial[0]?.id ?? null;
@@ -37,7 +43,7 @@ export function useChatSessions() {
       setActiveSessionId(activeId);
       setReady(true);
     })();
-  }, []);
+  }, [envRef]);
 
   const activeSession =
     sessions.find((s) => s.id === activeSessionId) ?? null;
@@ -62,8 +68,8 @@ export function useChatSessions() {
     [],
   );
 
-  const handleCreateSession = useCallback(() => {
-    const s = createSession();
+  const handleCreateSession = useCallback((env?: EnvType) => {
+    const s = createSession(undefined, undefined, env);
     setSessions((prev) => [...prev, s]);
     setActiveSessionId(s.id);
     return s;

@@ -146,23 +146,16 @@ const EventCard = memo(function EventCard({
               lineHeight: 1.55,
               maxHeight: expanded || !isLong ? "none" : 52,
               overflow: "hidden",
+              ...(isLong && !expanded
+                ? {
+                    maskImage: "linear-gradient(to bottom, black 40%, transparent 100%)",
+                    WebkitMaskImage: "linear-gradient(to bottom, black 40%, transparent 100%)",
+                  }
+                : {}),
             }}
           >
             {text}
           </pre>
-          {isLong && !expanded && (
-            <div
-              style={{
-                position: "absolute",
-                bottom: 0,
-                left: 0,
-                right: 0,
-                height: 24,
-                background: "linear-gradient(transparent, var(--bg-elevated))",
-                pointerEvents: "none",
-              }}
-            />
-          )}
         </div>
         {isLong && (
           <button

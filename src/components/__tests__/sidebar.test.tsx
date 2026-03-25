@@ -231,6 +231,99 @@ describe("Sidebar component", () => {
     expect(screen.queryByText("Archived only")).not.toBeInTheDocument();
   });
 
+  it("renders env dot indicator for sessions with env field", () => {
+    const sessionsWithEnv: Session[] = [
+      {
+        id: "env-1",
+        label: "Local Session",
+        env: "local",
+        messages: [],
+        activity: [],
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      },
+      {
+        id: "env-2",
+        label: "Staging Session",
+        env: "staging",
+        messages: [],
+        activity: [],
+        createdAt: Date.now(),
+        updatedAt: Date.now() - 1000,
+      },
+      {
+        id: "env-3",
+        label: "Prod Session",
+        env: "prod",
+        messages: [],
+        activity: [],
+        createdAt: Date.now(),
+        updatedAt: Date.now() - 2000,
+      },
+    ];
+    const { container } = render(
+      <Sidebar
+        {...defaultProps}
+        sessions={sessionsWithEnv}
+        activeSessionId="env-1"
+        collapsed={false}
+      />,
+    );
+    const items = container.querySelectorAll(".ant-conversations-item");
+    expect(items.length).toBe(3);
+    // Each item should have an env dot (a 7px colored circle)
+    const dots = container.querySelectorAll('span[style*="border-radius: 50%"]');
+    expect(dots.length).toBeGreaterThanOrEqual(3);
+  });
+
+  it("renders env info in collapsed mode tooltip without nested tooltips", () => {
+    const sessionsWithEnv: Session[] = [
+      {
+        id: "env-c",
+        label: "My Chat",
+        env: "staging",
+        messages: [],
+        activity: [],
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      },
+    ];
+    const { container } = render(
+      <Sidebar
+        {...defaultProps}
+        sessions={sessionsWithEnv}
+        activeSessionId="env-c"
+        collapsed={true}
+      />,
+    );
+    const items = container.querySelectorAll(".ant-conversations-item");
+    expect(items.length).toBe(1);
+  });
+
+  it("renders icon without env dot when session has no env", () => {
+    const noEnvSessions: Session[] = [
+      {
+        id: "no-env",
+        label: "Legacy Chat",
+        messages: [],
+        activity: [],
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      },
+    ];
+    const { container } = render(
+      <Sidebar
+        {...defaultProps}
+        sessions={noEnvSessions}
+        activeSessionId="no-env"
+        collapsed={false}
+      />,
+    );
+    // No env dot should be rendered (no colored circles)
+    const dots = container.querySelectorAll('span[style*="border-radius: 50%"]');
+    expect(dots.length).toBe(0);
+  });
+
   it("invokes Pin, Tag, and Archive from the conversation menu", async () => {
     const onPinSession = vi.fn();
     const onTagSession = vi.fn();

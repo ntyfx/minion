@@ -272,7 +272,7 @@ describe("ActivityFeed component", () => {
     expect(label?.style.color).toBe("var(--accent)");
   });
 
-  it("applies fade overlay gradient for long payloads", async () => {
+  it("applies mask-image fade for long payloads", async () => {
     const ActivityFeed = (await import("@/components/activity-feed")).default;
     const longPayload = "x".repeat(250);
     const { baseElement } = render(
@@ -283,12 +283,14 @@ describe("ActivityFeed component", () => {
         onToggle={vi.fn()}
       />,
     );
-    const fadeOverlay = baseElement.querySelector<HTMLDivElement>(
-      'div[style*="linear-gradient"]',
-    );
-    expect(fadeOverlay).toBeTruthy();
-    expect(fadeOverlay?.style.background).toContain("linear-gradient");
-    expect(fadeOverlay?.style.background).toContain("var(--bg-elevated)");
+    const pre = baseElement.querySelector<HTMLPreElement>("pre");
+    expect(pre).toBeTruthy();
+    const style = pre!.style;
+    const hasMask =
+      style.maskImage?.includes("linear-gradient") ||
+      style.webkitMaskImage?.includes("linear-gradient") ||
+      pre!.getAttribute("style")?.includes("mask-image");
+    expect(hasMask).toBe(true);
   });
 
   it("exports activity as JSON via blob URL and anchor click", async () => {

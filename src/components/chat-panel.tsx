@@ -76,6 +76,8 @@ interface ChatPanelProps {
   onStop: () => void;
   onBookmark?: (content: string, messageId: string) => void;
   bookmarkedMessageIds?: Set<string>;
+  disabled?: boolean;
+  disabledReason?: string;
 }
 
 export function mapRole(msg: ChatMessage) {
@@ -579,6 +581,8 @@ export default function ChatPanel({
   onStop,
   onBookmark,
   bookmarkedMessageIds,
+  disabled,
+  disabledReason,
 }: ChatPanelProps) {
   const t = useTranslations("chat");
   const hasMessages =
@@ -873,23 +877,24 @@ export default function ChatPanel({
               onSubmit={handleSubmit}
               onCancel={onStop}
               loading={isStreaming}
-              placeholder={t("placeholder")}
+              disabled={disabled}
+              placeholder={disabled ? disabledReason : t("placeholder")}
               submitType="enter"
             />
           </div>
         </div>
         <Typography.Text
-          type="secondary"
+          type={disabled ? "warning" : "secondary"}
           style={{
             display: "block",
             textAlign: "center",
             fontSize: 11,
             marginTop: 8,
-            color: "var(--text-muted)",
             letterSpacing: "0.01em",
+            ...(!disabled && { color: "var(--text-muted)" }),
           }}
         >
-          {t("hint")}
+          {disabled && disabledReason ? disabledReason : t("hint")}
         </Typography.Text>
       </div>
     </Flex>
