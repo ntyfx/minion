@@ -6,6 +6,7 @@ import {
   dbSaveSession,
   dbDeleteSession,
   migrateFromLocalStorage,
+  migrateSessionEnv,
   _closeDB,
 } from "@/lib/session-db";
 import { createSession } from "@/lib/sessions";
@@ -96,5 +97,59 @@ describe("migrateFromLocalStorage", () => {
     const migrated = await migrateFromLocalStorage();
     expect(migrated).toBe(false);
     expect(localStorage.getItem("minion-sessions")).toBeNull();
+  });
+});
+
+describe("migrateSessionEnv", () => {
+  it("backfills env on sessions that lack it", async () => {
+    const s1 = createSession("No Env");
+    const s2 = createSession("Also No Env");
+    await dbSaveSessions([s1, s2]);
+
+    const count = await migrateSessionEnv("staging");
+    expect(count).toBe(2);
+
+    const loaded = await dbLoadSessions();
+    for (const s of loaded) {
+      expect(s.env).toBe("staging");
+    }
+  });
+
+  it("skips sessions that already have env", async () => {
+    const s1 = createSession("Has Env", undefined, "prod");
+    const s2 = createSession("No Env");
+    await dbSaveSessions([s1, s2]);
+
+    const count = await migrateSessionEnv("local");
+    expect(count).toBe(1);
+
+    const loaded = await dbLoadSessions();
+    const withProd = loaded.find((s) => s.label === "Has Env");
+    const withLocal = loaded.find((s) => s.label === "No Env");
+    expect(withProd?.env).toBe("prod");
+    expect(withLocal?.env).toBe("local");
+  });
+
+  it("only runs once (idempotent via localStorage flag)", async () => {
+    await dbSaveSessions([createSession("A")]);
+
+    const first = await migrateSessionEnv("staging");
+    expect(first).toBe(1);
+
+    // Reset DB, add a new session without env
+    await _closeDB();
+    await deleteDB("minion-chat");
+    // Re-init DB
+    await dbSaveSessions([createSession("B")]);
+
+    const second = await migrateSessionEnv("prod");
+    expect(second).toBe(0); // skipped because flag is set
+  });
+
+  it("returns 0 when all sessions already have env", async () => {
+    const s = createSession("Done", undefined, "prod");
+    await dbSaveSessions([s]);
+    const count = await migrateSessionEnv("local");
+    expect(count).toBe(0);
   });
 });

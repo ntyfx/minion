@@ -21,7 +21,8 @@
     "importFailed": "导入失败，文件格式不正确",
     "editTags": "编辑标签",
     "tagsHint": "输入标签，用逗号分隔",
-    "tagsPlaceholder": "广告投放, 礼包管理"
+    "tagsPlaceholder": "广告投放, 礼包管理",
+    "envMismatch": "当前环境为 {currentEnv}，此会话属于 {sessionEnv} 环境，输入已禁用"
   },
   "chat": {
     "welcomeTitle": "Minion Chat",
@@ -69,7 +70,10 @@
     "menuDelete": "删除",
     "search": "搜索对话...",
     "active": "活跃",
-    "archived": "归档"
+    "archived": "归档",
+    "env_local": "本地环境",
+    "env_staging": "预发布环境",
+    "env_prod": "生产环境"
   },
   "settings": {
     "title": "设置",

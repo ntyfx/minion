@@ -1,5 +1,6 @@
 import { openDB, type IDBPDatabase } from "idb";
 import type { Session } from "@/types/chat";
+import type { EnvType } from "@/lib/environment";
 
 const DB_NAME = "minion-chat";
 const DB_VERSION = 1;
@@ -90,6 +91,35 @@ export async function migrateFromLocalStorage(): Promise<boolean> {
   } catch {
     return false;
   }
+}
+
+const ENV_MIGRATED_KEY = "minion-env-migrated";
+
+/**
+ * One-time migration: backfill `env` on sessions that lack it.
+ * Uses the provided env (derived from the current API Base URL).
+ * Returns the number of sessions updated.
+ */
+export async function migrateSessionEnv(currentEnv: EnvType): Promise<number> {
+  if (typeof window === "undefined") return 0;
+  if (localStorage.getItem(ENV_MIGRATED_KEY)) return 0;
+
+  const sessions = await dbLoadSessions();
+  let count = 0;
+  const updated = sessions.map((s) => {
+    if (s.env) return s;
+    count++;
+    return { ...s, env: currentEnv };
+  });
+
+  if (count === 0) {
+    localStorage.setItem(ENV_MIGRATED_KEY, "1");
+    return 0;
+  }
+
+  await dbSaveSessions(updated);
+  localStorage.setItem(ENV_MIGRATED_KEY, "1");
+  return count;
 }
 
 export async function getStorageEstimate(): Promise<{

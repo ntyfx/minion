@@ -21,7 +21,8 @@
     "importFailed": "Import failed — invalid file format",
     "editTags": "Edit Tags",
     "tagsHint": "Enter tags, separated by commas",
-    "tagsPlaceholder": "ad campaign, product packs"
+    "tagsPlaceholder": "ad campaign, product packs",
+    "envMismatch": "Current env is {currentEnv}, but this session belongs to {sessionEnv} — input disabled"
   },
   "chat": {
     "welcomeTitle": "Minion Chat",
@@ -69,7 +70,10 @@
     "menuDelete": "Delete",
     "search": "Search conversations...",
     "active": "Active",
-    "archived": "Archived"
+    "archived": "Archived",
+    "env_local": "Local",
+    "env_staging": "Staging",
+    "env_prod": "Production"
   },
   "settings": {
     "title": "Settings",

@@ -5,6 +5,7 @@ import { Conversations } from "@ant-design/x";
 import { Input, Tooltip, Tag, Flex } from "antd";
 import { useTranslations } from "next-intl";
 import { formatTimeAgo } from "@/lib/utils";
+import { ENV_COLORS, type EnvType } from "@/lib/environment";
 import type { Session } from "@/types/chat";
 import {
   DeleteOutlined,
@@ -65,70 +66,106 @@ export default memo(function Sidebar({
     });
   }, [sessions, search, showArchived]);
 
-  const items = useMemo(
-    () =>
-      filteredSessions.map((s) =>
-        collapsed
-          ? {
-              key: s.id,
-              label: (
-                <Tooltip title={s.label} placement="right">
-                  <span style={{ display: "flex", justifyContent: "center", fontSize: 16 }}>
-                    {s.pinned ? <PushpinOutlined style={{ color: "var(--accent)" }} /> : getChatIcon(s.icon)}
-                  </span>
-                </Tooltip>
-              ),
-            }
-          : {
-              key: s.id,
-              label: (
-                <Flex align="center" gap={4}>
-                  {s.pinned && (
-                    <PushpinOutlined style={{ fontSize: 10, color: "var(--accent)", flexShrink: 0 }} />
-                  )}
-                  <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                    {s.label}
-                  </span>
-                </Flex>
-              ),
-              icon: getChatIcon(s.icon),
-              description: (
-                <span
-                  style={{
-                    fontSize: 11,
-                    color: "var(--text-muted)",
-                    fontVariantNumeric: "tabular-nums",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 4,
-                    flexWrap: "wrap",
-                  }}
-                >
-                  <span>
-                    {s.messages.length > 0
-                      ? `${s.messages.length} ${t("msg")} · ${formatTimeAgo(s.updatedAt, t("now"))}`
-                      : formatTimeAgo(s.updatedAt, t("now"))}
-                  </span>
-                  {(s.tags ?? []).map((tag) => (
-                    <Tag
-                      key={tag}
-                      style={{
-                        margin: 0,
-                        fontSize: 10,
-                        lineHeight: "16px",
-                        padding: "0 4px",
-                        borderRadius: 4,
-                      }}
-                    >
-                      {tag}
-                    </Tag>
-                  ))}
-                </span>
-              ),
-            },
-      ),
-    [filteredSessions, collapsed, t],
-  );
+  const items = useMemo(() => {
+    const envLabel = (env: EnvType | undefined) =>
+      env ? t(`env_${env}` as Parameters<typeof t>[0]) : "";
+
+    const envDotStyle = (env: EnvType): React.CSSProperties => ({
+      position: "absolute",
+      top: -2,
+      right: -4,
+      width: 7,
+      height: 7,
+      borderRadius: "50%",
+      background: ENV_COLORS[env],
+      border: "1.5px solid var(--bg-surface)",
+    });
+
+    const iconWithDot = (s: Session) => {
+      const env = s.env;
+      if (!env) return getChatIcon(s.icon);
+      return (
+        <span style={{ position: "relative", display: "inline-flex" }}>
+          {getChatIcon(s.icon)}
+          <span style={envDotStyle(env)} />
+        </span>
+      );
+    };
+
+    return filteredSessions.map((s) => {
+      const label = envLabel(s.env);
+      const collapsedTitle = label ? `${s.label}  [${label}]` : s.label;
+
+      if (collapsed) {
+        return {
+          key: s.id,
+          label: (
+            <Tooltip title={collapsedTitle} placement="right">
+              <span style={{ display: "flex", justifyContent: "center", fontSize: 16 }}>
+                {s.pinned
+                  ? <PushpinOutlined style={{ color: "var(--accent)" }} />
+                  : iconWithDot(s)}
+              </span>
+            </Tooltip>
+          ),
+        };
+      }
+
+      return {
+        key: s.id,
+        label: (
+          <Flex align="center" gap={4}>
+            {s.pinned && (
+              <PushpinOutlined style={{ fontSize: 10, color: "var(--accent)", flexShrink: 0 }} />
+            )}
+            <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              {s.label}
+            </span>
+          </Flex>
+        ),
+        icon: (
+          <Tooltip title={label || undefined} placement="right">
+            <span style={{ display: "inline-flex" }}>
+              {iconWithDot(s)}
+            </span>
+          </Tooltip>
+        ),
+        description: (
+          <span
+            style={{
+              fontSize: 11,
+              color: "var(--text-muted)",
+              fontVariantNumeric: "tabular-nums",
+              display: "flex",
+              alignItems: "center",
+              gap: 4,
+              flexWrap: "wrap",
+            }}
+          >
+            <span>
+              {s.messages.length > 0
+                ? `${s.messages.length} ${t("msg")} · ${formatTimeAgo(s.updatedAt, t("now"))}`
+                : formatTimeAgo(s.updatedAt, t("now"))}
+            </span>
+            {(s.tags ?? []).map((tag) => (
+              <Tag
+                key={tag}
+                style={{
+                  margin: 0,
+                  fontSize: 10,
+                  lineHeight: "16px",
+                  padding: "0 4px",
+                  borderRadius: 4,
+                }}
+              >
+                {tag}
+              </Tag>
+            ))}
+          </span>
+        ),
+      };
+    });
+  }, [filteredSessions, collapsed, t]);
 
   const handleToggleArchived = useCallback(() => {
     setShowArchived((v) => !v);
