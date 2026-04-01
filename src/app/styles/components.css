@@ -80,6 +80,45 @@
   fill: url(#brand-svg-gradient);
 }
 
+/* ── Header env switch ── */
+.env-switch-select .ant-select-selector {
+  border-radius: 8px !important;
+  border-color: var(--border) !important;
+  background: var(--bg-muted) !important;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast),
+    background var(--transition-fast) !important;
+}
+
+.env-switch-select:hover .ant-select-selector {
+  border-color: var(--border-strong) !important;
+  background: var(--bg-hover) !important;
+}
+
+.env-switch-select.ant-select-focused .ant-select-selector {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 2px var(--accent-subtle) !important;
+}
+
+.env-switch-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.env-switch-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--bg-surface) 92%, transparent);
+  flex-shrink: 0;
+}
+
+.env-switch-dropdown .ant-select-item {
+  border-radius: 6px;
+}
+
 /* ── Ant Design overrides ── */
 
 .ant-btn-primary {

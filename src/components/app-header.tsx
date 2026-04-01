@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemoizedFn } from "ahooks";
-import { Badge, Flex, Tooltip } from "antd";
+import { Badge, Flex, Select, Tooltip } from "antd";
 import {
   SafetyCertificateOutlined,
   LinkOutlined,
@@ -20,13 +20,15 @@ import { TokenReportErrorBoundary } from "@/components/error-boundary-wrapper";
 import { TemplateToggle } from "@/components/template-panel";
 import { BookmarkToggle } from "@/components/bookmark-panel";
 import { SequenceToggle } from "@/components/sequence-panel";
-import type { Session, AppSettings } from "@/types/chat";
+import type { Session, AppSettings, EnvSettings, EnvType } from "@/types/chat";
+import { ENV_COLORS } from "@/lib/environment";
 
 interface AppHeaderProps {
   siderCollapsed: boolean;
   setSiderCollapsed: (collapsed: boolean) => void;
   isStreaming: boolean;
   settings: AppSettings;
+  activeEnvSettings: EnvSettings;
   activeSession: Session | null;
   sessions: Session[];
   unseenEventCount: number;
@@ -37,6 +39,7 @@ interface AppHeaderProps {
   onOpenTemplates: () => void;
   onOpenBookmarks: () => void;
   onOpenSequences: () => void;
+  onSwitchEnv: (env: EnvType) => void;
 }
 
 export function AppHeader({
@@ -44,6 +47,7 @@ export function AppHeader({
   setSiderCollapsed,
   isStreaming,
   settings,
+  activeEnvSettings,
   activeSession,
   sessions,
   unseenEventCount,
@@ -54,16 +58,38 @@ export function AppHeader({
   onOpenTemplates,
   onOpenBookmarks,
   onOpenSequences,
+  onSwitchEnv,
 }: AppHeaderProps) {
   const t = useTranslations("page");
+  const tSidebar = useTranslations("sidebar");
 
   const toggleSidebar = useMemoizedFn(() => {
     setSiderCollapsed(!siderCollapsed);
   });
 
-  const tokenPreview = settings.accessToken
-    ? `${settings.accessToken.slice(0, 6)}…${settings.accessToken.slice(-4)}`
+  const tokenPreview = activeEnvSettings.accessToken
+    ? `${activeEnvSettings.accessToken.slice(0, 6)}…${activeEnvSettings.accessToken.slice(-4)}`
     : t("tokenNotSet");
+
+  const baseEnvOptions: Array<{ value: EnvType; label: string }> = [
+    { value: "local", label: tSidebar("env_local") },
+    { value: "staging", label: tSidebar("env_staging") },
+    { value: "prod", label: tSidebar("env_prod") },
+  ];
+
+  const envOptions: Array<{ value: EnvType; label: React.ReactNode }> = baseEnvOptions.map((item) => ({
+    ...item,
+    label: (
+      <span className="env-switch-option">
+        <span
+          className="env-switch-dot"
+          style={{ background: ENV_COLORS[item.value] }}
+          aria-hidden
+        />
+        {item.label}
+      </span>
+    ),
+  }));
 
   return (
     <header className="app-header">
@@ -87,7 +113,7 @@ export function AppHeader({
         </span>
         <span className="header-meta">
           <LinkOutlined style={{ fontSize: 10 }} />
-          {settings.baseUrl.replace(/^https?:\/\//, "")}
+          {activeEnvSettings.baseUrl.replace(/^https?:\/\//, "")}
         </span>
         <span className="header-meta">
           <SafetyCertificateOutlined style={{ fontSize: 10 }} />
@@ -96,6 +122,15 @@ export function AppHeader({
       </Flex>
 
       <Flex gap={2} align="center">
+        <Select
+          className="env-switch-select"
+          classNames={{ popup: { root: "env-switch-dropdown" } }}
+          size="small"
+          value={settings.activeEnv}
+          onChange={(val) => onSwitchEnv(val as EnvType)}
+          style={{ width: 144, marginRight: 6 }}
+          options={envOptions}
+        />
         <Tooltip title={t("importSession")}>
           <button className="icon-button" onClick={onImportSession} aria-label={t("importSession")}>
             <ImportOutlined />
@@ -113,8 +148,8 @@ export function AppHeader({
           <TokenReportToggle sessions={sessions} />
         </TokenReportErrorBoundary>
         <ToolsToggle
-          baseUrl={settings.baseUrl}
-          accessToken={settings.accessToken}
+          baseUrl={activeEnvSettings.baseUrl}
+          accessToken={activeEnvSettings.accessToken}
         />
         <ActivityToggle
           count={unseenEventCount}

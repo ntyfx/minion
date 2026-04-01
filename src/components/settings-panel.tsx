@@ -11,12 +11,13 @@ import {
   DatabaseOutlined,
 } from "@ant-design/icons";
 import { useTranslations } from "next-intl";
-import type { AppSettings } from "@/types/chat";
+import type { AppSettings, EnvType } from "@/types/chat";
 import { preferredDefaultBaseUrl } from "@/lib/settings";
 import { useAppLocale, LOCALE_LIST, type LocaleId } from "@/lib/locale";
 import { useTheme } from "@/lib/theme";
 import { THEME_LIST, type ThemeId } from "@/lib/themes";
 import { getStorageEstimate } from "@/lib/session-db";
+import { ENV_COLORS } from "@/lib/environment";
 
 const APP_VERSION = process.env.NEXT_PUBLIC_APP_VERSION ?? "unknown";
 
@@ -44,16 +45,15 @@ export default function SettingsPanel({
 }: SettingsPanelProps) {
   const t = useTranslations("settings");
   const tTheme = useTranslations("theme");
+  const tSidebar = useTranslations("sidebar");
   const { locale, setLocale } = useAppLocale();
   const { themeId, setTheme } = useTheme();
-  const [baseUrl, setBaseUrl] = useState(settings.baseUrl);
-  const [accessToken, setAccessToken] = useState(settings.accessToken);
+  const [draftSettings, setDraftSettings] = useState(settings);
   const [messageApi, contextHolder] = message.useMessage();
   const [storageInfo, setStorageInfo] = useState<{ usage: number; quota: number } | null>(null);
 
   useEffect(() => {
-    setBaseUrl(settings.baseUrl);
-    setAccessToken(settings.accessToken);
+    setDraftSettings(settings);
   }, [settings]);
 
   useEffect(() => {
@@ -63,27 +63,80 @@ export default function SettingsPanel({
   }, [open]);
 
   const handleSave = () => {
-    onSave({ baseUrl, accessToken });
+    onSave(draftSettings);
     messageApi.success(t("saved"));
     onToggle();
   };
 
   const handleLoadDefaults = () => {
-    const defaultUrl = preferredDefaultBaseUrl();
-    setBaseUrl(defaultUrl);
-    onSave({ baseUrl: defaultUrl, accessToken });
+    const activeEnv = draftSettings.activeEnv;
+    const defaultUrl = activeEnv === "local" ? preferredDefaultBaseUrl() : "";
+    const next = {
+      ...draftSettings,
+      envs: {
+        ...draftSettings.envs,
+        [activeEnv]: {
+          ...draftSettings.envs[activeEnv],
+          baseUrl: defaultUrl,
+        },
+      },
+    };
+    setDraftSettings(next);
+    onSave(next);
     messageApi.info(t("urlReset"));
   };
 
   const handleClearToken = () => {
-    setAccessToken("");
-    onSave({ baseUrl, accessToken: "" });
+    const activeEnv = draftSettings.activeEnv;
+    const next = {
+      ...draftSettings,
+      envs: {
+        ...draftSettings.envs,
+        [activeEnv]: {
+          ...draftSettings.envs[activeEnv],
+          accessToken: "",
+        },
+      },
+    };
+    setDraftSettings(next);
+    onSave(next);
     messageApi.info(t("tokenCleared"));
+  };
+
+  const handleSwitchEnv = (env: EnvType) => {
+    setDraftSettings((prev) => ({ ...prev, activeEnv: env }));
+  };
+
+  const handleBaseUrlChange = (value: string) => {
+    setDraftSettings((prev) => ({
+      ...prev,
+      envs: {
+        ...prev.envs,
+        [prev.activeEnv]: {
+          ...prev.envs[prev.activeEnv],
+          baseUrl: value,
+        },
+      },
+    }));
+  };
+
+  const handleTokenChange = (value: string) => {
+    setDraftSettings((prev) => ({
+      ...prev,
+      envs: {
+        ...prev.envs,
+        [prev.activeEnv]: {
+          ...prev.envs[prev.activeEnv],
+          accessToken: value,
+        },
+      },
+    }));
   };
 
   const storagePercent = storageInfo && storageInfo.quota > 0
     ? Math.round((storageInfo.usage / storageInfo.quota) * 100)
     : 0;
+  const activeEnvConfig = draftSettings.envs[draftSettings.activeEnv];
 
   return (
     <Modal
@@ -114,6 +167,49 @@ export default function SettingsPanel({
             value={locale}
             onChange={(val: LocaleId) => setLocale(val)}
             options={LOCALE_LIST.map((l) => ({ value: l.id, label: l.label }))}
+            style={{ width: 160 }}
+            size="small"
+          />
+        </Flex>
+
+        <Flex align="center" justify="space-between">
+          <Typography.Text strong style={{ fontSize: 13 }}>
+            {t("activeEnv")}
+          </Typography.Text>
+          <Select
+            className="env-switch-select"
+            classNames={{ popup: { root: "env-switch-dropdown" } }}
+            value={draftSettings.activeEnv}
+            onChange={(val) => handleSwitchEnv(val as EnvType)}
+            options={[
+              {
+                value: "local",
+                label: (
+                  <span className="env-switch-option">
+                    <span className="env-switch-dot" style={{ background: ENV_COLORS.local }} />
+                    {tSidebar("env_local")}
+                  </span>
+                ),
+              },
+              {
+                value: "staging",
+                label: (
+                  <span className="env-switch-option">
+                    <span className="env-switch-dot" style={{ background: ENV_COLORS.staging }} />
+                    {tSidebar("env_staging")}
+                  </span>
+                ),
+              },
+              {
+                value: "prod",
+                label: (
+                  <span className="env-switch-option">
+                    <span className="env-switch-dot" style={{ background: ENV_COLORS.prod }} />
+                    {tSidebar("env_prod")}
+                  </span>
+                ),
+              },
+            ]}
             style={{ width: 160 }}
             size="small"
           />
@@ -212,8 +308,8 @@ export default function SettingsPanel({
             style={{ marginBottom: 12, borderRadius: 8 }}
           />
           <Input
-            value={baseUrl}
-            onChange={(e) => setBaseUrl(e.target.value)}
+            value={activeEnvConfig.baseUrl}
+            onChange={(e) => handleBaseUrlChange(e.target.value)}
             placeholder={t("apiBaseUrlPlaceholder")}
             aria-label={t("apiBaseUrl")}
             suffix={
@@ -260,8 +356,8 @@ export default function SettingsPanel({
             {t("accessToken")}
           </legend>
           <Input.Password
-            value={accessToken}
-            onChange={(e) => setAccessToken(e.target.value)}
+            value={activeEnvConfig.accessToken}
+            onChange={(e) => handleTokenChange(e.target.value)}
             placeholder={t("pasteToken")}
             aria-label={t("accessToken")}
             suffix={

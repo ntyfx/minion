@@ -95,7 +95,12 @@ export interface TokenUsage {
   toolsCalls: number;
 }
 
-export interface AppSettings {
+export interface EnvSettings {
   baseUrl: string;
   accessToken: string;
+}
+
+export interface AppSettings {
+  activeEnv: EnvType;
+  envs: Record<EnvType, EnvSettings>;
 }

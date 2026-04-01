@@ -96,7 +96,8 @@
     "storageTitle": "Storage",
     "sessions": "{count} conversations",
     "storageUsed": "Used {used} of {quota}",
-    "storageUnavailable": "Storage info unavailable"
+    "storageUnavailable": "Storage info unavailable",
+    "activeEnv": "Active environment"
   },
   "activity": {
     "title": "Activity Feed",

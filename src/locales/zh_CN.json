@@ -96,7 +96,8 @@
     "storageTitle": "存储",
     "sessions": "{count} 个对话",
     "storageUsed": "已使用 {used}，共 {quota}",
-    "storageUnavailable": "存储信息不可用"
+    "storageUnavailable": "存储信息不可用",
+    "activeEnv": "当前环境"
   },
   "activity": {
     "title": "活动日志",

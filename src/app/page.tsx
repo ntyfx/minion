@@ -26,8 +26,9 @@ import { saveBookmark, createBookmarkId, loadBookmarks } from "@/lib/bookmark-db
 import {
   loadSettings,
   saveSettings as persistSettings,
+  getActiveEnvSettings,
 } from "@/lib/settings";
-import { detectEnvFromUrl } from "@/lib/environment";
+import { getCurrentEnv, isSessionEnvMismatch } from "@/lib/env-routing";
 import { useTheme } from "@/lib/theme";
 import { useChatSessions } from "@/hooks/use-chat-sessions";
 import { useStreaming } from "@/hooks/use-streaming";
@@ -43,7 +44,11 @@ export default function Home() {
   const { colorScheme } = useTheme();
   const t = useTranslations("page");
   const [settings, setSettings] = useState<AppSettings>(() => loadSettings());
-  const currentEnv = useMemo(() => detectEnvFromUrl(settings.baseUrl), [settings.baseUrl]);
+  const activeEnvSettings = useMemo(
+    () => getActiveEnvSettings(settings),
+    [settings],
+  );
+  const currentEnv = useMemo(() => getCurrentEnv(settings), [settings]);
   const [siderCollapsed, setSiderCollapsed] = useState(false);
   const [activityOpen, setActivityOpen] = useState(false);
   const [seenEventCount, setSeenEventCount] = useState(0);
@@ -94,7 +99,7 @@ export default function Home() {
     handleStop,
   } = useStreaming({
     activeSessionId,
-    settings,
+    settings: activeEnvSettings,
     sessionsRef,
     setSessions,
     setActiveSessionId,
@@ -133,6 +138,12 @@ export default function Home() {
   });
 
   const handleSaveSettings = useMemoizedFn((next: AppSettings) => {
+    setSettings(next);
+    persistSettings(next);
+  });
+
+  const handleSwitchEnv = useMemoizedFn((env: AppSettings["activeEnv"]) => {
+    const next = { ...settings, activeEnv: env };
     setSettings(next);
     persistSettings(next);
   });
@@ -208,10 +219,7 @@ export default function Home() {
     (activeSession?.activity.length ?? 0) - seenEventCount,
   );
 
-  const envMismatch = !!(
-    activeSession?.env &&
-    activeSession.env !== currentEnv
-  );
+  const envMismatch = isSessionEnvMismatch(activeSession, currentEnv);
 
   if (sessionsLoading) {
     return (
@@ -301,6 +309,7 @@ export default function Home() {
           setSiderCollapsed={setSiderCollapsed}
           isStreaming={isStreaming}
           settings={settings}
+          activeEnvSettings={activeEnvSettings}
           activeSession={activeSession}
           sessions={sessions}
           unseenEventCount={unseenEventCount}
@@ -311,6 +320,7 @@ export default function Home() {
           onOpenTemplates={() => setTemplatesOpen(true)}
           onOpenBookmarks={() => setBookmarksOpen(true)}
           onOpenSequences={() => setSequencesOpen(true)}
+          onSwitchEnv={handleSwitchEnv}
         />
 
         <main style={{ flex: 1, overflow: "hidden" }}>

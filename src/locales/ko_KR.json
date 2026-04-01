@@ -96,7 +96,8 @@
     "storageTitle": "저장소",
     "sessions": "{count}개 대화",
     "storageUsed": "{used} / {quota} 사용 중",
-    "storageUnavailable": "저장소 정보를 사용할 수 없습니다"
+    "storageUnavailable": "저장소 정보를 사용할 수 없습니다",
+    "activeEnv": "현재 환경"
   },
   "activity": {
     "title": "활동 피드",
