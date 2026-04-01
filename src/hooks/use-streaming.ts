@@ -10,7 +10,7 @@ import {
 import type { SSEEvent } from "@/lib/sse-client";
 import { createSession } from "@/lib/sessions";
 import { generateMessageId } from "@/lib/sessions";
-import type { AppSettings, Session } from "@/types/chat";
+import type { EnvSettings, Session } from "@/types/chat";
 
 function generateEventId(): string {
   return `evt_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
@@ -18,7 +18,7 @@ function generateEventId(): string {
 
 interface UseStreamingOptions {
   activeSessionId: string | null;
-  settings: AppSettings;
+  settings: EnvSettings;
   sessionsRef: React.RefObject<Session[]>;
   setSessions: React.Dispatch<React.SetStateAction<Session[]>>;
   setActiveSessionId: (id: string) => void;

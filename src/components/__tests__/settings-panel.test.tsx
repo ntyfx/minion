@@ -37,7 +37,14 @@ describe("SettingsPanel component", () => {
   });
 
   const defaultProps = {
-    settings: { baseUrl: "http://localhost:8080", accessToken: "tok123" },
+    settings: {
+      activeEnv: "local" as const,
+      envs: {
+        local: { baseUrl: "http://localhost:8080", accessToken: "tok123" },
+        staging: { baseUrl: "https://staging.example.com", accessToken: "staging-token" },
+        prod: { baseUrl: "https://api.example.com", accessToken: "prod-token" },
+      },
+    },
     onSave: vi.fn(),
     open: true,
     onToggle: vi.fn(),
@@ -74,8 +81,12 @@ describe("SettingsPanel component", () => {
     });
 
     expect(onSave).toHaveBeenCalledWith({
-      baseUrl: "http://localhost:8080",
-      accessToken: "tok123",
+      activeEnv: "local",
+      envs: {
+        local: { baseUrl: "http://localhost:8080", accessToken: "tok123" },
+        staging: { baseUrl: "https://staging.example.com", accessToken: "staging-token" },
+        prod: { baseUrl: "https://api.example.com", accessToken: "prod-token" },
+      },
     });
   });
 
@@ -114,7 +125,14 @@ describe("SettingsPanel component", () => {
     rerender(
       <SettingsPanel
         {...defaultProps}
-        settings={{ baseUrl: "http://changed:1234", accessToken: "new-tok" }}
+        settings={{
+          activeEnv: "local",
+          envs: {
+            local: { baseUrl: "http://changed:1234", accessToken: "new-tok" },
+            staging: { baseUrl: "https://staging.example.com", accessToken: "staging-token" },
+            prod: { baseUrl: "https://api.example.com", accessToken: "prod-token" },
+          },
+        }}
       />,
     );
 
@@ -130,6 +148,59 @@ describe("SettingsPanel component", () => {
     const { baseElement } = render(<SettingsPanel {...defaultProps} />);
     expect(baseElement.textContent).toContain("settings.language");
     expect(baseElement.textContent).toContain("简体中文");
+  });
+
+  it("renders environment selector", async () => {
+    const SettingsPanel = (await import("@/components/settings-panel")).default;
+    const { baseElement } = render(<SettingsPanel {...defaultProps} />);
+    expect(baseElement.textContent).toContain("settings.activeEnv");
+    expect(baseElement.textContent).toContain("sidebar.env_local");
+  });
+
+  it("edits selected env config and keeps other envs intact", async () => {
+    const onSave = vi.fn();
+    const SettingsPanel = (await import("@/components/settings-panel")).default;
+    const { baseElement } = render(
+      <SettingsPanel
+        {...defaultProps}
+        onSave={onSave}
+        settings={{
+          activeEnv: "staging",
+          envs: {
+            local: { baseUrl: "http://localhost:8080", accessToken: "tok123" },
+            staging: {
+              baseUrl: "https://staging.example.com",
+              accessToken: "staging-token",
+            },
+            prod: { baseUrl: "https://api.example.com", accessToken: "prod-token" },
+          },
+        }}
+      />,
+    );
+
+    const urlInput = baseElement.querySelector(
+      'input[aria-label="settings.apiBaseUrl"]',
+    ) as HTMLInputElement;
+    expect(urlInput.value).toBe("https://staging.example.com");
+    fireEvent.change(urlInput, { target: { value: "https://stg.changed.example.com" } });
+
+    const saveBtn = findButtonByText(baseElement, "settings.save");
+    expect(saveBtn).toBeTruthy();
+    act(() => {
+      saveBtn!.click();
+    });
+
+    expect(onSave).toHaveBeenCalledWith({
+      activeEnv: "staging",
+      envs: {
+        local: { baseUrl: "http://localhost:8080", accessToken: "tok123" },
+        staging: {
+          baseUrl: "https://stg.changed.example.com",
+          accessToken: "staging-token",
+        },
+        prod: { baseUrl: "https://api.example.com", accessToken: "prod-token" },
+      },
+    });
   });
 
 
@@ -212,8 +283,12 @@ describe("SettingsPanel component", () => {
     ) as HTMLInputElement;
     expect(input.value).toBe("");
     expect(onSave).toHaveBeenCalledWith({
-      baseUrl: "http://localhost:8080",
-      accessToken: "",
+      activeEnv: "local",
+      envs: {
+        local: { baseUrl: "http://localhost:8080", accessToken: "" },
+        staging: { baseUrl: "https://staging.example.com", accessToken: "staging-token" },
+        prod: { baseUrl: "https://api.example.com", accessToken: "prod-token" },
+      },
     });
     expect(baseElement.textContent).toContain("settings.tokenCleared");
   });
@@ -308,7 +383,14 @@ describe("formatBytes function", () => {
     const SettingsPanel = (await import("@/components/settings-panel")).default;
     const { baseElement } = render(
       <SettingsPanel
-        settings={{ baseUrl: "http://localhost:8080", accessToken: "" }}
+        settings={{
+          activeEnv: "local",
+          envs: {
+            local: { baseUrl: "http://localhost:8080", accessToken: "" },
+            staging: { baseUrl: "", accessToken: "" },
+            prod: { baseUrl: "", accessToken: "" },
+          },
+        }}
         onSave={vi.fn()}
         open={true}
         onToggle={vi.fn()}

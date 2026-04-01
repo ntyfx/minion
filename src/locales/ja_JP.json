@@ -96,7 +96,8 @@
     "storageTitle": "ストレージ",
     "sessions": "{count} 件の会話",
     "storageUsed": "{used} / {quota} 使用中",
-    "storageUnavailable": "ストレージ情報を取得できません"
+    "storageUnavailable": "ストレージ情報を取得できません",
+    "activeEnv": "現在の環境"
   },
   "activity": {
     "title": "アクティビティ",

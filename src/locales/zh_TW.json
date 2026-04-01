@@ -96,7 +96,8 @@
     "storageTitle": "儲存空間",
     "sessions": "{count} 個對話",
     "storageUsed": "已使用 {used}，共 {quota}",
-    "storageUnavailable": "儲存資訊不可用"
+    "storageUnavailable": "儲存資訊不可用",
+    "activeEnv": "目前環境"
   },
   "activity": {
     "title": "活動日誌",

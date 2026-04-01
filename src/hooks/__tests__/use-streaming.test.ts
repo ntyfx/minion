@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { renderHook, act, waitFor } from "@testing-library/react";
 import { useStreaming } from "../use-streaming";
-import type { Session, AppSettings } from "@/types/chat";
+import type { Session, EnvSettings } from "@/types/chat";
 import type { SSEEvent } from "@/lib/sse-client";
 
 // Mock the SSE client
@@ -14,7 +14,7 @@ vi.mock("@/lib/sse-client", () => ({
 import { streamChat } from "@/lib/sse-client";
 
 describe("useStreaming", () => {
-  const mockSettings: AppSettings = {
+  const mockSettings: EnvSettings = {
     baseUrl: "http://localhost:8080",
     accessToken: "test-token",
   };
