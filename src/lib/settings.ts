@@ -1,5 +1,9 @@
 import type { AppSettings, EnvSettings, EnvType, AIServiceProvider, AIServiceConfig } from "@/types/chat";
 import { detectEnvFromUrl } from "@/lib/environment";
+import {
+  createDefaultAIServices,
+  getAIServiceProviders,
+} from "@/lib/ai-services";
 
 const STORAGE_KEYS = {
   baseUrl: "minion-demo-base-url",
@@ -64,23 +68,6 @@ export function getActiveEnvSettings(settings: AppSettings): EnvSettings {
   return settings.envs[settings.activeEnv];
 }
 
-function createDefaultAIServices(): Record<AIServiceProvider, AIServiceConfig> {
-  return {
-    "claude-code": {
-      provider: "claude-code",
-      apiKey: "",
-      baseUrl: "",
-      enabled: false,
-    },
-    "deepseek": {
-      provider: "deepseek",
-      apiKey: "",
-      baseUrl: "https://api.deepseek.com",
-      enabled: false,
-    },
-  };
-}
-
 function createDefaultSettings(): AppSettings {
   return {
     activeEnv: "local",
@@ -127,13 +114,6 @@ function mergeStoredSettings(base: AppSettings): AppSettings {
   }
 }
 
-function asAIServiceProvider(value: unknown): AIServiceProvider | null {
-  if (value === "claude-code" || value === "deepseek") {
-    return value;
-  }
-  return null;
-}
-
 function mergeAIService(
   base: AIServiceConfig,
   patch: Partial<AIServiceConfig> | undefined,
@@ -152,6 +132,8 @@ function mergeAIService(
   };
 }
 
+const ENV_LIST: EnvType[] = ["local", "staging", "prod"];
+
 function mergeSettings(base: AppSettings, patch: unknown): AppSettings {
   if (!patch || typeof patch !== "object") return base;
   const input = patch as Partial<AppSettings> & {
@@ -159,17 +141,28 @@ function mergeSettings(base: AppSettings, patch: unknown): AppSettings {
     aiServices?: Partial<Record<AIServiceProvider, Partial<AIServiceConfig>>>;
   };
   const activeEnv = asEnvType(input.activeEnv) ?? base.activeEnv;
+
+  const envs = {} as Record<EnvType, EnvSettings>;
+  ENV_LIST.forEach((env) => {
+    envs[env] = mergeEnv(
+      base.envs[env],
+      input.envs?.[env],
+      env === "local" ? base.envs.local.baseUrl : ""
+    );
+  });
+
+  const aiServices = {} as Record<AIServiceProvider, AIServiceConfig>;
+  getAIServiceProviders().forEach((provider) => {
+    aiServices[provider] = mergeAIService(
+      base.aiServices[provider],
+      input.aiServices?.[provider]
+    );
+  });
+
   return {
     activeEnv,
-    envs: {
-      local: mergeEnv(base.envs.local, input.envs?.local, base.envs.local.baseUrl),
-      staging: mergeEnv(base.envs.staging, input.envs?.staging, ""),
-      prod: mergeEnv(base.envs.prod, input.envs?.prod, ""),
-    },
-    aiServices: {
-      "claude-code": mergeAIService(base.aiServices["claude-code"], input.aiServices?.["claude-code"]),
-      "deepseek": mergeAIService(base.aiServices["deepseek"], input.aiServices?.["deepseek"]),
-    },
+    envs,
+    aiServices,
   };
 }
 

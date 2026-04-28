@@ -100,7 +100,7 @@ export type AIServiceProvider = "claude-code" | "deepseek";
 export interface AIServiceConfig {
   provider: AIServiceProvider;
   apiKey: string;
-  baseUrl?: string;
+  baseUrl: string;
   enabled: boolean;
 }
 

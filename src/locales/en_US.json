@@ -108,7 +108,11 @@
     "aiServiceBaseUrlPlaceholder": "Enter Base URL (optional)",
     "aiServiceApiKeyCleared": "API Key cleared.",
     "aiServiceClaudeCodeDesc": "Claude Code is an AI programming assistant by Anthropic.",
-    "aiServiceDeepSeekDesc": "DeepSeek is a powerful AI model. Default: https://api.deepseek.com."
+    "aiServiceDeepSeekDesc": "DeepSeek is a powerful AI model. Default: https://api.deepseek.com.",
+    "validation": {
+      "apiKeyTooShort": "API Key is too short",
+      "invalidUrl": "Invalid URL format"
+    }
   },
   "activity": {
     "title": "Activity Feed",

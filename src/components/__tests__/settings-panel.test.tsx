@@ -460,6 +460,243 @@ describe("SettingsPanel component", () => {
 
     expect(baseElement.textContent).toContain("settings.storageUsed");
   });
+
+  it("renders AI Services section with Tabs", async () => {
+    const SettingsPanel = (await import("@/components/settings-panel")).default;
+    const { baseElement } = render(<SettingsPanel {...defaultProps} />);
+
+    expect(baseElement.textContent).toContain("settings.aiServices");
+    expect(baseElement.textContent).toContain("settings.aiServiceClaudeCode");
+    expect(baseElement.textContent).toContain("settings.aiServiceDeepSeek");
+  });
+
+  it("toggles AI service enabled state", async () => {
+    const onSave = vi.fn();
+    const SettingsPanel = (await import("@/components/settings-panel")).default;
+    const { baseElement } = render(
+      <SettingsPanel {...defaultProps} onSave={onSave} />,
+    );
+
+    const switches = baseElement.querySelectorAll('button[role="switch"]');
+    expect(switches.length).toBeGreaterThan(0);
+
+    const claudeCodeSwitch = switches[0];
+    expect(claudeCodeSwitch.getAttribute("aria-checked")).toBe("false");
+
+    act(() => {
+      claudeCodeSwitch.click();
+    });
+
+    expect(claudeCodeSwitch.getAttribute("aria-checked")).toBe("true");
+
+    const saveBtn = findButtonByText(baseElement, "settings.save");
+    act(() => {
+      saveBtn!.click();
+    });
+
+    expect(onSave).toHaveBeenCalled();
+    const savedSettings = onSave.mock.calls[0][0];
+    expect(savedSettings.aiServices["claude-code"].enabled).toBe(true);
+  });
+
+  it("updates AI service API Key input", async () => {
+    const SettingsPanel = (await import("@/components/settings-panel")).default;
+    const { baseElement } = render(<SettingsPanel {...defaultProps} />);
+
+    const inputs = baseElement.querySelectorAll(
+      'input[aria-label="settings.aiServiceApiKey"]',
+    ) as NodeListOf<HTMLInputElement>;
+    expect(inputs.length).toBeGreaterThan(0);
+
+    const claudeCodeInput = inputs[0];
+    fireEvent.change(claudeCodeInput, { target: { value: "sk-test-12345678" } });
+    expect(claudeCodeInput.value).toBe("sk-test-12345678");
+  });
+
+  it("updates AI service Base URL input", async () => {
+    const SettingsPanel = (await import("@/components/settings-panel")).default;
+    const { baseElement } = render(
+      <SettingsPanel
+        {...defaultProps}
+        settings={{
+          ...defaultProps.settings,
+          aiServices: {
+            "claude-code": {
+              provider: "claude-code" as const,
+              apiKey: "",
+              baseUrl: "https://claude.example.com",
+              enabled: false,
+            },
+            "deepseek": {
+              provider: "deepseek" as const,
+              apiKey: "",
+              baseUrl: "https://api.deepseek.com",
+              enabled: false,
+            },
+          },
+        }}
+      />,
+    );
+
+    const inputs = baseElement.querySelectorAll(
+      'input[aria-label="settings.aiServiceBaseUrl"]',
+    ) as NodeListOf<HTMLInputElement>;
+    expect(inputs.length).toBeGreaterThan(0);
+
+    const activeInput = inputs[0];
+    expect(activeInput.value).toBe("https://claude.example.com");
+
+    fireEvent.change(activeInput, { target: { value: "https://custom-api.example.com" } });
+    expect(activeInput.value).toBe("https://custom-api.example.com");
+  });
+
+  it("clears AI service API Key when clear icon clicked", async () => {
+    const onSave = vi.fn();
+    const SettingsPanel = (await import("@/components/settings-panel")).default;
+    const { baseElement } = render(
+      <SettingsPanel
+        {...defaultProps}
+        onSave={onSave}
+        settings={{
+          ...defaultProps.settings,
+          aiServices: {
+            "claude-code": {
+              provider: "claude-code" as const,
+              apiKey: "sk-existing-key-1234",
+              baseUrl: "",
+              enabled: true,
+            },
+            "deepseek": {
+              provider: "deepseek" as const,
+              apiKey: "",
+              baseUrl: "https://api.deepseek.com",
+              enabled: false,
+            },
+          },
+        }}
+      />,
+    );
+
+    const inputs = baseElement.querySelectorAll(
+      'input[aria-label="settings.aiServiceApiKey"]',
+    ) as NodeListOf<HTMLInputElement>;
+    const claudeCodeInput = inputs[0];
+    expect(claudeCodeInput.value).toBe("sk-existing-key-1234");
+
+    const clearIcons = baseElement.querySelectorAll(
+      '[aria-label="settings.clearToken"]',
+    );
+    expect(clearIcons.length).toBeGreaterThan(0);
+
+    act(() => {
+      clearIcons[1].click();
+    });
+
+    expect(claudeCodeInput.value).toBe("");
+    expect(baseElement.textContent).toContain("settings.aiServiceApiKeyCleared");
+
+    expect(onSave).not.toHaveBeenCalled();
+  });
+
+  it("disables AI service inputs when service is disabled", async () => {
+    const SettingsPanel = (await import("@/components/settings-panel")).default;
+    const { baseElement } = render(<SettingsPanel {...defaultProps} />);
+
+    const apiKeyInputs = baseElement.querySelectorAll(
+      'input[aria-label="settings.aiServiceApiKey"]',
+    ) as NodeListOf<HTMLInputElement>;
+    const baseUrlInputs = baseElement.querySelectorAll(
+      'input[aria-label="settings.aiServiceBaseUrl"]',
+    ) as NodeListOf<HTMLInputElement>;
+
+    expect(apiKeyInputs.length).toBeGreaterThan(0);
+    expect(baseUrlInputs.length).toBeGreaterThan(0);
+    expect(apiKeyInputs[0].disabled).toBe(true);
+    expect(baseUrlInputs[0].disabled).toBe(true);
+  });
+
+  it("saves AI services configuration", async () => {
+    const onSave = vi.fn();
+    const SettingsPanel = (await import("@/components/settings-panel")).default;
+    const { baseElement } = render(
+      <SettingsPanel {...defaultProps} onSave={onSave} />,
+    );
+
+    const switches = baseElement.querySelectorAll('button[role="switch"]');
+    const apiKeyInputs = baseElement.querySelectorAll(
+      'input[aria-label="settings.aiServiceApiKey"]',
+    ) as NodeListOf<HTMLInputElement>;
+    const baseUrlInputs = baseElement.querySelectorAll(
+      'input[aria-label="settings.aiServiceBaseUrl"]',
+    ) as NodeListOf<HTMLInputElement>;
+
+    act(() => {
+      switches[0].click();
+    });
+    fireEvent.change(apiKeyInputs[0], { target: { value: "sk-new-key-12345678" } });
+    fireEvent.change(baseUrlInputs[0], { target: { value: "https://custom.example.com" } });
+
+    const saveBtn = findButtonByText(baseElement, "settings.save");
+    act(() => {
+      saveBtn!.click();
+    });
+
+    expect(onSave).toHaveBeenCalled();
+    const savedSettings = onSave.mock.calls[0][0];
+    expect(savedSettings.aiServices["claude-code"].enabled).toBe(true);
+    expect(savedSettings.aiServices["claude-code"].apiKey).toBe("sk-new-key-12345678");
+    expect(savedSettings.aiServices["claude-code"].baseUrl).toBe("https://custom.example.com");
+  });
+
+  it("preserves other AI service config when editing one", async () => {
+    const onSave = vi.fn();
+    const SettingsPanel = (await import("@/components/settings-panel")).default;
+    const { baseElement } = render(
+      <SettingsPanel
+        {...defaultProps}
+        onSave={onSave}
+        settings={{
+          ...defaultProps.settings,
+          aiServices: {
+            "claude-code": {
+              provider: "claude-code" as const,
+              apiKey: "sk-claude-1234",
+              baseUrl: "https://claude.example.com",
+              enabled: true,
+            },
+            "deepseek": {
+              provider: "deepseek" as const,
+              apiKey: "sk-deepseek-5678",
+              baseUrl: "https://api.deepseek.com",
+              enabled: false,
+            },
+          },
+        }}
+      />,
+    );
+
+    const apiKeyInputs = baseElement.querySelectorAll(
+      'input[aria-label="settings.aiServiceApiKey"]',
+    ) as NodeListOf<HTMLInputElement>;
+
+    fireEvent.change(apiKeyInputs[0], { target: { value: "sk-claude-updated-9999" } });
+
+    const saveBtn = findButtonByText(baseElement, "settings.save");
+    act(() => {
+      saveBtn!.click();
+    });
+
+    expect(onSave).toHaveBeenCalled();
+    const savedSettings = onSave.mock.calls[0][0];
+
+    expect(savedSettings.aiServices["claude-code"].enabled).toBe(true);
+    expect(savedSettings.aiServices["claude-code"].apiKey).toBe("sk-claude-updated-9999");
+    expect(savedSettings.aiServices["claude-code"].baseUrl).toBe("https://claude.example.com");
+
+    expect(savedSettings.aiServices["deepseek"].enabled).toBe(false);
+    expect(savedSettings.aiServices["deepseek"].apiKey).toBe("sk-deepseek-5678");
+    expect(savedSettings.aiServices["deepseek"].baseUrl).toBe("https://api.deepseek.com");
+  });
 });
 
 describe("formatBytes function", () => {

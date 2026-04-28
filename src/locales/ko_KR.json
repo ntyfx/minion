@@ -108,7 +108,11 @@
     "aiServiceBaseUrlPlaceholder": "Base URL 입력 (선택사항)",
     "aiServiceApiKeyCleared": "API 키가 삭제되었습니다.",
     "aiServiceClaudeCodeDesc": "Claude Code는 Anthropic의 AI 프로그래밍 어시스턴트입니다.",
-    "aiServiceDeepSeekDesc": "DeepSeek는 강력한 AI 모델입니다. 기본: https://api.deepseek.com."
+    "aiServiceDeepSeekDesc": "DeepSeek는 강력한 AI 모델입니다. 기본: https://api.deepseek.com.",
+    "validation": {
+      "apiKeyTooShort": "API 키가 너무 짧습니다",
+      "invalidUrl": "잘못된 URL 형식입니다"
+    }
   },
   "activity": {
     "title": "활동 피드",

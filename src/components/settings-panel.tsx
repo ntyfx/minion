@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { Input, Flex, Typography, Alert, Modal, Tooltip, Select, message, Progress, Switch, Tabs } from "antd";
 import {
   SaveOutlined,
@@ -11,13 +11,128 @@ import {
   DatabaseOutlined,
 } from "@ant-design/icons";
 import { useTranslations } from "next-intl";
-import type { AppSettings, EnvType, AIServiceProvider } from "@/types/chat";
-import { preferredDefaultBaseUrl } from "@/lib/settings";
+import type { AppSettings, EnvType, AIServiceProvider, AIServiceConfig } from "@/types/chat";
+import { preferredDefaultBaseUrl, normalizeBaseUrl } from "@/lib/settings";
+import {
+  getAIServiceProviders,
+  AI_SERVICE_CONFIGS,
+} from "@/lib/ai-services";
 import { useAppLocale, LOCALE_LIST, type LocaleId } from "@/lib/locale";
 import { useTheme } from "@/lib/theme";
 import { THEME_LIST, type ThemeId } from "@/lib/themes";
 import { getStorageEstimate } from "@/lib/session-db";
 import { ENV_COLORS } from "@/lib/environment";
+
+interface ValidationErrors {
+  [field: string]: string | undefined;
+}
+
+function validateApiKey(key: string, t: ReturnType<typeof useTranslations<"settings">>): string | undefined {
+  const trimmed = key.trim();
+  if (trimmed === "") return undefined;
+  if (trimmed.length < 8) {
+    return t("validation.apiKeyTooShort");
+  }
+  return undefined;
+}
+
+function validateBaseUrl(url: string, t: ReturnType<typeof useTranslations<"settings">>): string | undefined {
+  const trimmed = url.trim();
+  if (trimmed === "") return undefined;
+  try {
+    new URL(normalizeBaseUrl(trimmed));
+    return undefined;
+  } catch {
+    return t("validation.invalidUrl");
+  }
+}
+
+interface AIServiceConfigPanelProps {
+  provider: AIServiceProvider;
+  config: AIServiceConfig;
+  onToggle: (provider: AIServiceProvider, enabled: boolean) => void;
+  onApiKeyChange: (provider: AIServiceProvider, apiKey: string) => void;
+  onBaseUrlChange: (provider: AIServiceProvider, baseUrl: string) => void;
+  onClearApiKey: (provider: AIServiceProvider) => void;
+  validationErrors: ValidationErrors;
+}
+
+function AIServiceConfigPanel({
+  provider,
+  config,
+  onToggle,
+  onApiKeyChange,
+  onBaseUrlChange,
+  onClearApiKey,
+  validationErrors,
+}: AIServiceConfigPanelProps) {
+  const t = useTranslations("settings");
+  const serviceConfig = AI_SERVICE_CONFIGS[provider];
+
+  const apiKeyError = validationErrors[`${provider}-apiKey`];
+  const baseUrlError = validationErrors[`${provider}-baseUrl`];
+
+  return (
+    <Flex vertical gap={8} style={{ paddingTop: 12 }}>
+      <Flex align="center" justify="space-between" style={{ marginBottom: 4 }}>
+        <Typography.Text strong style={{ fontSize: 13 }}>
+          {t("aiServiceEnable")}
+        </Typography.Text>
+        <Switch
+          checked={config.enabled}
+          onChange={(checked) => onToggle(provider, checked)}
+          size="small"
+          aria-label={t("aiServiceEnable")}
+        />
+      </Flex>
+      <Input.Password
+        value={config.apiKey}
+        onChange={(e) => onApiKeyChange(provider, e.target.value)}
+        placeholder={t("aiServiceApiKeyPlaceholder")}
+        aria-label={t("aiServiceApiKey")}
+        disabled={!config.enabled}
+        status={apiKeyError ? "error" : undefined}
+        suffix={
+          <Tooltip title={t("clearToken")}>
+            <DeleteOutlined
+              onClick={() => onClearApiKey(provider)}
+              style={{ color: "var(--text-muted)", cursor: "pointer" }}
+              aria-label={t("clearToken")}
+            />
+          </Tooltip>
+        }
+      />
+      {apiKeyError && (
+        <Typography.Text style={{ fontSize: 12, color: "#ff4d4f" }}>
+          {apiKeyError}
+        </Typography.Text>
+      )}
+      <Input
+        value={config.baseUrl}
+        onChange={(e) => onBaseUrlChange(provider, e.target.value)}
+        placeholder={t("aiServiceBaseUrlPlaceholder")}
+        aria-label={t("aiServiceBaseUrl")}
+        disabled={!config.enabled}
+        status={baseUrlError ? "error" : undefined}
+      />
+      {baseUrlError && (
+        <Typography.Text style={{ fontSize: 12, color: "#ff4d4f" }}>
+          {baseUrlError}
+        </Typography.Text>
+      )}
+      <Typography.Text
+        style={{
+          fontSize: 12,
+          display: "block",
+          marginTop: 6,
+          color: "var(--text-muted)",
+        }}
+      >
+        {t(serviceConfig.descKey)}
+      </Typography.Text>
+    </Flex>
+  );
+}
 
 const APP_VERSION = process.env.NEXT_PUBLIC_APP_VERSION ?? "unknown";
 
@@ -51,6 +166,7 @@ export default function SettingsPanel({
   const [draftSettings, setDraftSettings] = useState(settings);
   const [messageApi, contextHolder] = message.useMessage();
   const [storageInfo, setStorageInfo] = useState<{ usage: number; quota: number } | null>(null);
+  const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
 
   useEffect(() => {
     setDraftSettings(settings);
@@ -133,7 +249,7 @@ export default function SettingsPanel({
     }));
   };
 
-  const handleAIServiceToggle = (provider: AIServiceProvider, enabled: boolean) => {
+  const handleAIServiceToggle = useCallback((provider: AIServiceProvider, enabled: boolean) => {
     setDraftSettings((prev) => ({
       ...prev,
       aiServices: {
@@ -144,9 +260,9 @@ export default function SettingsPanel({
         },
       },
     }));
-  };
+  }, []);
 
-  const handleAIServiceApiKeyChange = (provider: AIServiceProvider, apiKey: string) => {
+  const handleAIServiceApiKeyChange = useCallback((provider: AIServiceProvider, apiKey: string) => {
     setDraftSettings((prev) => ({
       ...prev,
       aiServices: {
@@ -157,9 +273,15 @@ export default function SettingsPanel({
         },
       },
     }));
-  };
 
-  const handleAIServiceBaseUrlChange = (provider: AIServiceProvider, baseUrl: string) => {
+    const error = validateApiKey(apiKey, t);
+    setValidationErrors((prev) => ({
+      ...prev,
+      [`${provider}-apiKey`]: error,
+    }));
+  }, [t]);
+
+  const handleAIServiceBaseUrlChange = useCallback((provider: AIServiceProvider, baseUrl: string) => {
     setDraftSettings((prev) => ({
       ...prev,
       aiServices: {
@@ -170,28 +292,62 @@ export default function SettingsPanel({
         },
       },
     }));
-  };
 
-  const handleClearAIServiceApiKey = (provider: AIServiceProvider) => {
-    const next = {
-      ...draftSettings,
+    const error = validateBaseUrl(baseUrl, t);
+    setValidationErrors((prev) => ({
+      ...prev,
+      [`${provider}-baseUrl`]: error,
+    }));
+  }, [t]);
+
+  const handleClearAIServiceApiKey = useCallback((provider: AIServiceProvider) => {
+    setDraftSettings((prev) => ({
+      ...prev,
       aiServices: {
-        ...draftSettings.aiServices,
+        ...prev.aiServices,
         [provider]: {
-          ...draftSettings.aiServices[provider],
+          ...prev.aiServices[provider],
           apiKey: "",
         },
       },
-    };
-    setDraftSettings(next);
-    onSave(next);
+    }));
+    setValidationErrors((prev) => ({
+      ...prev,
+      [`${provider}-apiKey`]: undefined,
+    }));
     messageApi.info(t("aiServiceApiKeyCleared"));
-  };
+  }, [t, messageApi]);
 
   const storagePercent = storageInfo && storageInfo.quota > 0
     ? Math.round((storageInfo.usage / storageInfo.quota) * 100)
     : 0;
   const activeEnvConfig = draftSettings.envs[draftSettings.activeEnv];
+
+  const aiServiceTabs = useMemo(() => {
+    return getAIServiceProviders().map((provider) => ({
+      key: provider,
+      label: t(AI_SERVICE_CONFIGS[provider].labelKey),
+      children: (
+        <AIServiceConfigPanel
+          provider={provider}
+          config={draftSettings.aiServices[provider]}
+          onToggle={handleAIServiceToggle}
+          onApiKeyChange={handleAIServiceApiKeyChange}
+          onBaseUrlChange={handleAIServiceBaseUrlChange}
+          onClearApiKey={handleClearAIServiceApiKey}
+          validationErrors={validationErrors}
+        />
+      ),
+    }));
+  }, [
+    draftSettings.aiServices,
+    validationErrors,
+    handleAIServiceToggle,
+    handleAIServiceApiKeyChange,
+    handleAIServiceBaseUrlChange,
+    handleClearAIServiceApiKey,
+    t,
+  ]);
 
   return (
     <Modal
@@ -462,115 +618,11 @@ export default function SettingsPanel({
             {t("aiServices")}
           </legend>
           <Tabs
-            defaultActiveKey="claude-code"
+            defaultActiveKey={getAIServiceProviders()[0]}
             type="card"
             size="small"
-            items={[
-              {
-                key: "claude-code",
-                label: t("aiServiceClaudeCode"),
-                children: (
-                  <Flex vertical gap={8} style={{ paddingTop: 12 }}>
-                    <Flex align="center" justify="space-between" style={{ marginBottom: 4 }}>
-                      <Typography.Text strong style={{ fontSize: 13 }}>
-                        {t("aiServiceEnable")}
-                      </Typography.Text>
-                      <Switch
-                        checked={draftSettings.aiServices["claude-code"].enabled}
-                        onChange={(checked) => handleAIServiceToggle("claude-code", checked)}
-                        size="small"
-                        aria-label={t("aiServiceEnable")}
-                      />
-                    </Flex>
-                    <Input.Password
-                      value={draftSettings.aiServices["claude-code"].apiKey}
-                      onChange={(e) => handleAIServiceApiKeyChange("claude-code", e.target.value)}
-                      placeholder={t("aiServiceApiKeyPlaceholder")}
-                      aria-label={t("aiServiceApiKey")}
-                      disabled={!draftSettings.aiServices["claude-code"].enabled}
-                      suffix={
-                        <Tooltip title={t("clearToken")}>
-                          <DeleteOutlined
-                            onClick={() => handleClearAIServiceApiKey("claude-code")}
-                            style={{ color: "var(--text-muted)", cursor: "pointer" }}
-                            aria-label={t("clearToken")}
-                          />
-                        </Tooltip>
-                      }
-                    />
-                    <Input
-                      value={draftSettings.aiServices["claude-code"].baseUrl}
-                      onChange={(e) => handleAIServiceBaseUrlChange("claude-code", e.target.value)}
-                      placeholder={t("aiServiceBaseUrlPlaceholder")}
-                      aria-label={t("aiServiceBaseUrl")}
-                      disabled={!draftSettings.aiServices["claude-code"].enabled}
-                    />
-                    <Typography.Text
-                      style={{
-                        fontSize: 12,
-                        display: "block",
-                        marginTop: 6,
-                        color: "var(--text-muted)",
-                      }}
-                    >
-                      {t("aiServiceClaudeCodeDesc")}
-                    </Typography.Text>
-                  </Flex>
-                ),
-              },
-              {
-                key: "deepseek",
-                label: t("aiServiceDeepSeek"),
-                children: (
-                  <Flex vertical gap={8} style={{ paddingTop: 12 }}>
-                    <Flex align="center" justify="space-between" style={{ marginBottom: 4 }}>
-                      <Typography.Text strong style={{ fontSize: 13 }}>
-                        {t("aiServiceEnable")}
-                      </Typography.Text>
-                      <Switch
-                        checked={draftSettings.aiServices["deepseek"].enabled}
-                        onChange={(checked) => handleAIServiceToggle("deepseek", checked)}
-                        size="small"
-                        aria-label={t("aiServiceEnable")}
-                      />
-                    </Flex>
-                    <Input.Password
-                      value={draftSettings.aiServices["deepseek"].apiKey}
-                      onChange={(e) => handleAIServiceApiKeyChange("deepseek", e.target.value)}
-                      placeholder={t("aiServiceApiKeyPlaceholder")}
-                      aria-label={t("aiServiceApiKey")}
-                      disabled={!draftSettings.aiServices["deepseek"].enabled}
-                      suffix={
-                        <Tooltip title={t("clearToken")}>
-                          <DeleteOutlined
-                            onClick={() => handleClearAIServiceApiKey("deepseek")}
-                            style={{ color: "var(--text-muted)", cursor: "pointer" }}
-                            aria-label={t("clearToken")}
-                          />
-                        </Tooltip>
-                      }
-                    />
-                    <Input
-                      value={draftSettings.aiServices["deepseek"].baseUrl}
-                      onChange={(e) => handleAIServiceBaseUrlChange("deepseek", e.target.value)}
-                      placeholder={t("aiServiceBaseUrlPlaceholder")}
-                      aria-label={t("aiServiceBaseUrl")}
-                      disabled={!draftSettings.aiServices["deepseek"].enabled}
-                    />
-                    <Typography.Text
-                      style={{
-                        fontSize: 12,
-                        display: "block",
-                        marginTop: 6,
-                        color: "var(--text-muted)",
-                      }}
-                    >
-                      {t("aiServiceDeepSeekDesc")}
-                    </Typography.Text>
-                  </Flex>
-                ),
-              },
-            ]}
+            items={aiServiceTabs}
+            destroyOnHidden={false}
           />
         </fieldset>
 
