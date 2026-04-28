@@ -97,7 +97,18 @@
     "sessions": "{count} 个对话",
     "storageUsed": "已使用 {used}，共 {quota}",
     "storageUnavailable": "存储信息不可用",
-    "activeEnv": "当前环境"
+    "activeEnv": "当前环境",
+    "aiServices": "AI 服务",
+    "aiServiceClaudeCode": "Claude Code",
+    "aiServiceDeepSeek": "DeepSeek",
+    "aiServiceEnable": "启用 AI 服务",
+    "aiServiceApiKey": "API Key",
+    "aiServiceApiKeyPlaceholder": "输入 API Key",
+    "aiServiceBaseUrl": "Base URL",
+    "aiServiceBaseUrlPlaceholder": "输入 Base URL（可选）",
+    "aiServiceApiKeyCleared": "API Key 已清除。",
+    "aiServiceClaudeCodeDesc": "Claude Code 是 Anthropic 提供的 AI 编程助手。",
+    "aiServiceDeepSeekDesc": "DeepSeek 是强大的中文 AI 模型，默认使用 https://api.deepseek.com。"
   },
   "activity": {
     "title": "活动日志",

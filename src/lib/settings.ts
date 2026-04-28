@@ -1,4 +1,4 @@
-import type { AppSettings, EnvSettings, EnvType } from "@/types/chat";
+import type { AppSettings, EnvSettings, EnvType, AIServiceProvider, AIServiceConfig } from "@/types/chat";
 import { detectEnvFromUrl } from "@/lib/environment";
 
 const STORAGE_KEYS = {
@@ -64,6 +64,23 @@ export function getActiveEnvSettings(settings: AppSettings): EnvSettings {
   return settings.envs[settings.activeEnv];
 }
 
+function createDefaultAIServices(): Record<AIServiceProvider, AIServiceConfig> {
+  return {
+    "claude-code": {
+      provider: "claude-code",
+      apiKey: "",
+      baseUrl: "",
+      enabled: false,
+    },
+    "deepseek": {
+      provider: "deepseek",
+      apiKey: "",
+      baseUrl: "https://api.deepseek.com",
+      enabled: false,
+    },
+  };
+}
+
 function createDefaultSettings(): AppSettings {
   return {
     activeEnv: "local",
@@ -72,6 +89,7 @@ function createDefaultSettings(): AppSettings {
       staging: { baseUrl: "", accessToken: "" },
       prod: { baseUrl: "", accessToken: "" },
     },
+    aiServices: createDefaultAIServices(),
   };
 }
 
@@ -109,10 +127,36 @@ function mergeStoredSettings(base: AppSettings): AppSettings {
   }
 }
 
+function asAIServiceProvider(value: unknown): AIServiceProvider | null {
+  if (value === "claude-code" || value === "deepseek") {
+    return value;
+  }
+  return null;
+}
+
+function mergeAIService(
+  base: AIServiceConfig,
+  patch: Partial<AIServiceConfig> | undefined,
+): AIServiceConfig {
+  if (!patch) return base;
+  const nextApiKey = (patch.apiKey ?? base.apiKey ?? "").trim();
+  const nextBaseUrl = patch.baseUrl !== undefined
+    ? normalizeBaseUrl(patch.baseUrl)
+    : base.baseUrl;
+  const nextEnabled = typeof patch.enabled === "boolean" ? patch.enabled : base.enabled;
+  return {
+    provider: base.provider,
+    apiKey: nextApiKey,
+    baseUrl: nextBaseUrl,
+    enabled: nextEnabled,
+  };
+}
+
 function mergeSettings(base: AppSettings, patch: unknown): AppSettings {
   if (!patch || typeof patch !== "object") return base;
   const input = patch as Partial<AppSettings> & {
     envs?: Partial<Record<EnvType, Partial<EnvSettings>>>;
+    aiServices?: Partial<Record<AIServiceProvider, Partial<AIServiceConfig>>>;
   };
   const activeEnv = asEnvType(input.activeEnv) ?? base.activeEnv;
   return {
@@ -121,6 +165,10 @@ function mergeSettings(base: AppSettings, patch: unknown): AppSettings {
       local: mergeEnv(base.envs.local, input.envs?.local, base.envs.local.baseUrl),
       staging: mergeEnv(base.envs.staging, input.envs?.staging, ""),
       prod: mergeEnv(base.envs.prod, input.envs?.prod, ""),
+    },
+    aiServices: {
+      "claude-code": mergeAIService(base.aiServices["claude-code"], input.aiServices?.["claude-code"]),
+      "deepseek": mergeAIService(base.aiServices["deepseek"], input.aiServices?.["deepseek"]),
     },
   };
 }

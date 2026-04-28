@@ -97,7 +97,18 @@
     "sessions": "{count}개 대화",
     "storageUsed": "{used} / {quota} 사용 중",
     "storageUnavailable": "저장소 정보를 사용할 수 없습니다",
-    "activeEnv": "현재 환경"
+    "activeEnv": "현재 환경",
+    "aiServices": "AI 서비스",
+    "aiServiceClaudeCode": "Claude Code",
+    "aiServiceDeepSeek": "DeepSeek",
+    "aiServiceEnable": "AI 서비스 활성화",
+    "aiServiceApiKey": "API 키",
+    "aiServiceApiKeyPlaceholder": "API 키 입력",
+    "aiServiceBaseUrl": "Base URL",
+    "aiServiceBaseUrlPlaceholder": "Base URL 입력 (선택사항)",
+    "aiServiceApiKeyCleared": "API 키가 삭제되었습니다.",
+    "aiServiceClaudeCodeDesc": "Claude Code는 Anthropic의 AI 프로그래밍 어시스턴트입니다.",
+    "aiServiceDeepSeekDesc": "DeepSeek는 강력한 AI 모델입니다. 기본: https://api.deepseek.com."
   },
   "activity": {
     "title": "활동 피드",

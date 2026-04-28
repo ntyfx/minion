@@ -95,6 +95,15 @@ export interface TokenUsage {
   toolsCalls: number;
 }
 
+export type AIServiceProvider = "claude-code" | "deepseek";
+
+export interface AIServiceConfig {
+  provider: AIServiceProvider;
+  apiKey: string;
+  baseUrl?: string;
+  enabled: boolean;
+}
+
 export interface EnvSettings {
   baseUrl: string;
   accessToken: string;
@@ -103,4 +112,5 @@ export interface EnvSettings {
 export interface AppSettings {
   activeEnv: EnvType;
   envs: Record<EnvType, EnvSettings>;
+  aiServices: Record<AIServiceProvider, AIServiceConfig>;
 }

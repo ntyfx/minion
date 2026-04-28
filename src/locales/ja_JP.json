@@ -97,7 +97,18 @@
     "sessions": "{count} 件の会話",
     "storageUsed": "{used} / {quota} 使用中",
     "storageUnavailable": "ストレージ情報を取得できません",
-    "activeEnv": "現在の環境"
+    "activeEnv": "現在の環境",
+    "aiServices": "AI サービス",
+    "aiServiceClaudeCode": "Claude Code",
+    "aiServiceDeepSeek": "DeepSeek",
+    "aiServiceEnable": "AI サービスを有効化",
+    "aiServiceApiKey": "API キー",
+    "aiServiceApiKeyPlaceholder": "API キーを入力",
+    "aiServiceBaseUrl": "Base URL",
+    "aiServiceBaseUrlPlaceholder": "Base URL を入力（オプション）",
+    "aiServiceApiKeyCleared": "API キーをクリアしました。",
+    "aiServiceClaudeCodeDesc": "Claude Code は Anthropic の AI プログラミングアシスタントです。",
+    "aiServiceDeepSeekDesc": "DeepSeek は強力な AI モデルです。デフォルト: https://api.deepseek.com。"
   },
   "activity": {
     "title": "アクティビティ",

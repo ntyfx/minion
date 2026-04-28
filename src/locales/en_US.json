@@ -97,7 +97,18 @@
     "sessions": "{count} conversations",
     "storageUsed": "Used {used} of {quota}",
     "storageUnavailable": "Storage info unavailable",
-    "activeEnv": "Active environment"
+    "activeEnv": "Active environment",
+    "aiServices": "AI Services",
+    "aiServiceClaudeCode": "Claude Code",
+    "aiServiceDeepSeek": "DeepSeek",
+    "aiServiceEnable": "Enable AI service",
+    "aiServiceApiKey": "API Key",
+    "aiServiceApiKeyPlaceholder": "Enter API Key",
+    "aiServiceBaseUrl": "Base URL",
+    "aiServiceBaseUrlPlaceholder": "Enter Base URL (optional)",
+    "aiServiceApiKeyCleared": "API Key cleared.",
+    "aiServiceClaudeCodeDesc": "Claude Code is an AI programming assistant by Anthropic.",
+    "aiServiceDeepSeekDesc": "DeepSeek is a powerful AI model. Default: https://api.deepseek.com."
   },
   "activity": {
     "title": "Activity Feed",

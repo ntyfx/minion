@@ -44,6 +44,20 @@ describe("SettingsPanel component", () => {
         staging: { baseUrl: "https://staging.example.com", accessToken: "staging-token" },
         prod: { baseUrl: "https://api.example.com", accessToken: "prod-token" },
       },
+      aiServices: {
+        "claude-code": {
+          provider: "claude-code" as const,
+          apiKey: "",
+          baseUrl: "",
+          enabled: false,
+        },
+        "deepseek": {
+          provider: "deepseek" as const,
+          apiKey: "",
+          baseUrl: "https://api.deepseek.com",
+          enabled: false,
+        },
+      },
     },
     onSave: vi.fn(),
     open: true,
@@ -86,6 +100,20 @@ describe("SettingsPanel component", () => {
         local: { baseUrl: "http://localhost:8080", accessToken: "tok123" },
         staging: { baseUrl: "https://staging.example.com", accessToken: "staging-token" },
         prod: { baseUrl: "https://api.example.com", accessToken: "prod-token" },
+      },
+      aiServices: {
+        "claude-code": {
+          provider: "claude-code" as const,
+          apiKey: "",
+          baseUrl: "",
+          enabled: false,
+        },
+        "deepseek": {
+          provider: "deepseek" as const,
+          apiKey: "",
+          baseUrl: "https://api.deepseek.com",
+          enabled: false,
+        },
       },
     });
   });
@@ -132,6 +160,20 @@ describe("SettingsPanel component", () => {
             staging: { baseUrl: "https://staging.example.com", accessToken: "staging-token" },
             prod: { baseUrl: "https://api.example.com", accessToken: "prod-token" },
           },
+          aiServices: {
+            "claude-code": {
+              provider: "claude-code" as const,
+              apiKey: "",
+              baseUrl: "",
+              enabled: false,
+            },
+            "deepseek": {
+              provider: "deepseek" as const,
+              apiKey: "",
+              baseUrl: "https://api.deepseek.com",
+              enabled: false,
+            },
+          },
         }}
       />,
     );
@@ -174,6 +216,20 @@ describe("SettingsPanel component", () => {
             },
             prod: { baseUrl: "https://api.example.com", accessToken: "prod-token" },
           },
+          aiServices: {
+            "claude-code": {
+              provider: "claude-code" as const,
+              apiKey: "",
+              baseUrl: "",
+              enabled: false,
+            },
+            "deepseek": {
+              provider: "deepseek" as const,
+              apiKey: "",
+              baseUrl: "https://api.deepseek.com",
+              enabled: false,
+            },
+          },
         }}
       />,
     );
@@ -199,6 +255,20 @@ describe("SettingsPanel component", () => {
           accessToken: "staging-token",
         },
         prod: { baseUrl: "https://api.example.com", accessToken: "prod-token" },
+      },
+      aiServices: {
+        "claude-code": {
+          provider: "claude-code" as const,
+          apiKey: "",
+          baseUrl: "",
+          enabled: false,
+        },
+        "deepseek": {
+          provider: "deepseek" as const,
+          apiKey: "",
+          baseUrl: "https://api.deepseek.com",
+          enabled: false,
+        },
       },
     });
   });
@@ -288,6 +358,20 @@ describe("SettingsPanel component", () => {
         local: { baseUrl: "http://localhost:8080", accessToken: "" },
         staging: { baseUrl: "https://staging.example.com", accessToken: "staging-token" },
         prod: { baseUrl: "https://api.example.com", accessToken: "prod-token" },
+      },
+      aiServices: {
+        "claude-code": {
+          provider: "claude-code" as const,
+          apiKey: "",
+          baseUrl: "",
+          enabled: false,
+        },
+        "deepseek": {
+          provider: "deepseek" as const,
+          apiKey: "",
+          baseUrl: "https://api.deepseek.com",
+          enabled: false,
+        },
       },
     });
     expect(baseElement.textContent).toContain("settings.tokenCleared");
@@ -389,6 +473,20 @@ describe("formatBytes function", () => {
             local: { baseUrl: "http://localhost:8080", accessToken: "" },
             staging: { baseUrl: "", accessToken: "" },
             prod: { baseUrl: "", accessToken: "" },
+          },
+          aiServices: {
+            "claude-code": {
+              provider: "claude-code" as const,
+              apiKey: "",
+              baseUrl: "",
+              enabled: false,
+            },
+            "deepseek": {
+              provider: "deepseek" as const,
+              apiKey: "",
+              baseUrl: "https://api.deepseek.com",
+              enabled: false,
+            },
           },
         }}
         onSave={vi.fn()}
