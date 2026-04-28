@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Input, Flex, Typography, Alert, Modal, Tooltip, Select, message, Progress, Switch, Divider } from "antd";
+import { Input, Flex, Typography, Alert, Modal, Tooltip, Select, message, Progress, Switch, Tabs } from "antd";
 import {
   SaveOutlined,
   UndoOutlined,
@@ -443,120 +443,135 @@ export default function SettingsPanel({
           </Typography.Text>
         </fieldset>
 
-        <Divider style={{ margin: "12px 0" }}>
-          <Typography.Text style={{ fontSize: 12, color: "var(--text-muted)" }}>
+        <fieldset
+          style={{
+            border: "1px solid var(--border)",
+            borderRadius: 10,
+            padding: 16,
+            margin: 0,
+          }}
+        >
+          <legend
+            style={{
+              fontSize: 13,
+              fontWeight: 600,
+              color: "var(--text-primary)",
+              padding: "0 4px",
+            }}
+          >
             {t("aiServices")}
-          </Typography.Text>
-        </Divider>
-
-        <fieldset
-          style={{
-            border: "1px solid var(--border)",
-            borderRadius: 10,
-            padding: 16,
-            margin: 0,
-          }}
-        >
-          <Flex align="center" justify="space-between" style={{ marginBottom: 12 }}>
-            <Typography.Text strong style={{ fontSize: 13 }}>
-              {t("aiServiceClaudeCode")}
-            </Typography.Text>
-            <Switch
-              checked={draftSettings.aiServices["claude-code"].enabled}
-              onChange={(checked) => handleAIServiceToggle("claude-code", checked)}
-              size="small"
-              aria-label={t("aiServiceEnable")}
-            />
-          </Flex>
-          <Input.Password
-            value={draftSettings.aiServices["claude-code"].apiKey}
-            onChange={(e) => handleAIServiceApiKeyChange("claude-code", e.target.value)}
-            placeholder={t("aiServiceApiKeyPlaceholder")}
-            aria-label={t("aiServiceApiKey")}
-            disabled={!draftSettings.aiServices["claude-code"].enabled}
-            suffix={
-              <Tooltip title={t("clearToken")}>
-                <DeleteOutlined
-                  onClick={() => handleClearAIServiceApiKey("claude-code")}
-                  style={{ color: "var(--text-muted)", cursor: "pointer" }}
-                  aria-label={t("clearToken")}
-                />
-              </Tooltip>
-            }
-            style={{ marginBottom: 8 }}
+          </legend>
+          <Tabs
+            defaultActiveKey="claude-code"
+            type="card"
+            size="small"
+            items={[
+              {
+                key: "claude-code",
+                label: t("aiServiceClaudeCode"),
+                children: (
+                  <Flex vertical gap={8} style={{ paddingTop: 12 }}>
+                    <Flex align="center" justify="space-between" style={{ marginBottom: 4 }}>
+                      <Typography.Text strong style={{ fontSize: 13 }}>
+                        {t("aiServiceEnable")}
+                      </Typography.Text>
+                      <Switch
+                        checked={draftSettings.aiServices["claude-code"].enabled}
+                        onChange={(checked) => handleAIServiceToggle("claude-code", checked)}
+                        size="small"
+                        aria-label={t("aiServiceEnable")}
+                      />
+                    </Flex>
+                    <Input.Password
+                      value={draftSettings.aiServices["claude-code"].apiKey}
+                      onChange={(e) => handleAIServiceApiKeyChange("claude-code", e.target.value)}
+                      placeholder={t("aiServiceApiKeyPlaceholder")}
+                      aria-label={t("aiServiceApiKey")}
+                      disabled={!draftSettings.aiServices["claude-code"].enabled}
+                      suffix={
+                        <Tooltip title={t("clearToken")}>
+                          <DeleteOutlined
+                            onClick={() => handleClearAIServiceApiKey("claude-code")}
+                            style={{ color: "var(--text-muted)", cursor: "pointer" }}
+                            aria-label={t("clearToken")}
+                          />
+                        </Tooltip>
+                      }
+                    />
+                    <Input
+                      value={draftSettings.aiServices["claude-code"].baseUrl}
+                      onChange={(e) => handleAIServiceBaseUrlChange("claude-code", e.target.value)}
+                      placeholder={t("aiServiceBaseUrlPlaceholder")}
+                      aria-label={t("aiServiceBaseUrl")}
+                      disabled={!draftSettings.aiServices["claude-code"].enabled}
+                    />
+                    <Typography.Text
+                      style={{
+                        fontSize: 12,
+                        display: "block",
+                        marginTop: 6,
+                        color: "var(--text-muted)",
+                      }}
+                    >
+                      {t("aiServiceClaudeCodeDesc")}
+                    </Typography.Text>
+                  </Flex>
+                ),
+              },
+              {
+                key: "deepseek",
+                label: t("aiServiceDeepSeek"),
+                children: (
+                  <Flex vertical gap={8} style={{ paddingTop: 12 }}>
+                    <Flex align="center" justify="space-between" style={{ marginBottom: 4 }}>
+                      <Typography.Text strong style={{ fontSize: 13 }}>
+                        {t("aiServiceEnable")}
+                      </Typography.Text>
+                      <Switch
+                        checked={draftSettings.aiServices["deepseek"].enabled}
+                        onChange={(checked) => handleAIServiceToggle("deepseek", checked)}
+                        size="small"
+                        aria-label={t("aiServiceEnable")}
+                      />
+                    </Flex>
+                    <Input.Password
+                      value={draftSettings.aiServices["deepseek"].apiKey}
+                      onChange={(e) => handleAIServiceApiKeyChange("deepseek", e.target.value)}
+                      placeholder={t("aiServiceApiKeyPlaceholder")}
+                      aria-label={t("aiServiceApiKey")}
+                      disabled={!draftSettings.aiServices["deepseek"].enabled}
+                      suffix={
+                        <Tooltip title={t("clearToken")}>
+                          <DeleteOutlined
+                            onClick={() => handleClearAIServiceApiKey("deepseek")}
+                            style={{ color: "var(--text-muted)", cursor: "pointer" }}
+                            aria-label={t("clearToken")}
+                          />
+                        </Tooltip>
+                      }
+                    />
+                    <Input
+                      value={draftSettings.aiServices["deepseek"].baseUrl}
+                      onChange={(e) => handleAIServiceBaseUrlChange("deepseek", e.target.value)}
+                      placeholder={t("aiServiceBaseUrlPlaceholder")}
+                      aria-label={t("aiServiceBaseUrl")}
+                      disabled={!draftSettings.aiServices["deepseek"].enabled}
+                    />
+                    <Typography.Text
+                      style={{
+                        fontSize: 12,
+                        display: "block",
+                        marginTop: 6,
+                        color: "var(--text-muted)",
+                      }}
+                    >
+                      {t("aiServiceDeepSeekDesc")}
+                    </Typography.Text>
+                  </Flex>
+                ),
+              },
+            ]}
           />
-          <Input
-            value={draftSettings.aiServices["claude-code"].baseUrl}
-            onChange={(e) => handleAIServiceBaseUrlChange("claude-code", e.target.value)}
-            placeholder={t("aiServiceBaseUrlPlaceholder")}
-            aria-label={t("aiServiceBaseUrl")}
-            disabled={!draftSettings.aiServices["claude-code"].enabled}
-          />
-          <Typography.Text
-            style={{
-              fontSize: 12,
-              display: "block",
-              marginTop: 6,
-              color: "var(--text-muted)",
-            }}
-          >
-            {t("aiServiceClaudeCodeDesc")}
-          </Typography.Text>
-        </fieldset>
-
-        <fieldset
-          style={{
-            border: "1px solid var(--border)",
-            borderRadius: 10,
-            padding: 16,
-            margin: 0,
-          }}
-        >
-          <Flex align="center" justify="space-between" style={{ marginBottom: 12 }}>
-            <Typography.Text strong style={{ fontSize: 13 }}>
-              {t("aiServiceDeepSeek")}
-            </Typography.Text>
-            <Switch
-              checked={draftSettings.aiServices["deepseek"].enabled}
-              onChange={(checked) => handleAIServiceToggle("deepseek", checked)}
-              size="small"
-              aria-label={t("aiServiceEnable")}
-            />
-          </Flex>
-          <Input.Password
-            value={draftSettings.aiServices["deepseek"].apiKey}
-            onChange={(e) => handleAIServiceApiKeyChange("deepseek", e.target.value)}
-            placeholder={t("aiServiceApiKeyPlaceholder")}
-            aria-label={t("aiServiceApiKey")}
-            disabled={!draftSettings.aiServices["deepseek"].enabled}
-            suffix={
-              <Tooltip title={t("clearToken")}>
-                <DeleteOutlined
-                  onClick={() => handleClearAIServiceApiKey("deepseek")}
-                  style={{ color: "var(--text-muted)", cursor: "pointer" }}
-                  aria-label={t("clearToken")}
-                />
-              </Tooltip>
-            }
-            style={{ marginBottom: 8 }}
-          />
-          <Input
-            value={draftSettings.aiServices["deepseek"].baseUrl}
-            onChange={(e) => handleAIServiceBaseUrlChange("deepseek", e.target.value)}
-            placeholder={t("aiServiceBaseUrlPlaceholder")}
-            aria-label={t("aiServiceBaseUrl")}
-            disabled={!draftSettings.aiServices["deepseek"].enabled}
-          />
-          <Typography.Text
-            style={{
-              fontSize: 12,
-              display: "block",
-              marginTop: 6,
-              color: "var(--text-muted)",
-            }}
-          >
-            {t("aiServiceDeepSeekDesc")}
-          </Typography.Text>
         </fieldset>
 
         <fieldset
