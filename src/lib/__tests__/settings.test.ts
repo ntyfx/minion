@@ -6,6 +6,7 @@ import {
   saveSettings,
   clearToken,
 } from "@/lib/settings";
+import { createDefaultAIServices } from "@/lib/ai-services";
 
 beforeEach(() => {
   localStorage.clear();
@@ -114,6 +115,7 @@ describe("loadSettings / saveSettings", () => {
         staging: { baseUrl: "https://api.test.com", accessToken: "tok_123" },
         prod: { baseUrl: "https://prod.example.com", accessToken: "prod_tok" },
       },
+      aiServices: createDefaultAIServices(),
     });
     const loaded = loadSettings();
     expect(loaded.activeEnv).toBe("staging");
@@ -139,6 +141,7 @@ describe("loadSettings / saveSettings", () => {
         staging: { baseUrl: "", accessToken: "" },
         prod: { baseUrl: "", accessToken: "" },
       },
+      aiServices: createDefaultAIServices(),
     });
     const loaded = loadSettings();
     expect(loaded.envs.local.baseUrl).toBe("http://example.com");
@@ -194,6 +197,7 @@ describe("clearToken", () => {
         staging: { baseUrl: "http://staging.local", accessToken: "secret" },
         prod: { baseUrl: "http://prod.local", accessToken: "prod-token" },
       },
+      aiServices: createDefaultAIServices(),
     });
     clearToken();
     const loaded = loadSettings();

@@ -484,7 +484,7 @@ describe("SettingsPanel component", () => {
     expect(claudeCodeSwitch.getAttribute("aria-checked")).toBe("false");
 
     act(() => {
-      claudeCodeSwitch.click();
+      fireEvent.click(claudeCodeSwitch);
     });
 
     expect(claudeCodeSwitch.getAttribute("aria-checked")).toBe("true");
@@ -589,7 +589,7 @@ describe("SettingsPanel component", () => {
     expect(clearIcons.length).toBeGreaterThan(0);
 
     act(() => {
-      clearIcons[1].click();
+      fireEvent.click(clearIcons[1]);
     });
 
     expect(claudeCodeInput.value).toBe("");
@@ -631,7 +631,7 @@ describe("SettingsPanel component", () => {
     ) as NodeListOf<HTMLInputElement>;
 
     act(() => {
-      switches[0].click();
+      fireEvent.click(switches[0]);
     });
     fireEvent.change(apiKeyInputs[0], { target: { value: "sk-new-key-12345678" } });
     fireEvent.change(baseUrlInputs[0], { target: { value: "https://custom.example.com" } });

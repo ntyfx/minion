@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { getCurrentEnv, isSessionEnvMismatch } from "@/lib/env-routing";
 import type { AppSettings } from "@/types/chat";
+import { createDefaultAIServices } from "@/lib/ai-services";
 
 function createSettings(activeEnv: AppSettings["activeEnv"], baseUrl: string): AppSettings {
   return {
@@ -10,6 +11,7 @@ function createSettings(activeEnv: AppSettings["activeEnv"], baseUrl: string): A
       staging: { baseUrl, accessToken: "staging-token" },
       prod: { baseUrl: "https://minion.example.com", accessToken: "prod-token" },
     },
+    aiServices: createDefaultAIServices(),
   };
 }
 
