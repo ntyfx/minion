@@ -109,6 +109,8 @@
     "aiServiceApiKeyCleared": "API 키가 삭제되었습니다.",
     "aiServiceClaudeCodeDesc": "Claude Code는 Anthropic의 AI 프로그래밍 어시스턴트입니다.",
     "aiServiceDeepSeekDesc": "DeepSeek는 강력한 AI 모델입니다. 기본: https://api.deepseek.com.",
+    "aiServiceExpand": "확장",
+    "aiServiceCollapse": "접기",
     "validation": {
       "apiKeyTooShort": "API 키가 너무 짧습니다",
       "invalidUrl": "잘못된 URL 형식입니다"

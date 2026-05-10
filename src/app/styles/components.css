@@ -197,3 +197,41 @@
   background: var(--accent-subtle);
   color: var(--accent-text);
 }
+
+/* ── AI Service card ── */
+
+.ai-service-card {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-elevated);
+  padding: 12px 14px;
+  transition: border-color var(--transition-fast), background var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.ai-service-card.is-enabled {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent-subtle) 60%, var(--bg-elevated));
+  box-shadow: 0 0 0 1px var(--accent-subtle);
+}
+
+.ai-service-desc {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.ai-service-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--border);
+  transition: border-color var(--transition-fast);
+}
+
+.ai-service-card.is-enabled .ai-service-card-body {
+  border-top-color: color-mix(in srgb, var(--accent) 28%, transparent);
+}
