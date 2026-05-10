@@ -109,6 +109,8 @@
     "aiServiceApiKeyCleared": "API Key cleared.",
     "aiServiceClaudeCodeDesc": "Claude Code is an AI programming assistant by Anthropic.",
     "aiServiceDeepSeekDesc": "DeepSeek is a powerful AI model. Default: https://api.deepseek.com.",
+    "aiServiceExpand": "Expand",
+    "aiServiceCollapse": "Collapse",
     "validation": {
       "apiKeyTooShort": "API Key is too short",
       "invalidUrl": "Invalid URL format"

@@ -461,13 +461,75 @@ describe("SettingsPanel component", () => {
     expect(baseElement.textContent).toContain("settings.storageUsed");
   });
 
-  it("renders AI Services section with Tabs", async () => {
+  it("renders AI Services section as stacked cards", async () => {
     const SettingsPanel = (await import("@/components/settings-panel")).default;
     const { baseElement } = render(<SettingsPanel {...defaultProps} />);
 
     expect(baseElement.textContent).toContain("settings.aiServices");
     expect(baseElement.textContent).toContain("settings.aiServiceClaudeCode");
     expect(baseElement.textContent).toContain("settings.aiServiceDeepSeek");
+
+    const cards = baseElement.querySelectorAll(".ai-service-card");
+    expect(cards.length).toBe(2);
+
+    const avatars = baseElement.querySelectorAll(".ant-avatar");
+    expect(avatars.length).toBe(2);
+    expect(avatars[0].textContent).toBe("C");
+    expect(avatars[1].textContent).toBe("D");
+  });
+
+  it("does not mark any AI service card as enabled when all are disabled", async () => {
+    const SettingsPanel = (await import("@/components/settings-panel")).default;
+    const { baseElement } = render(<SettingsPanel {...defaultProps} />);
+
+    const enabledCards = baseElement.querySelectorAll(".ai-service-card.is-enabled");
+    expect(enabledCards.length).toBe(0);
+  });
+
+  it("marks the AI service card as enabled when its switch is on", async () => {
+    const SettingsPanel = (await import("@/components/settings-panel")).default;
+    const { baseElement } = render(
+      <SettingsPanel
+        {...defaultProps}
+        settings={{
+          ...defaultProps.settings,
+          aiServices: {
+            "claude-code": {
+              provider: "claude-code" as const,
+              apiKey: "sk-existing-12345678",
+              baseUrl: "",
+              enabled: true,
+            },
+            "deepseek": {
+              provider: "deepseek" as const,
+              apiKey: "",
+              baseUrl: "https://api.deepseek.com",
+              enabled: false,
+            },
+          },
+        }}
+      />,
+    );
+
+    const cards = baseElement.querySelectorAll(".ai-service-card");
+    expect(cards[0].classList.contains("is-enabled")).toBe(true);
+    expect(cards[1].classList.contains("is-enabled")).toBe(false);
+  });
+
+  it("toggles the is-enabled card class when the switch is flipped", async () => {
+    const SettingsPanel = (await import("@/components/settings-panel")).default;
+    const { baseElement } = render(<SettingsPanel {...defaultProps} />);
+
+    const cards = baseElement.querySelectorAll(".ai-service-card");
+    expect(cards[0].classList.contains("is-enabled")).toBe(false);
+
+    const switches = baseElement.querySelectorAll('button[role="switch"]');
+    act(() => {
+      fireEvent.click(switches[0]);
+    });
+
+    const cardsAfter = baseElement.querySelectorAll(".ai-service-card");
+    expect(cardsAfter[0].classList.contains("is-enabled")).toBe(true);
   });
 
   it("toggles AI service enabled state", async () => {
@@ -503,6 +565,16 @@ describe("SettingsPanel component", () => {
     const SettingsPanel = (await import("@/components/settings-panel")).default;
     const { baseElement } = render(<SettingsPanel {...defaultProps} />);
 
+    // Default state: services disabled → cards collapsed → inputs not rendered.
+    // Expand the first card via its chevron before editing.
+    const chevrons = baseElement.querySelectorAll<HTMLButtonElement>(
+      '.ai-service-collapse-btn',
+    );
+    expect(chevrons.length).toBe(2);
+    act(() => {
+      fireEvent.click(chevrons[0]);
+    });
+
     const inputs = baseElement.querySelectorAll(
       'input[aria-label="settings.aiServiceApiKey"]',
     ) as NodeListOf<HTMLInputElement>;
@@ -537,6 +609,14 @@ describe("SettingsPanel component", () => {
         }}
       />,
     );
+
+    // Service disabled → card collapsed; expand first to access the input.
+    const chevrons = baseElement.querySelectorAll<HTMLButtonElement>(
+      '.ai-service-collapse-btn',
+    );
+    act(() => {
+      fireEvent.click(chevrons[0]);
+    });
 
     const inputs = baseElement.querySelectorAll(
       'input[aria-label="settings.aiServiceBaseUrl"]',
@@ -602,6 +682,14 @@ describe("SettingsPanel component", () => {
     const SettingsPanel = (await import("@/components/settings-panel")).default;
     const { baseElement } = render(<SettingsPanel {...defaultProps} />);
 
+    // Inputs are only mounted once the user expands the disabled card.
+    const chevrons = baseElement.querySelectorAll<HTMLButtonElement>(
+      '.ai-service-collapse-btn',
+    );
+    act(() => {
+      fireEvent.click(chevrons[0]);
+    });
+
     const apiKeyInputs = baseElement.querySelectorAll(
       'input[aria-label="settings.aiServiceApiKey"]',
     ) as NodeListOf<HTMLInputElement>;
@@ -623,6 +711,11 @@ describe("SettingsPanel component", () => {
     );
 
     const switches = baseElement.querySelectorAll('button[role="switch"]');
+    act(() => {
+      fireEvent.click(switches[0]);
+    });
+
+    // After enabling, the card auto-expands and inputs become available.
     const apiKeyInputs = baseElement.querySelectorAll(
       'input[aria-label="settings.aiServiceApiKey"]',
     ) as NodeListOf<HTMLInputElement>;
@@ -630,9 +723,6 @@ describe("SettingsPanel component", () => {
       'input[aria-label="settings.aiServiceBaseUrl"]',
     ) as NodeListOf<HTMLInputElement>;
 
-    act(() => {
-      fireEvent.click(switches[0]);
-    });
     fireEvent.change(apiKeyInputs[0], { target: { value: "sk-new-key-12345678" } });
     fireEvent.change(baseUrlInputs[0], { target: { value: "https://custom.example.com" } });
 
@@ -696,6 +786,148 @@ describe("SettingsPanel component", () => {
     expect(savedSettings.aiServices["deepseek"].enabled).toBe(false);
     expect(savedSettings.aiServices["deepseek"].apiKey).toBe("sk-deepseek-5678");
     expect(savedSettings.aiServices["deepseek"].baseUrl).toBe("https://api.deepseek.com");
+  });
+
+  it("collapses disabled AI service cards by default", async () => {
+    const SettingsPanel = (await import("@/components/settings-panel")).default;
+    const { baseElement } = render(<SettingsPanel {...defaultProps} />);
+
+    const apiKeyInputs = baseElement.querySelectorAll(
+      'input[aria-label="settings.aiServiceApiKey"]',
+    );
+    expect(apiKeyInputs.length).toBe(0);
+
+    const cards = baseElement.querySelectorAll(".ai-service-card");
+    cards.forEach((card) => {
+      expect(card.classList.contains("is-expanded")).toBe(false);
+    });
+  });
+
+  it("expands enabled AI service cards by default", async () => {
+    const SettingsPanel = (await import("@/components/settings-panel")).default;
+    const { baseElement } = render(
+      <SettingsPanel
+        {...defaultProps}
+        settings={{
+          ...defaultProps.settings,
+          aiServices: {
+            "claude-code": {
+              provider: "claude-code" as const,
+              apiKey: "sk-claude-1234",
+              baseUrl: "",
+              enabled: true,
+            },
+            "deepseek": {
+              provider: "deepseek" as const,
+              apiKey: "",
+              baseUrl: "https://api.deepseek.com",
+              enabled: false,
+            },
+          },
+        }}
+      />,
+    );
+
+    const cards = baseElement.querySelectorAll(".ai-service-card");
+    expect(cards[0].classList.contains("is-expanded")).toBe(true);
+    expect(cards[1].classList.contains("is-expanded")).toBe(false);
+
+    const apiKeyInputs = baseElement.querySelectorAll(
+      'input[aria-label="settings.aiServiceApiKey"]',
+    );
+    expect(apiKeyInputs.length).toBe(1);
+  });
+
+  it("toggles card body via the collapse chevron", async () => {
+    const SettingsPanel = (await import("@/components/settings-panel")).default;
+    const { baseElement } = render(<SettingsPanel {...defaultProps} />);
+
+    const chevrons = baseElement.querySelectorAll<HTMLButtonElement>(
+      '.ai-service-collapse-btn',
+    );
+    expect(chevrons.length).toBe(2);
+    expect(chevrons[0].getAttribute("aria-expanded")).toBe("false");
+
+    act(() => {
+      fireEvent.click(chevrons[0]);
+    });
+
+    expect(chevrons[0].getAttribute("aria-expanded")).toBe("true");
+    let inputs = baseElement.querySelectorAll(
+      'input[aria-label="settings.aiServiceApiKey"]',
+    );
+    expect(inputs.length).toBe(1);
+
+    act(() => {
+      fireEvent.click(chevrons[0]);
+    });
+
+    expect(chevrons[0].getAttribute("aria-expanded")).toBe("false");
+    inputs = baseElement.querySelectorAll(
+      'input[aria-label="settings.aiServiceApiKey"]',
+    );
+    expect(inputs.length).toBe(0);
+  });
+
+  it("auto-expands a card when its switch is turned on", async () => {
+    const SettingsPanel = (await import("@/components/settings-panel")).default;
+    const { baseElement } = render(<SettingsPanel {...defaultProps} />);
+
+    const cardsBefore = baseElement.querySelectorAll(".ai-service-card");
+    expect(cardsBefore[0].classList.contains("is-expanded")).toBe(false);
+
+    const switches = baseElement.querySelectorAll('button[role="switch"]');
+    act(() => {
+      fireEvent.click(switches[0]);
+    });
+
+    const cardsAfter = baseElement.querySelectorAll(".ai-service-card");
+    expect(cardsAfter[0].classList.contains("is-expanded")).toBe(true);
+    const apiKeyInputs = baseElement.querySelectorAll(
+      'input[aria-label="settings.aiServiceApiKey"]',
+    );
+    expect(apiKeyInputs.length).toBe(1);
+  });
+
+  it("keeps the collapse state independent when the switch is turned off", async () => {
+    const SettingsPanel = (await import("@/components/settings-panel")).default;
+    const { baseElement } = render(
+      <SettingsPanel
+        {...defaultProps}
+        settings={{
+          ...defaultProps.settings,
+          aiServices: {
+            "claude-code": {
+              provider: "claude-code" as const,
+              apiKey: "sk-existing-12345678",
+              baseUrl: "",
+              enabled: true,
+            },
+            "deepseek": {
+              provider: "deepseek" as const,
+              apiKey: "",
+              baseUrl: "https://api.deepseek.com",
+              enabled: false,
+            },
+          },
+        }}
+      />,
+    );
+
+    // Card starts expanded because it's enabled.
+    const cards = baseElement.querySelectorAll(".ai-service-card");
+    expect(cards[0].classList.contains("is-expanded")).toBe(true);
+
+    // Turning the switch off keeps the card expanded so the user can still
+    // see the values they were editing.
+    const switches = baseElement.querySelectorAll('button[role="switch"]');
+    act(() => {
+      fireEvent.click(switches[0]);
+    });
+
+    const cardsAfter = baseElement.querySelectorAll(".ai-service-card");
+    expect(cardsAfter[0].classList.contains("is-enabled")).toBe(false);
+    expect(cardsAfter[0].classList.contains("is-expanded")).toBe(true);
   });
 });
 

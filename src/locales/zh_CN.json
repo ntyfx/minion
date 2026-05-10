@@ -109,6 +109,8 @@
     "aiServiceApiKeyCleared": "API Key 已清除。",
     "aiServiceClaudeCodeDesc": "Claude Code 是 Anthropic 提供的 AI 编程助手。",
     "aiServiceDeepSeekDesc": "DeepSeek 是强大的中文 AI 模型，默认使用 https://api.deepseek.com。",
+    "aiServiceExpand": "展开",
+    "aiServiceCollapse": "收起",
     "validation": {
       "apiKeyTooShort": "API Key 长度太短",
       "invalidUrl": "无效的 URL 格式"
