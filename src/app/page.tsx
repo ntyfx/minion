@@ -108,6 +108,8 @@ export default function Home() {
       messageApi.warning(t("missingToken"));
       setSettingsOpen(true);
     },
+    onStreamComplete: () => {
+    },
   });
 
   const {
@@ -387,11 +389,9 @@ export default function Home() {
       <SequencePanel
         open={sequencesOpen}
         onClose={() => setSequencesOpen(false)}
-        onRun={(messages) => {
-          if (messages.length > 0) {
-            handleSend(messages[0]);
-          }
-        }}
+        isStreaming={isStreaming}
+        onSendMessage={handleSend}
+        onStopStreaming={handleStop}
       />
 
       <BookmarkPanel

@@ -24,6 +24,7 @@ interface UseStreamingOptions {
   setActiveSessionId: (id: string) => void;
   updateSession: (id: string, updater: (s: Session) => Session) => void;
   onMissingToken: () => void;
+  onStreamComplete?: () => void;
 }
 
 export function useStreaming({
@@ -34,6 +35,7 @@ export function useStreaming({
   setActiveSessionId,
   updateSession,
   onMissingToken,
+  onStreamComplete,
 }: UseStreamingOptions) {
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamingContent, setStreamingContent] = useState("");
@@ -258,6 +260,7 @@ export function useStreaming({
         setIsStreaming(false);
         setStreamingContent("");
         setReasoningContent("");
+        onStreamComplete?.();
       }
     });
 

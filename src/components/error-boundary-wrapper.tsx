@@ -10,10 +10,13 @@ interface ErrorFallbackProps {
 }
 
 function ErrorFallback({ message, buttonText, compact }: ErrorFallbackProps) {
+  const safeMessage = message ?? "Something went wrong";
+  const safeButtonText = buttonText ?? "Reload page";
+
   if (compact) {
     return (
       <div style={{ padding: 16, color: "var(--text-secondary)" }}>
-        {message}
+        {safeMessage}
       </div>
     );
   }
@@ -22,14 +25,14 @@ function ErrorFallback({ message, buttonText, compact }: ErrorFallbackProps) {
     <div className="flex items-center justify-center" style={{ height: "100%", padding: 40 }}>
       <div style={{ textAlign: "center" }}>
         <p style={{ color: "var(--text-secondary)", marginBottom: 16 }}>
-          {message}
+          {safeMessage}
         </p>
         <button
           className="icon-button"
           onClick={() => window.location.reload()}
           style={{ padding: "8px 16px", width: "auto" }}
         >
-          {buttonText}
+          {safeButtonText}
         </button>
       </div>
     </div>
@@ -45,8 +48,16 @@ function SectionErrorBoundary({ children, section }: SectionErrorBoundaryProps) 
   const t = useTranslations("errorBoundary");
 
   const isCompact = section === "sidebar";
-  const message = t(`${section}.message`);
-  const buttonText = t(`${section}.retry`);
+  let message: string;
+  let buttonText: string;
+
+  try {
+    message = t(`${section}.message`);
+    buttonText = t(`${section}.retry`);
+  } catch {
+    message = "Something went wrong";
+    buttonText = "Reload page";
+  }
 
   return (
     <ErrorBoundary

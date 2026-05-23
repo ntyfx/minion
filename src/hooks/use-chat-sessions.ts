@@ -43,7 +43,7 @@ export function useChatSessions(currentEnv?: EnvType) {
       setActiveSessionId(activeId);
       setReady(true);
     })();
-  }, [envRef]);
+  }, [currentEnv]);
 
   const activeSession =
     sessions.find((s) => s.id === activeSessionId) ?? null;
